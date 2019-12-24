@@ -5,77 +5,76 @@ using System.Linq;
 namespace Logic
 {
 
+	public class UserToken
+	{
+
+
+
+	}
+
+	public class TokenProvider
+	{
+
+
+
+	}
+
     public class User : Entity
     {
 
     }
 
-    public class EntityAttribute : IEquatable <EntityAttribute>
-	{
+    public class EntityAttribute : IEquatable<EntityAttribute>
+    {
 
-		public bool Equals ( EntityAttribute other )
-		{
-			if ( ReferenceEquals ( null , other ) )
-			{
-				return false ;
-			}
+        public bool Equals(EntityAttribute other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
 
-			if ( ReferenceEquals ( this , other ) )
-			{
-				return true ;
-			}
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
 
-			return Guid . Equals ( other . Guid ) ;
-		}
+            return Guid.Equals(other.Guid);
+        }
 
-		public override bool Equals ( object obj )
-		{
-			if ( ReferenceEquals ( null , obj ) )
-			{
-				return false ;
-			}
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntityAttribute other && Equals(other);
+        }
 
-			if ( ReferenceEquals ( this , obj ) )
-			{
-				return true ;
-			}
+        public override int GetHashCode()
+        {
+            return Guid.GetHashCode();
+        }
 
-			if ( obj . GetType ( ) != this . GetType ( ) )
-			{
-				return false ;
-			}
+        public static bool operator ==(EntityAttribute left, EntityAttribute right) { return Equals(left, right); }
 
-			return Equals ( ( EntityAttribute ) obj ) ;
-		}
+        public static bool operator !=(EntityAttribute left, EntityAttribute right) { return !Equals(left, right); }
 
-		public override int GetHashCode ( )
-		{
-			return Guid . GetHashCode ( ) ;
-		}
-
-		public static bool operator == ( EntityAttribute left , EntityAttribute right ) { return Equals ( left , right ) ; }
-
-		public static bool operator != ( EntityAttribute left , EntityAttribute right ) { return ! Equals ( left , right ) ; }
-
-		public Guid Guid { get ; set ; }
+        public Guid Guid { get; set; }
 
         public string Name { get; set; }
 
-        public PermissionGroup Permissions { get; set; }
+        public PermissionGroup ReadPermissions { get; set; }
 
         public Entity Owner { get; set; }
 
         public string Value { get; set; }
 
-		public bool CanAccess ( Entity target )
-		{
-			if ( target == null )
-			{
-				throw new ArgumentNullException ( nameof ( target ) ) ;
-			}
+        public AccessType Access(Entity target)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
 
-			return Permissions . IsAllowedToAccess ( target ) ;
-		}
+            return ReadPermissions.Access(target);
+        }
 
     }
 
@@ -86,9 +85,7 @@ namespace Logic
 
         public HashSet<EntityAttribute> Attributes { get; set; }
 
-        public bool Contain(Entity entity) { return IsMember(entity, new HashSet<Entity>()); }
-
-        protected virtual bool IsMember(Entity entity, HashSet<Entity> checkedEntities)
+        public virtual bool Contain(Entity entity, HashSet<Entity> checkedEntities = null)
         {
             if (checkedEntities.Contains(this))
             {
@@ -125,8 +122,8 @@ namespace Logic
                 return true;
             }
 
-            return obj.GetType() == GetType() && Equals((Entity)obj) ;
-		}
+            return obj.GetType() == GetType() && Equals((Entity)obj);
+        }
 
         public override int GetHashCode() { return Guid.GetHashCode(); }
 
@@ -142,23 +139,34 @@ namespace Logic
 
         public HashSet<Entity> Members { get; set; }
 
-        protected override bool IsMember(Entity entity, HashSet<Entity> checkedEntities)
+        public override bool Contain(Entity entity, HashSet<Entity> checkedEntities = null)
         {
-            if (base.IsMember(entity, checkedEntities))
+            checkedEntities = checkedEntities ?? new HashSet<Entity>();
+
+            if (checkedEntities.Contains(this))
             {
-                return true;
-            }
-            else
-			{
-				foreach ( Entity member in Members.Except(checkedEntities) )
-				{
-					member . IsMember ( entity , checkedEntities ) ;
-				}
-              
-                               
+                return base.Contain(entity, checkedEntities);
             }
 
-            return false;
+            else
+            {
+                if (base.Contain(entity, checkedEntities))
+                {
+                    return true;
+                }
+                else
+                {
+                    foreach (Entity member in Members.Except(checkedEntities))
+                    {
+                        if (member.Contain(entity, checkedEntities))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
         }
 
     }
@@ -172,10 +180,27 @@ namespace Logic
 
     }
 
+    public enum PermissionType
+    {
+        Read,
+        Write,
+    }
+
+    public enum AccessType
+    {
+
+        ReadWrite,
+        Read,
+        None,
+
+    }
+
     public class Permission
     {
 
         public PermissionStatus Status { get; set; }
+
+        public PermissionType Type { get; set; }
 
         public Entity Target { get; set; }
 
@@ -185,33 +210,85 @@ namespace Logic
     {
         public HashSet<Permission> Permissions { get; set; }
 
-        public bool IsAllowedToAccess(Entity entity)
+        public AccessType Access(Entity entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            bool result = false;
+            bool? write = null;
+            bool? read = null;
 
-			List <Permission> affectedPermission= Permissions . Where ( ( perm ) => perm . Target . Contain ( entity ) ) .ToList();
+            List<Permission> affectedPermission = Permissions.Where((perm) => perm.Target.Contain(entity)).ToList();
 
             foreach (Permission permission in affectedPermission)
             {
-                    switch (permission.Status)
-                    {
-                        case PermissionStatus.Allow:
+                switch (permission.Status)
+                {
+                    case PermissionStatus.Allow:
+                        {
+                            switch (permission.Type)
                             {
-                                result = true;
-                                break;
+                                case PermissionType.Read:
+                                    {
+                                        if (read != false)
+                                        {
+                                            read = true;
+                                        }
+                                        break;
+                                    }
+                                case PermissionType.Write:
+                                    {
+                                        if (write != false)
+                                        {
+                                            write = true;
+                                        }
+                                        break;
+                                    }
                             }
-                        case PermissionStatus.Deny:
+                            break;
+                        }
+                    case PermissionStatus.Deny:
+                        {
+                            switch (permission.Type)
                             {
-                                return false;
+                                case PermissionType.Read:
+                                    {
+
+                                        read = false;
+                                        break;
+                                    }
+                                case PermissionType.Write:
+                                    {
+                                        write = false;
+                                        break;
+                                    }
                             }
-                    }
+                            break;
+                        }
+                }
             }
-            return result;
+
+            bool writeResult = write ?? false;
+            bool readResult = read ?? false;
+
+            if (readResult)
+            {
+                if (writeResult)
+                {
+                    return AccessType.ReadWrite;
+                }
+                else
+                {
+                    return AccessType.Read;
+                }
+            }
+            else
+            {
+                return AccessType.None;
+            }
+
         }
     }
 
