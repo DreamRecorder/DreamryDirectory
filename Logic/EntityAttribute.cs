@@ -3,7 +3,10 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+using DreamRecorder . Directory . Logic . Entities ;
+using DreamRecorder . Directory . Logic . Permissions ;
+
+namespace DreamRecorder . Directory . Logic
 {
 
 	public class EntityAttribute : IEquatable<EntityAttribute>
@@ -42,7 +45,7 @@ namespace Logic
 
 		public string Name { get; set; }
 
-		public PermissionGroup ReadPermissions { get; set; }
+		public PermissionGroup Permissions { get; set; }
 
 		public Entity Owner { get; set; }
 
@@ -55,7 +58,7 @@ namespace Logic
 				throw new ArgumentNullException(nameof(target));
 			}
 
-			return ReadPermissions.Access(target);
+			return Permissions.Access(target);
 		}
 
 	}

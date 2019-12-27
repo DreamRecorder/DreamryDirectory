@@ -3,13 +3,11 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+namespace DreamRecorder . Directory . Logic . Entities
 {
 
-	public class AccessToken : Token
+	public class User : Entity
 	{
-
-		public Entity Target { get; set; }
 
 	}
 

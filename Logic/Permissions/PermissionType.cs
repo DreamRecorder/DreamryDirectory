@@ -3,7 +3,7 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+namespace DreamRecorder . Directory . Logic . Permissions
 {
 
 	public enum PermissionType

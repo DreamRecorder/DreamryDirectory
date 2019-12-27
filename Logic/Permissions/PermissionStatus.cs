@@ -3,11 +3,15 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+namespace DreamRecorder . Directory . Logic . Permissions
 {
 
-	public class Service : Entity
+	public enum PermissionStatus
 	{
+
+		Allow,
+
+		Deny
 
 	}
 

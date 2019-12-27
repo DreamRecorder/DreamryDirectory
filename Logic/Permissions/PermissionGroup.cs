@@ -3,12 +3,15 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+using DreamRecorder.Directory.Logic.Entities ;
+
+namespace DreamRecorder . Directory . Logic . Permissions
 {
 
 	public class PermissionGroup
 	{
-		public HashSet<Permission> Permissions { get; set; }
+
+		public HashSet <Permission> Permissions { get ; set ; } = new HashSet <Permission> ( ) ;
 
 		public AccessType Access(Entity entity)
 		{

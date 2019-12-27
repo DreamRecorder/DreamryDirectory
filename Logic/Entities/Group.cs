@@ -3,7 +3,7 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+namespace DreamRecorder . Directory . Logic . Entities
 {
 
 	public class Group : Entity
@@ -13,7 +13,7 @@ namespace Logic
 
 		public override bool Contain(Entity entity, HashSet<Entity> checkedEntities = null)
 		{
-			checkedEntities = checkedEntities ?? new HashSet<Entity>();
+			checkedEntities ??= new HashSet<Entity>();
 
 			if (checkedEntities.Contains(this))
 			{

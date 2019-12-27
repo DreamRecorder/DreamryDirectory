@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>DreamRecorder.Directory.ApiService</AssemblyName>
+    <RootNamespace>DreamRecorder.Directory.ApiService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

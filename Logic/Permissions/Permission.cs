@@ -3,7 +3,9 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+using DreamRecorder.Directory.Logic.Entities ;
+
+namespace DreamRecorder . Directory . Logic . Permissions
 {
 
 	public class Permission

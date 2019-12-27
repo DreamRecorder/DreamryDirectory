@@ -3,13 +3,17 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+using DreamRecorder . Directory . Logic . Tokens ;
+
+namespace DreamRecorder . Directory . Logic
 {
 
 	public interface IDirectoryProvider
 	{
 
 		EntityToken Login(LoginToken token);
+
+		EntityToken ChangeToken ( EntityToken token , Guid target ) ;
 
 		AccessToken Access(EntityToken token, Guid target);
 
@@ -29,8 +33,11 @@ namespace Logic
 
 		bool CheckToken ( EntityToken token , AccessToken tokenToCheck ) ;
 
-		
+		Guid CreateUser ( EntityToken token ) ;
 
+		Guid CreateGroup ( EntityToken token ) ;
+
+		void RegisterLogin ( EntityToken loginServiceToken , EntityToken targetToken ) ;
 
 	}
 

@@ -3,7 +3,9 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace Logic
+using JetBrains.Annotations ;
+
+namespace DreamRecorder . Directory . Logic . Entities
 {
 
 	public class Entity : IEquatable<Entity>
@@ -13,7 +15,7 @@ namespace Logic
 
 		public HashSet<EntityAttribute> Attributes { get; set; }
 
-		public virtual bool Contain(Entity entity, HashSet<Entity> checkedEntities = null)
+		public virtual bool Contain([CanBeNull]Entity entity, HashSet<Entity> checkedEntities = null)
 		{
 			if (checkedEntities.Contains(this))
 			{
