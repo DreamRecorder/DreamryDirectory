@@ -46,7 +46,8 @@ namespace DreamRecorder . Directory . ApiService .Controllers
 				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			token.NotAfter.
+			return token . NotAfter      > DateTimeOffset . UtcNow
+					&& token . NotBefore < DateTimeOffset . UtcNow ;
 		}
 
 
@@ -55,6 +56,11 @@ namespace DreamRecorder . Directory . ApiService .Controllers
 			if ( token == null )
 			{
 				throw new ArgumentNullException ( nameof ( token ) ) ;
+			}
+
+			if (CheckTokenTime(token))
+			{
+				
 			}
 
 
