@@ -15,6 +15,8 @@ namespace DreamRecorder . Directory . Logic
 
 		EntityToken ChangeToken ( EntityToken token , Guid target ) ;
 
+		EntityToken DisposeToken ( EntityToken token ) ;
+
 		AccessToken Access(EntityToken token, Guid target);
 
 		string GetProperty(EntityToken token, Guid target, string name);

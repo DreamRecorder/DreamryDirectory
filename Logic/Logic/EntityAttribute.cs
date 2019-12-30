@@ -2,14 +2,17 @@
 using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
+using System . Xml . Linq ;
 
 using DreamRecorder . Directory . Logic . Entities ;
 using DreamRecorder . Directory . Logic . Permissions ;
 
+using DreamRecorder.ToolBox.General;
+
 namespace DreamRecorder . Directory . Logic
 {
 
-	public class EntityAttribute : IEquatable<EntityAttribute>
+	public class EntityAttribute : IEquatable<EntityAttribute>,ISelfSerializable
 	{
 
 		public bool Equals(EntityAttribute other)
@@ -37,6 +40,16 @@ namespace DreamRecorder . Directory . Logic
 			return Guid.GetHashCode();
 		}
 
+		public XElement ToXElement ( )
+		{
+			XElement result = new XElement(nameof(EntityAttribute));
+
+			result.SetAttributeValue(nameof(Name), Name);
+			result.SetAttributeValue(nameof(Owner),  Owner.Guid);
+			result.SetAttributeValue(nameof(Value),    Value);
+			result.SetAttributeValue(nameof(Guid),    Guid);
+		}
+
 		public static bool operator ==(EntityAttribute left, EntityAttribute right) { return Equals(left, right); }
 
 		public static bool operator !=(EntityAttribute left, EntityAttribute right) { return !Equals(left, right); }
@@ -60,6 +73,9 @@ namespace DreamRecorder . Directory . Logic
 
 			return Permissions.Access(target);
 		}
+
+
+
 
 	}
 

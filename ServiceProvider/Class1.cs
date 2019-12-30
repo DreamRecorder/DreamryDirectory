@@ -1,13 +1,43 @@
-﻿using DreamRecorder.Directory.Logic;
-using DreamRecorder.Directory.Logic.Tokens;
-using System;
-using System.Collections.Generic;
+﻿using System ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
+using System . Net ;
 
-namespace ServiceProvider
+using DreamRecorder . Directory . Logic ;
+using DreamRecorder . Directory . Logic . Tokens ;
+
+namespace DreamRecorder . Directory . ServiceProvider
 {
+    public interface ITokenProvider
+	{
+
+		EntityToken GetToken ( ) ;
+
+	}
+
+	public interface IAccessTokenProvider
+	{
+
+		AccessToken Access ( Guid target ) ;
+
+	}
+
+    public interface IDirectoryClient:ITokenProvider,ILoginProvider,IAccessTokenProvider
+    {
+        ICollection<(ILoginProvider loginProvider,object credential)> Credentials { get; }
+
+        ICollection<EndPoint> Directories { get ; }
+    }
+
+    
+
     public class DirectoryProvider : IDirectoryProvider
     {
-        public AccessToken Access(EntityToken token, Guid target) => throw new NotImplementedException();
+
+		public EntityToken DisposeToken ( EntityToken token ) { throw new NotImplementedException ( ) ; }
+
+		public AccessToken Access(EntityToken token, Guid target) => throw new NotImplementedException();
         public AccessType AccessProperty(EntityToken token, Guid target, string name) => throw new NotImplementedException();
         public void AddToGroup(EntityToken token, Guid group, Guid target) => throw new NotImplementedException();
         public EntityToken ChangeToken(EntityToken token, Guid target) => throw new NotImplementedException();

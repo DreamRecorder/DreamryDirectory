@@ -11,7 +11,7 @@ namespace DreamRecorder . Directory . Logic . Tokens
 
 		public Guid Owner { get; set; }
 
-		public Guid Secret { get; set; }
+		public byte[] Secret { get; set; }
 
 		public DateTimeOffset NotBefore { get; set; }
 

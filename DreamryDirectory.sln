@@ -3,13 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29505.145
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{3E28BA79-66A2-4F9F-8310-C25D784AAFAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Directory\Service\Service.csproj", "{3E28BA79-66A2-4F9F-8310-C25D784AAFAE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Management", "Management\Management.csproj", "{7FDFCF4C-763E-4033-8FAC-CF7B17728A05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Management", "Directory\Management\Management.csproj", "{7FDFCF4C-763E-4033-8FAC-CF7B17728A05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logic", "Logic\Logic.csproj", "{3EC00E2C-245A-48EA-AEF3-871A3F482F14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceProvider", "ServiceProvider\ServiceProvider.csproj", "{2057FC78-0524-4037-AC65-D9B198B04B81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceProvider", "ServiceProvider\ServiceProvider.csproj", "{2057FC78-0524-4037-AC65-D9B198B04B81}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Directory", "Directory", "{1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logic", "Logic", "{F399D4C0-E70E-43E6-87A7-595990BE3A89}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logic", "Logic\Logic\Logic.csproj", "{2BF2615B-36C8-4C88-940D-71F6A277E1D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LoginProviders", "LoginProviders", "{28BDA5EA-EBBB-4B85-85DC-E47ACA7A73D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PreSharedKeyLoginProvider", "LoginProviders\PreSharedKeyLoginProvider\PreSharedKeyLoginProvider.csproj", "{1C812DD6-246B-427F-978D-5F88F7000AAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,19 +33,39 @@ Global
 		{7FDFCF4C-763E-4033-8FAC-CF7B17728A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FDFCF4C-763E-4033-8FAC-CF7B17728A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FDFCF4C-763E-4033-8FAC-CF7B17728A05}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3EC00E2C-245A-48EA-AEF3-871A3F482F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3EC00E2C-245A-48EA-AEF3-871A3F482F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3EC00E2C-245A-48EA-AEF3-871A3F482F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3EC00E2C-245A-48EA-AEF3-871A3F482F14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2057FC78-0524-4037-AC65-D9B198B04B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2057FC78-0524-4037-AC65-D9B198B04B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2057FC78-0524-4037-AC65-D9B198B04B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2057FC78-0524-4037-AC65-D9B198B04B81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BF2615B-36C8-4C88-940D-71F6A277E1D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BF2615B-36C8-4C88-940D-71F6A277E1D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BF2615B-36C8-4C88-940D-71F6A277E1D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BF2615B-36C8-4C88-940D-71F6A277E1D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3E28BA79-66A2-4F9F-8310-C25D784AAFAE} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
+		{7FDFCF4C-763E-4033-8FAC-CF7B17728A05} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
+		{2BF2615B-36C8-4C88-940D-71F6A277E1D0} = {F399D4C0-E70E-43E6-87A7-595990BE3A89}
+		{1C812DD6-246B-427F-978D-5F88F7000AAD} = {28BDA5EA-EBBB-4B85-85DC-E47ACA7A73D3}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3812D07C-6F92-4F95-9D16-7B4EE2492BD2}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 1
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://vsts.dreamry.org/defaultcollection
+		SccProjectUniqueName0 = ServiceProvider\\ServiceProvider.csproj
+		SccProjectName0 = ServiceProvider
+		SccAuxPath0 = https://vsts.dreamry.org/defaultcollection
+		SccLocalPath0 = ServiceProvider
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 	EndGlobalSection
 EndGlobal
