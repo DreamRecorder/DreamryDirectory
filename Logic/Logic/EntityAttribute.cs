@@ -48,6 +48,8 @@ namespace DreamRecorder . Directory . Logic
 			result.SetAttributeValue(nameof(Owner),  Owner.Guid);
 			result.SetAttributeValue(nameof(Value),    Value);
 			result.SetAttributeValue(nameof(Guid),    Guid);
+
+			return result;
 		}
 
 		public static bool operator ==(EntityAttribute left, EntityAttribute right) { return Equals(left, right); }
