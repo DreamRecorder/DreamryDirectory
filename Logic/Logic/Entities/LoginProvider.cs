@@ -6,7 +6,7 @@ using System.Linq ;
 namespace DreamRecorder . Directory . Logic . Entities
 {
 
-	public class Service : Entity
+	public class LoginProvider : Entity
 	{
 
 	}

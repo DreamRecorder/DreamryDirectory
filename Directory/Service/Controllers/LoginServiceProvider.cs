@@ -3,11 +3,13 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace DreamRecorder . Directory . Logic . Entities
+namespace DreamRecorder . Directory . ApiService . Controllers
 {
 
-	public class Service : Entity
+	public class LoginServiceProvider
 	{
+
+
 
 	}
 

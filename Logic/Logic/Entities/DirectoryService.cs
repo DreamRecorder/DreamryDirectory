@@ -6,8 +6,10 @@ using System.Linq ;
 namespace DreamRecorder . Directory . Logic . Entities
 {
 
-	public class Service : Entity
+	public class DirectoryService : Entity
 	{
+
+
 
 	}
 
