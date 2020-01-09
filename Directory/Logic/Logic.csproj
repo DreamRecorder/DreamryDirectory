@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>DreamRecorder.Directory.Services.Logic</AssemblyName>
+    <RootNamespace>DreamRecorder.Directory.Services.Logic</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Logic\Logic\Logic.csproj" />
+  </ItemGroup>
+
+</Project>

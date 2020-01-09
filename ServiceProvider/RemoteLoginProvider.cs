@@ -21,14 +21,14 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 			HttpClient client = new HttpClient ( ) ;
 
-			client.PostAsync($"https://{ServiceEndPoint.Address}:{ServiceEndPoint.Port}/Login",)
+			//client . PostAsync (
+			//					$"https://{ServiceEndPoint . Address}:{ServiceEndPoint . Port}/Login" , ) ;
 
-
+			throw new NotImplementedException();
 		}
 
-		public LoginToken Login ( object credential ) => throw new NotImplementedException ( ) ;
-
 		public bool CheckToken ( AccessToken token , LoginToken tokenToCheck ) => throw new NotImplementedException ( ) ;
+
 
 	}
 
