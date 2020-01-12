@@ -3,13 +3,15 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace DreamRecorder . Directory . Logic . Tokens
+namespace DreamRecorder . Directory . Services . Logic . Permissions
 {
 
-	public class AccessToken : Token
+	public enum PermissionStatus
 	{
 
-		public Guid Target { get; set; }
+		Allow,
+
+		Deny
 
 	}
 

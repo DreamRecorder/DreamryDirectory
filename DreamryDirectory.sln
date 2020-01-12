@@ -15,6 +15,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreSharedKeyLoginProvider",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{92BC2AC2-FBEC-48F9-A1B0-AECD6799C30D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceProvider", "Clients\ServiceProvider\ServiceProvider.csproj", "{9A0739B7-14F7-48DA-821B-BB08335B97E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiService", "Services\ApiService\ApiService.csproj", "{4DDDE2D0-12C6-483E-A783-34A48C9455F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logic", "Services\Logic\Logic.csproj", "{1806CFA6-2743-441E-AD87-67E502F1D2F5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Management", "Services\Management\Management.csproj", "{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +37,22 @@ Global
 		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C812DD6-246B-427F-978D-5F88F7000AAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A0739B7-14F7-48DA-821B-BB08335B97E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A0739B7-14F7-48DA-821B-BB08335B97E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A0739B7-14F7-48DA-821B-BB08335B97E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A0739B7-14F7-48DA-821B-BB08335B97E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DDDE2D0-12C6-483E-A783-34A48C9455F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DDDE2D0-12C6-483E-A783-34A48C9455F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DDDE2D0-12C6-483E-A783-34A48C9455F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DDDE2D0-12C6-483E-A783-34A48C9455F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1806CFA6-2743-441E-AD87-67E502F1D2F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1806CFA6-2743-441E-AD87-67E502F1D2F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1806CFA6-2743-441E-AD87-67E502F1D2F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1806CFA6-2743-441E-AD87-67E502F1D2F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,8 +60,23 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2BF2615B-36C8-4C88-940D-71F6A277E1D0} = {F399D4C0-E70E-43E6-87A7-595990BE3A89}
 		{1C812DD6-246B-427F-978D-5F88F7000AAD} = {28BDA5EA-EBBB-4B85-85DC-E47ACA7A73D3}
+		{9A0739B7-14F7-48DA-821B-BB08335B97E4} = {92BC2AC2-FBEC-48F9-A1B0-AECD6799C30D}
+		{4DDDE2D0-12C6-483E-A783-34A48C9455F8} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
+		{1806CFA6-2743-441E-AD87-67E502F1D2F5} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
+		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3812D07C-6F92-4F95-9D16-7B4EE2492BD2}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 1
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://vsts.dreamry.org/defaultcollection
+		SccProjectUniqueName0 = Clients\\ServiceProvider\\ServiceProvider.csproj
+		SccProjectTopLevelParentUniqueName0 = DreamryDirectory.sln
+		SccProjectName0 = Clients/ServiceProvider
+		SccAuxPath0 = https://vsts.dreamry.org/defaultcollection
+		SccLocalPath0 = Clients\\ServiceProvider
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 	EndGlobalSection
 EndGlobal

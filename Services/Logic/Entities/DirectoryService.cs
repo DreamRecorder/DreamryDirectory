@@ -3,13 +3,13 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-namespace DreamRecorder . Directory . Logic . Tokens
+namespace DreamRecorder . Directory . Services . Logic . Entities
 {
 
-	public class AccessToken : Token
+	public class DirectoryService : Entity
 	{
 
-		public Guid Target { get; set; }
+
 
 	}
 

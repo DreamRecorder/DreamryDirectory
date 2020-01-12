@@ -13,13 +13,16 @@ namespace DreamRecorder . Directory . Logic
 	public interface IDirectoryProvider
 	{
 
+		[CanBeNull] 
 		EntityToken Login([CanBeNull]LoginToken token);
 
+		[CanBeNull]
 		EntityToken ChangeToken ([NotNull] EntityToken token , Guid target ) ;
 
 		void DisposeToken ([NotNull] EntityToken token ) ;
 
 
+		[CanBeNull] 
 		AccessToken Access([NotNull] EntityToken token, Guid target);
 
 		string GetProperty([NotNull] EntityToken token, Guid target, string name);
