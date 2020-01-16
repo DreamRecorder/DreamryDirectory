@@ -25,10 +25,7 @@ namespace DreamRecorder . Directory . Services . Logic
 		public virtual ILoginServiceProvider LoginServiceProvider { get; }
 
 
-		public void Start()
-		{
-			
-		}
+		public void Start() { Everyone = new Everyone ( ) { Guid = Guid . Parse ( "" ) } ; }
 
 		public AccessToken IssueAccessToken( [NotNull] Entity entity, [NotNull] Entity accessTarget, TimeSpan lifetime)
 		{
@@ -132,6 +129,7 @@ namespace DreamRecorder . Directory . Services . Logic
 		}
 
 
+
 		public EntityToken Login(LoginToken token)
 		{
 
@@ -149,7 +147,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 					var target= Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
 
-					if ( target is Entity )
+					if ( ! (target is null) )
 					{
 						target.GetIsDisabled()
 					}
@@ -249,12 +247,12 @@ namespace DreamRecorder . Directory . Services . Logic
 															=> directoryService.Guid == token.Issuer);
 					if (!(issuer is null))
 					{
-
+						
 					}
 
 				}
 			}
-
+			return false;
 		}
 
 		public bool CheckToken([NotNull] EntityToken token, [NotNull] AccessToken tokenToCheck)

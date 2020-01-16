@@ -16,4 +16,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	}
 
+	public interface ILogin
+
 }
