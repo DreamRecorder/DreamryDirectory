@@ -16,6 +16,11 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	}
 
-	public interface ILogin
+	public interface IDirectoryServiceProvider
+	{
+
+		IDirectoryProvider GetDirectoryProvider ( DirectoryService directoryService ) ;
+
+	}
 
 }
