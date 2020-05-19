@@ -12,10 +12,10 @@ using DreamRecorder.ToolBox.General ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public class EntityAttribute : IEquatable<EntityAttribute>,ISelfSerializable
+	public class EntityProperty : IEquatable<EntityProperty>,ISelfSerializable
 	{
 
-		public bool Equals(EntityAttribute other)
+		public bool Equals(EntityProperty other)
 		{
 			if (other is null)
 			{
@@ -30,19 +30,13 @@ namespace DreamRecorder . Directory . Services . Logic
 			return Guid.Equals(other.Guid);
 		}
 
-		public override bool Equals(object obj)
-		{
-			return ReferenceEquals(this, obj) || obj is EntityAttribute other && Equals(other);
-		}
+		public override bool Equals(object obj) => ReferenceEquals(this, obj) || obj is EntityProperty other && Equals(other) ;
 
-		public override int GetHashCode()
-		{
-			return Guid.GetHashCode();
-		}
+		public override int GetHashCode() => Guid.GetHashCode() ;
 
 		public XElement ToXElement ( )
 		{
-			XElement result = new XElement(nameof(EntityAttribute));
+			XElement result = new XElement(nameof(EntityProperty));
 
 			result.SetAttributeValue(nameof(Name), Name);
 			result.SetAttributeValue(nameof(Owner),  Owner.Guid);
@@ -52,9 +46,9 @@ namespace DreamRecorder . Directory . Services . Logic
 			return result;
 		}
 
-		public static bool operator ==(EntityAttribute left, EntityAttribute right) { return Equals(left, right); }
+		public static bool operator ==(EntityProperty left, EntityProperty right) => Equals(left, right) ;
 
-		public static bool operator !=(EntityAttribute left, EntityAttribute right) { return !Equals(left, right); }
+		public static bool operator !=(EntityProperty left, EntityProperty right) => !Equals(left, right) ;
 
 		public Guid Guid { get; set; }
 
@@ -71,6 +65,11 @@ namespace DreamRecorder . Directory . Services . Logic
 			if (target == null)
 			{
 				throw new ArgumentNullException(nameof(target));
+			}
+
+			if ( target==Owner )
+			{
+				return AccessType . ReadWrite ;
 			}
 
 			return Permissions.Access(target);

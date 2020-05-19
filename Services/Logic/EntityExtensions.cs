@@ -26,7 +26,7 @@ namespace DreamRecorder . Directory . Services .Logic
 				throw new ArgumentNullException ( nameof ( entity ) ) ;
 			}
 
-			if (entity.Attributes.FirstOrDefault(prop => prop.Name == IsDisabledName) is EntityAttribute attribute)
+			if (entity.Properties.FirstOrDefault(prop => prop.Name == IsDisabledName) is EntityProperty attribute)
 			{
 				if ( bool.TryParse(attribute.Value,out bool result) )
 				{
@@ -52,13 +52,13 @@ namespace DreamRecorder . Directory . Services .Logic
 				throw new ArgumentNullException ( nameof ( entity ) ) ;
 			}
 
-			if ( entity.Attributes.FirstOrDefault( (prop)=>prop.Name==CanLoginFromName)is EntityAttribute attribute)
+			if ( entity.Properties.FirstOrDefault( (prop)=>prop.Name==CanLoginFromName)is EntityProperty attribute)
 			{
 				return attribute . Value . Split ( ',' ) .
 							Select ( Guid . Parse ) .
 							ToHashSet ( ) ; ;
 			}
-
+			throw null;
 		}
 
 

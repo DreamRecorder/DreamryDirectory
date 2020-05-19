@@ -13,7 +13,7 @@ namespace DreamRecorder . Directory . Logic
 
 		LoginToken Login(object credential);
 
-		bool CheckToken ( AccessToken token , LoginToken tokenToCheck ) ;
+		void CheckToken ( AccessToken token , LoginToken tokenToCheck ) ;
 
 	}
 

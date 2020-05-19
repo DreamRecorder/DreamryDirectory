@@ -59,7 +59,6 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 						{
 							case PermissionType.Read:
 							{
-
 								read = false;
 								break;
 							}

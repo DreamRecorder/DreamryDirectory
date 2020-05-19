@@ -13,7 +13,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public Guid Guid { get; set; }
 
-		public HashSet<EntityAttribute> Attributes { get; set; }
+		public HashSet<EntityProperty> Properties { get; set; }
 
 		public virtual bool Contain([CanBeNull]Entity entity, HashSet<Entity> checkedEntities = null)
 		{
@@ -55,11 +55,11 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 			return obj.GetType() == GetType() && Equals((Entity)obj);
 		}
 
-		public override int GetHashCode() { return Guid.GetHashCode(); }
+		public override int GetHashCode() => Guid.GetHashCode() ;
 
-		public static bool operator ==(Entity left, Entity right) { return Equals(left, right); }
+		public static bool operator ==(Entity left, Entity right) => Equals(left, right) ;
 
-		public static bool operator !=(Entity left, Entity right) { return !Equals(left, right); }
+		public static bool operator !=(Entity left, Entity right) => !Equals(left, right) ;
 
 	}
 

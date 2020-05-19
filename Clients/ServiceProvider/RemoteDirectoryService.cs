@@ -6,7 +6,7 @@ using System . Linq ;
 namespace DreamRecorder . Directory . ServiceProvider
 {
 
-	public class RemoteDirectoryProvider// : IDirectoryProvider
+	public class RemoteDirectoryService// : IDirectoryService
     {
 
 	}
