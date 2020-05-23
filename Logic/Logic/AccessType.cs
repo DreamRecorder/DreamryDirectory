@@ -5,13 +5,13 @@ using System.Linq ;
 
 namespace DreamRecorder . Directory . Logic
 {
-
+	[Flags]
 	public enum AccessType
 	{
-
-		ReadWrite,
-		Read,
-		None,
+		ReadWrite=3,
+		Write=2,
+		Read=1,
+		None=0,
 
 	}
 

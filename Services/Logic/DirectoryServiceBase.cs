@@ -321,7 +321,7 @@ namespace DreamRecorder.Directory.Services.Logic
 					{
 						AccessType validAccess= property . Access ( requester ) ;
 
-						if ( validAccess ==AccessType.None )
+						if ( (validAccess&AccessType.Read)==0 )
 						{
 							throw new PermissionDeniedException ( ) ;
 						}
@@ -387,7 +387,14 @@ namespace DreamRecorder.Directory.Services.Logic
 					}
 					else
 					{
-						
+						accessTarget . Properties . Add (
+														new EntityProperty ( )
+														{
+															Guid  = new Guid ( ) ,
+															Name  = name ,
+															Owner = requester ,
+															Value = value
+														} ) ;
 					}
 				}
 				else
@@ -461,7 +468,10 @@ namespace DreamRecorder.Directory.Services.Logic
 			throw new NotImplementedException ( ) ;
 		}
 
-		public void AddToGroup(EntityToken token, Guid @group, Guid target) { throw new NotImplementedException(); }
+		public void AddToGroup ( EntityToken token , Guid @group , Guid target )
+		{
+			CheckToken ( token ) ;
+		}
 
 		public void RemoveFromGroup(EntityToken token, Guid @group, Guid target) { throw new NotImplementedException(); }
 

@@ -54,7 +54,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public string Name { get; set; }
 
-		public PermissionGroup Permissions { get; set; }
+		public PermissionGroup Permissions { get ; set ; } = new PermissionGroup ( ) ;
 
 		public Entity Owner { get; set; }
 
