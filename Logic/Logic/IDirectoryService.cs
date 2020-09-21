@@ -47,9 +47,9 @@ namespace DreamRecorder . Directory . Logic
 		/// </summary>
 		/// <param name="token"></param>
 		/// <param name="group"></param>
-		/// <param name="entity"></param>
+		/// <param name="target"></param>
 		/// <returns></returns>
-		bool Contain ( [NotNull] EntityToken token , Guid group , Guid entity ) ;
+		bool Contain ( [NotNull] EntityToken token , Guid group , Guid target ) ;
 
 		[NotNull]
 		ICollection <Guid> ListGroup ( [NotNull] EntityToken token , Guid group ) ;

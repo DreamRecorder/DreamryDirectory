@@ -8,6 +8,7 @@ using DreamRecorder . Directory . Logic . Tokens ;
 namespace DreamRecorder . Directory . ServiceProvider
 {
 
+
 	public interface IEntityTokenProvider
 	{
 

@@ -16,8 +16,9 @@ using ILoginProvider = DreamRecorder.Directory.Logic.ILoginProvider;
 
 namespace DreamRecorder.Directory.Services.Logic
 {
+
 	[PublicAPI]
-	public class DirectoryServiceBase : IDirectoryService
+	public class DirectoryServiceBase : IDirectoryService,IDirectoryServiceInternal
 	{
 
 		public IAccessTokenProvider AccessTokenProvider { get; set; }
@@ -26,15 +27,17 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public RNGCryptoServiceProvider RngProvider { get; set; } = new RNGCryptoServiceProvider();
 
-		public DirectoryService ServiceEntity { get; set; }
+		public KnownSpecialGroups KnownSpecialGroups { get ; }
 
-		public EntityToken ServiceToken { get; set; }
+		public         DirectoryService   ServiceEntity      { get; set; }
+
+		public EntityToken ServiceToken { get; }
 
 		public virtual ILoginServiceProvider LoginServiceProvider { get; }
 
 		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get; }
 
-		public void Start() { Everyone = new Everyone() { Guid = Guid.Parse("") }; }
+		public void Start() {  }
 
 		public ITokenPolicy TokenPolicy { get; set; }
 
@@ -113,10 +116,6 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public HashSet<DirectoryService> DirectoryServices { get; set; }
 
-		public Everyone Everyone { get; set; }
-
-		public AuthorizedUser AuthorizedUser { get; set; }
-
 		public EntityToken EveryoneToken { get; set; }
 
 		public IEnumerable<Entity> Entities
@@ -124,7 +123,7 @@ namespace DreamRecorder.Directory.Services.Logic
 						Union(Services).
 						Union(LoginServices).
 						Union(DirectoryServices).
-						Union(new Entity[] { Everyone, AuthorizedUser });
+						Union(KnownSpecialGroups.Entities);
 
 		public HashSet<EntityToken> IssuedEntityTokens { get; set; }
 
@@ -416,13 +415,12 @@ namespace DreamRecorder.Directory.Services.Logic
 				}
 			}
 			else
-
 			{
 				throw new EntityNotFoundException();
 			}
 		}
 
-		public bool Contain(EntityToken token, Guid @group, Guid entity)
+		public bool Contain(EntityToken token, Guid @group, Guid target)
 		{
 			if (token == null)
 			{
@@ -431,12 +429,39 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			if (expr)
+			Entity requester = Entities.SingleOrDefault((entity) => entity.Guid == token.Owner);
+
+			if (requester != null)
 			{
+				Group groupTarget = Groups.SingleOrDefault(grp => grp.Guid == group);
 
+				if ( Check )
+				{
+					
+				}
+
+				if (groupTarget != null)
+				{
+					Entity accessTarget = Entities.SingleOrDefault((entity) => entity.Guid == target);
+
+					if (accessTarget != null)
+					{
+
+					}
+					else
+					{
+						throw new EntityNotFoundException();
+					}
+				}
+				else
+				{
+					throw new EntityNotFoundException();
+				}
 			}
-
-			throw new NotImplementedException();
+			else
+			{
+				throw new EntityNotFoundException();
+			}
 		}
 
 		public ICollection<Guid> ListGroup(EntityToken token, Guid @group)
@@ -613,9 +638,9 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			User user = new User ( ) { } ;
+			User user = new User() { };
 
-			Users . Add ( user ) ;
+			Users.Add(user);
 
 
 
