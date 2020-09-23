@@ -144,6 +144,7 @@ namespace DreamRecorder.Directory.Services.Logic
 			if (token.NotAfter > DateTimeOffset.UtcNow
 				&& token.NotBefore < DateTimeOffset.UtcNow)
 			{
+				return ;
 			}
 			else
 			{
@@ -435,7 +436,7 @@ namespace DreamRecorder.Directory.Services.Logic
 			{
 				Group groupTarget = Groups.SingleOrDefault(grp => grp.Guid == group);
 
-				if ( Check )
+				if ( AccessPro )
 				{
 					
 				}
