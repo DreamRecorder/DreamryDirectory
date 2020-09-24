@@ -437,20 +437,20 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			if ( requester != null )
 			{
-				Group groupTarget = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
 
-				if ( groupTarget != null )
+				if ( targetGroup != null )
 				{
-					if ( ! groupTarget . GetMembersProperty ( ) . Access ( requester ) . HasFlag ( AccessType . Read ) )
+					if ( ! targetGroup . GetMembersProperty ( ) . Access ( requester ) . HasFlag ( AccessType . Read ) )
 					{
 						throw new PermissionDeniedException ( ) ;
 					}
 
-					Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+					Entity targetEntity = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
 
-					if ( accessTarget != null )
+					if ( targetEntity != null )
 					{
-						return groupTarget . Contain ( accessTarget ) ;
+						return targetGroup . Contain ( targetEntity ) ;
 					}
 					else
 					{
@@ -505,12 +505,46 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public void AddToGroup ( EntityToken token , Guid @group , Guid target )
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
+
+			Entity requester = Entities.SingleOrDefault((entity) => entity.Guid == token.Owner);
+
+			if (requester != null)
+			{
+				Group groupTarget = Groups.SingleOrDefault(grp => grp.Guid == group);
+
+				if (groupTarget != null)
+				{
+					if (!groupTarget.GetMembersProperty().Access(requester).HasFlag(AccessType.Read))
+					{
+						throw new PermissionDeniedException();
+					}
+
+					Entity accessTarget = Entities.SingleOrDefault((entity) => entity.Guid == target);
+
+					if (accessTarget != null)
+					{
+						return groupTarget.Contain(accessTarget);
+					}
+					else
+					{
+						throw new EntityNotFoundException();
+					}
+				}
+				else
+				{
+					throw new EntityNotFoundException();
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException();
+			}
 		}
 
 		public void RemoveFromGroup ( EntityToken token , Guid @group , Guid target )
@@ -734,6 +768,10 @@ namespace DreamRecorder . Directory . Services . Logic
 																	Status = Permissions . PermissionStatus . Allow ,
 																	Type   = Permissions . PermissionType . Write
 																} ) ;
+
+				Groups . Add ( group ) ;
+
+				return group.Guid;
 			}
 			else
 			{
