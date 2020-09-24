@@ -11,13 +11,6 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public static class DirectoryServiceInternal
-	{
-
-		public static IDirectoryServiceInternal Current { get ; set ; }
-
-	}
-
 	public interface IDirectoryServiceInternal
 	{
 		KnownSpecialGroups KnownSpecialGroups{ get; }

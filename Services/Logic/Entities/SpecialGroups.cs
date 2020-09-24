@@ -6,9 +6,10 @@ using System.Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
 
-	public class Everyone : SpecialGroup
+	public class SpecialGroups : SpecialGroup
 	{
-		public override bool Contain(Entity entity, HashSet<Entity> checkedEntities = null) => true;
+
+		public override bool Contain(Entity entity, HashSet<Entity> checkedEntities = null) => entity is SpecialGroup;
 
 	}
 

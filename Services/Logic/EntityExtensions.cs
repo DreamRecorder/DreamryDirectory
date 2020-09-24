@@ -11,43 +11,6 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public static class GroupExtensions
-	{
-
-		public static readonly string Members = nameof ( Members ) ;
-
-		public static readonly string MembersName = $"{Consts . Namespace}.{Members}" ;
-
-		public static EntityProperty GetMembersProperty ( [NotNull]this Group group )
-		{
-			if ( @group == null )
-			{
-				throw new ArgumentNullException ( nameof ( @group ) ) ;
-			}
-
-			if ( group . Properties . FirstOrDefault ( ( prop ) => prop . Name == Members ) is EntityProperty property )
-			{
-
-			}
-			else
-			{
-				property = new EntityProperty ( )
-							{
-								Name  = MembersName ,
-								Guid  = Guid . NewGuid ( ) ,
-								Owner = DirectoryServiceInternal . Current . KnownSpecialGroups . DirectoryServices ,
-								Value = string . Empty
-							} ;
-
-				group . Properties . Add ( property ) ;
-			}
-
-			return property;
-
-		}
-
-	}
-
 	public static class EntityExtensions
 	{
 
@@ -125,6 +88,14 @@ namespace DreamRecorder . Directory . Services . Logic
 								Permissions = new PermissionGroup ( ) ,
 							} ;
 
+				property.Permissions.Permissions.Add(
+													new Permission()
+													{
+														Target = DirectoryServiceInternal.Current.
+															KnownSpecialGroups.LoginServices,
+														Status = PermissionStatus.Allow,
+														Type   = PermissionType.Read
+													});
 
 				entity . Properties . Add ( property ) ;
 			}

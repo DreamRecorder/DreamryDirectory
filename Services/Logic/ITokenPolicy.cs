@@ -3,16 +3,17 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
-using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public interface ILoginServiceProvider
+	public interface ITokenPolicy
 	{
 
-		ILoginProvider GetLoginProvider ( LoginService loginService ) ;
+		TimeSpan EntityTokenTimeSpan ( Entity entity ) ;
+
+		TimeSpan AccessTokenLife ( Entity entity , Entity accessTarget ) ;
 
 	}
 

@@ -9,10 +9,10 @@ using DreamRecorder . Directory . Services . Logic . Entities ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public interface ILoginServiceProvider
+	public interface IDirectoryServiceProvider
 	{
 
-		ILoginProvider GetLoginProvider ( LoginService loginService ) ;
+		IDirectoryService GetDirectoryProvider ( DirectoryService directoryService ) ;
 
 	}
 
