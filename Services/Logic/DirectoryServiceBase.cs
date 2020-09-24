@@ -18,7 +18,7 @@ namespace DreamRecorder.Directory.Services.Logic
 {
 
 	[PublicAPI]
-	public class DirectoryServiceBase : IDirectoryService,IDirectoryServiceInternal
+	public class DirectoryServiceBase : IDirectoryService, IDirectoryServiceInternal
 	{
 
 		public IAccessTokenProvider AccessTokenProvider { get; set; }
@@ -27,9 +27,9 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public RNGCryptoServiceProvider RngProvider { get; set; } = new RNGCryptoServiceProvider();
 
-		public KnownSpecialGroups KnownSpecialGroups { get ; }
+		public KnownSpecialGroups KnownSpecialGroups { get; }
 
-		public         DirectoryService   ServiceEntity      { get; set; }
+		public DirectoryService ServiceEntity { get; set; }
 
 		public EntityToken ServiceToken { get; }
 
@@ -37,7 +37,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get; }
 
-		public void Start() {  }
+		public void Start() { }
 
 		public ITokenPolicy TokenPolicy { get; set; }
 
@@ -144,7 +144,7 @@ namespace DreamRecorder.Directory.Services.Logic
 			if (token.NotAfter > DateTimeOffset.UtcNow
 				&& token.NotBefore < DateTimeOffset.UtcNow)
 			{
-				return ;
+				return;
 			}
 			else
 			{
@@ -436,18 +436,18 @@ namespace DreamRecorder.Directory.Services.Logic
 			{
 				Group groupTarget = Groups.SingleOrDefault(grp => grp.Guid == group);
 
-				if ( AccessPro )
-				{
-					
-				}
-
 				if (groupTarget != null)
 				{
+					if (!groupTarget.GetMembersProperty().Access(requester).HasFlag(AccessType.Read))
+					{
+						throw new PermissionDeniedException();
+					}
+
 					Entity accessTarget = Entities.SingleOrDefault((entity) => entity.Guid == target);
 
 					if (accessTarget != null)
 					{
-
+						return groupTarget.Contain(accessTarget);
 					}
 					else
 					{
@@ -467,14 +467,58 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public ICollection<Guid> ListGroup(EntityToken token, Guid @group)
 		{
-			throw new NotImplementedException();
+			if (token == null)
+			{
+				throw new ArgumentNullException(nameof(token));
+			}
+
+			CheckToken(token);
+
+			Entity requester = Entities.SingleOrDefault((entity) => entity.Guid == token.Owner);
+
+			if (requester != null)
+			{
+				Group groupTarget = Groups.SingleOrDefault(grp => grp.Guid == group);
+
+				if (groupTarget != null)
+				{
+					if (!groupTarget.GetMembersProperty().Access(requester).HasFlag(AccessType.Read))
+					{
+						throw new PermissionDeniedException();
+					}
+
+					return groupTarget.Members.Select(entity => entity.Guid).ToHashSet();
+
+				}
+				else
+				{
+					throw new EntityNotFoundException();
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException();
+			}
 		}
 
-		public void AddToGroup(EntityToken token, Guid @group, Guid target) { CheckToken(token); }
+		public void AddToGroup(EntityToken token, Guid @group, Guid target)
+		{
+			if (token == null)
+			{
+				throw new ArgumentNullException(nameof(token));
+			}
+
+			CheckToken(token);
+		}
 
 		public void RemoveFromGroup(EntityToken token, Guid @group, Guid target)
 		{
-			throw new NotImplementedException();
+			if (token == null)
+			{
+				throw new ArgumentNullException(nameof(token));
+			}
+
+			CheckToken(token);
 		}
 
 		protected void CheckToken([NotNull] EntityToken token)

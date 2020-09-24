@@ -69,14 +69,33 @@ Global
 		SolutionGuid = {3812D07C-6F92-4F95-9D16-7B4EE2492BD2}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 1
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://vsts.dreamry.org/defaultcollection
 		SccProjectUniqueName0 = Clients\\ServiceProvider\\ServiceProvider.csproj
 		SccProjectTopLevelParentUniqueName0 = DreamryDirectory.sln
 		SccProjectName0 = Clients/ServiceProvider
-		SccAuxPath0 = https://vsts.dreamry.org/defaultcollection
 		SccLocalPath0 = Clients\\ServiceProvider
-		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccLocalPath1 = .
+		SccProjectUniqueName2 = Logic\\Logic\\Logic.csproj
+		SccProjectTopLevelParentUniqueName2 = DreamryDirectory.sln
+		SccProjectName2 = Logic/Logic
+		SccLocalPath2 = Logic\\Logic
+		SccProjectUniqueName3 = LoginProviders\\PreSharedKeyLoginProvider\\PreSharedKeyLoginProvider.csproj
+		SccProjectTopLevelParentUniqueName3 = DreamryDirectory.sln
+		SccProjectName3 = LoginProviders/PreSharedKeyLoginProvider
+		SccLocalPath3 = LoginProviders\\PreSharedKeyLoginProvider
+		SccProjectUniqueName4 = Services\\ApiService\\ApiService.csproj
+		SccProjectTopLevelParentUniqueName4 = DreamryDirectory.sln
+		SccProjectName4 = Services/ApiService
+		SccLocalPath4 = Services\\ApiService
+		SccProjectUniqueName5 = Services\\Logic\\Logic.csproj
+		SccProjectTopLevelParentUniqueName5 = DreamryDirectory.sln
+		SccProjectName5 = Services/Logic
+		SccLocalPath5 = Services\\Logic
+		SccProjectUniqueName6 = Services\\Management\\Management.csproj
+		SccProjectTopLevelParentUniqueName6 = DreamryDirectory.sln
+		SccProjectName6 = Services/Management
+		SccLocalPath6 = Services\\Management
 	EndGlobalSection
 EndGlobal

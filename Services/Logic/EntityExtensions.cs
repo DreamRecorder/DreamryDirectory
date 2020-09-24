@@ -27,7 +27,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			if ( group . Properties . FirstOrDefault ( ( prop ) => prop . Name == Members ) is EntityProperty property )
 			{
-				return property ;
+
 			}
 			else
 			{
@@ -39,8 +39,11 @@ namespace DreamRecorder . Directory . Services . Logic
 								Value = string . Empty
 							} ;
 
-
+				group . Properties . Add ( property ) ;
 			}
+
+			return property;
+
 		}
 
 	}
@@ -116,28 +119,12 @@ namespace DreamRecorder . Directory . Services . Logic
 				property = new EntityProperty ( )
 							{
 								Name        = CanLoginFromName ,
-								Owner       = DirectoryServiceInternal . Current . ServiceEntity ,
+								Owner       = DirectoryServiceInternal.Current.
+																		KnownSpecialGroups.DirectoryServices,
 								Guid        = Guid . NewGuid ( ) ,
 								Permissions = new PermissionGroup ( ) ,
 							} ;
 
-				property . Permissions . Permissions . Add (
-															new Permission ( )
-															{
-																Target = DirectoryServiceInternal . Current .
-																	KnownSpecialGroups . DirectoryServices ,
-																Type   = PermissionType . Write ,
-																Status = PermissionStatus . Allow
-															} ) ;
-
-				property . Permissions . Permissions . Add (
-															new Permission ( )
-															{
-																Target = DirectoryServiceInternal . Current .
-																	KnownSpecialGroups . DirectoryServices ,
-																Type   = PermissionType . Read ,
-																Status = PermissionStatus . Allow
-															} ) ;
 
 				entity . Properties . Add ( property ) ;
 			}
