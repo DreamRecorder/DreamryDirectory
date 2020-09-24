@@ -18,7 +18,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static readonly string MembersName = $"{Consts . Namespace}.{Members}" ;
 
-		public static EntityProperty GetMembersProperty ( [NotNull] Group group )
+		public static EntityProperty GetMembersProperty ( [NotNull]this Group group )
 		{
 			if ( @group == null )
 			{

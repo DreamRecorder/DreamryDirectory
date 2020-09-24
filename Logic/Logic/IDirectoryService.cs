@@ -42,6 +42,10 @@ namespace DreamRecorder . Directory . Logic
 		/// <returns></returns>
 		AccessType AccessProperty ( [NotNull] EntityToken token , Guid target , string name ) ;
 
+		AccessType GrantRead ( [NotNull] EntityToken token , Guid target , string name , Guid access ) ;
+
+		AccessType GrantWrite ( [NotNull] EntityToken token , Guid target , string name , Guid access ) ;
+
 		/// <summary>
 		/// Check if an entity is a member of a group
 		/// </summary>
@@ -83,6 +87,7 @@ namespace DreamRecorder . Directory . Logic
 		Guid CreateUser ( [NotNull] EntityToken token ) ;
 
 		Guid CreateGroup ( [NotNull] EntityToken token ) ;
+
 
 		void RegisterLogin (
 			[NotNull] EntityToken loginServiceToken ,

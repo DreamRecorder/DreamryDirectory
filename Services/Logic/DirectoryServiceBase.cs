@@ -683,15 +683,44 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			User user = new User() { };
+			LoginService requester = LoginServices.SingleOrDefault((entity) => entity.Guid == token.Owner);
 
-			Users.Add(user);
+			if (requester != null)
+			{
+				User user = new User() { };
 
+				Users.Add(user);
 
+				user . AddCanLoginFrom ( requester ) ;
 
+				return user.Guid;
+			}
+			else
+			{
+				throw new EntityNotFoundException();
+			}
 		}
 
-		public Guid CreateGroup(EntityToken token) => throw new NotImplementedException();
+		public Guid CreateGroup(EntityToken token)
+		{
+			if (token == null)
+			{
+				throw new ArgumentNullException(nameof(token));
+			}
+
+			CheckToken(token);
+
+			Entity requester = Entities.SingleOrDefault((entity) => entity.Guid == token.Owner);
+
+			if (requester != null)
+			{
+
+			}
+			else
+			{
+				throw new EntityNotFoundException();
+			}
+		}
 
 		public void RegisterLogin(EntityToken loginServiceToken, LoginToken targetToken)
 		{
