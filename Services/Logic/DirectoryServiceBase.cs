@@ -9,6 +9,7 @@ using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
 using DreamRecorder . Directory . ServiceProvider ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
+using DreamRecorder . Directory . Services . Logic . Permissions ;
 
 using JetBrains . Annotations ;
 
@@ -152,7 +153,6 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 		}
 
-
 		public EntityToken Login ( LoginToken token )
 		{
 			if ( token == null )
@@ -230,7 +230,23 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			IssuedEntityTokens . Remove ( token ) ;
+			if ( token . Issuer == ServiceEntity . Guid )
+			{
+				IssuedEntityTokens . Remove ( token ) ;
+			}
+			else
+			{
+				DirectoryService issuer =
+					DirectoryServices . FirstOrDefault (
+														( directoryService )
+															=> directoryService . Guid == token . Issuer ) ;
+				if ( ! ( issuer is null ) )
+				{
+					IDirectoryService issuerService = DirectoryServiceProvider . GetDirectoryProvider ( issuer ) ;
+
+					issuerService . DisposeToken ( token ) ;
+				}
+			}
 		}
 
 		public AccessToken Access ( EntityToken token , Guid target )
@@ -292,13 +308,13 @@ namespace DreamRecorder . Directory . Services . Logic
 					{
 						AccessType validAccess = property . Access ( requester ) ;
 
-						if ( ( validAccess & AccessType . Read ) == 0 )
+						if ( validAccess . HasFlag ( AccessType . Read ) )
 						{
-							throw new PermissionDeniedException ( ) ;
+							return property . Value ;
 						}
 						else
 						{
-							return property . Value ;
+							throw new PermissionDeniedException ( ) ;
 						}
 					}
 					else
@@ -344,13 +360,13 @@ namespace DreamRecorder . Directory . Services . Logic
 					{
 						AccessType validAccess = property . Access ( requester ) ;
 
-						if ( validAccess != AccessType . ReadWrite )
+						if ( validAccess . HasFlag ( AccessType . Write ) )
 						{
-							throw new PermissionDeniedException ( ) ;
+							property . Value = value ;
 						}
 						else
 						{
-							property . Value = value ;
+							throw new PermissionDeniedException ( ) ;
 						}
 					}
 					else
@@ -389,14 +405,14 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			if ( requester != null )
 			{
-				Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity propertyTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
 
-				if ( accessTarget != null )
+				if ( propertyTarget != null )
 				{
 					name = name . Normalize ( NormalizationForm . FormD ) ;
 
 					EntityProperty property =
-						accessTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+						propertyTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
 
 					if ( property != null )
 					{
@@ -420,9 +436,161 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 		}
 
-		public AccessType GrantRead ( EntityToken token , Guid target , string name , Guid access ) { }
+		public AccessType GrantRead ( EntityToken token , Guid target , string name , Guid access )
+		{
+			if ( token == null )
+			{
+				throw new ArgumentNullException ( nameof ( token ) ) ;
+			}
 
-		public AccessType GrantWrite ( EntityToken token , Guid target , string name , Guid access ) { }
+			CheckToken ( token ) ;
+
+			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+
+			if ( requester != null )
+			{
+				Entity propertyTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+
+				if ( propertyTarget != null )
+				{
+					name = name . Normalize ( NormalizationForm . FormD ) ;
+
+					EntityProperty property =
+						propertyTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+
+					if ( property != null )
+					{
+						if ( property . Owner == requester )
+						{
+							Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == access ) ;
+
+							if ( accessTarget != null )
+							{
+								Permission permission =
+									property . Permissions . Permissions . FirstOrDefault (
+									p
+										=> p . Target     == accessTarget
+											&& p . Status == PermissionStatus . Allow
+											&& p . Type   == PermissionType . Read ) ;
+
+								if ( permission is null )
+								{
+									permission = new Permission ( )
+												{
+													Status = PermissionStatus . Allow ,
+													Target = propertyTarget ,
+													Type   = PermissionType . Read
+												} ;
+
+									property . Permissions . Permissions . Add ( permission ) ;
+								}
+
+								return property . Access ( accessTarget ) ;
+							}
+
+							else
+							{
+								throw new EntityNotFoundException ( ) ;
+							}
+						}
+						else
+						{
+							throw new PermissionDeniedException ( ) ;
+						}
+					}
+					else
+					{
+						throw new PropertyNotFoundException ( ) ;
+					}
+				}
+				else
+				{
+					throw new EntityNotFoundException ( ) ;
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException ( ) ;
+			}
+		}
+
+		public AccessType GrantWrite ( EntityToken token , Guid target , string name , Guid access )
+		{
+			if ( token == null )
+			{
+				throw new ArgumentNullException ( nameof ( token ) ) ;
+			}
+
+			CheckToken ( token ) ;
+
+			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+
+			if ( requester != null )
+			{
+				Entity propertyTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+
+				if ( propertyTarget != null )
+				{
+					name = name . Normalize ( NormalizationForm . FormD ) ;
+
+					EntityProperty property =
+						propertyTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+
+					if ( property != null )
+					{
+						if ( property . Owner == requester )
+						{
+							Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == access ) ;
+
+							if ( accessTarget != null )
+							{
+								Permission permission =
+									property . Permissions . Permissions . FirstOrDefault (
+									p
+										=> p . Target     == accessTarget
+											&& p . Status == PermissionStatus . Allow
+											&& p . Type   == PermissionType . Write ) ;
+
+								if ( permission is null )
+								{
+									permission = new Permission ( )
+												{
+													Status = PermissionStatus . Allow ,
+													Target = propertyTarget ,
+													Type   = PermissionType . Write
+												} ;
+
+									property . Permissions . Permissions . Add ( permission ) ;
+								}
+
+								return property . Access ( accessTarget ) ;
+							}
+
+							else
+							{
+								throw new EntityNotFoundException ( ) ;
+							}
+						}
+						else
+						{
+							throw new PermissionDeniedException ( ) ;
+						}
+					}
+					else
+					{
+						throw new PropertyNotFoundException ( ) ;
+					}
+				}
+				else
+				{
+					throw new EntityNotFoundException ( ) ;
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException ( ) ;
+			}
+		}
 
 		public bool Contain ( EntityToken token , Guid @group , Guid target )
 		{
@@ -481,16 +649,16 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			if ( requester != null )
 			{
-				Group groupTarget = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
 
-				if ( groupTarget != null )
+				if ( targetGroup != null )
 				{
-					if ( ! groupTarget . GetMembersProperty ( ) . Access ( requester ) . HasFlag ( AccessType . Read ) )
+					if ( ! targetGroup . GetMembersProperty ( ) . Access ( requester ) . HasFlag ( AccessType . Read ) )
 					{
 						throw new PermissionDeniedException ( ) ;
 					}
 
-					return groupTarget . Members . Select ( entity => entity . Guid ) . ToHashSet ( ) ;
+					return targetGroup . Members . Select ( entity => entity . Guid ) . ToHashSet ( ) ;
 				}
 				else
 				{
@@ -505,45 +673,47 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public void AddToGroup ( EntityToken token , Guid @group , Guid target )
 		{
-			if (token == null)
+			if ( token == null )
 			{
-				throw new ArgumentNullException(nameof(token));
+				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			CheckToken(token);
+			CheckToken ( token ) ;
 
-			Entity requester = Entities.SingleOrDefault((entity) => entity.Guid == token.Owner);
+			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
 
-			if (requester != null)
+			if ( requester != null )
 			{
-				Group groupTarget = Groups.SingleOrDefault(grp => grp.Guid == group);
+				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
 
-				if (groupTarget != null)
+				if ( targetGroup != null )
 				{
-					if (!groupTarget.GetMembersProperty().Access(requester).HasFlag(AccessType.Read))
+					if ( ! targetGroup . GetMembersProperty ( ) .
+										Access ( requester ) .
+										HasFlag ( AccessType . Write ) )
 					{
-						throw new PermissionDeniedException();
+						throw new PermissionDeniedException ( ) ;
 					}
 
-					Entity accessTarget = Entities.SingleOrDefault((entity) => entity.Guid == target);
+					Entity targetEntity = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
 
-					if (accessTarget != null)
+					if ( targetEntity != null )
 					{
-						return groupTarget.Contain(accessTarget);
+						targetGroup . Members . Add ( targetEntity ) ;
 					}
 					else
 					{
-						throw new EntityNotFoundException();
+						throw new EntityNotFoundException ( ) ;
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException();
+					throw new EntityNotFoundException ( ) ;
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException();
+				throw new EntityNotFoundException ( ) ;
 			}
 		}
 
@@ -555,6 +725,42 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 
 			CheckToken ( token ) ;
+
+			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+
+			if ( requester != null )
+			{
+				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+
+				if ( targetGroup != null )
+				{
+					if ( ! targetGroup . GetMembersProperty ( ) .
+										Access ( requester ) .
+										HasFlag ( AccessType . Write ) )
+					{
+						throw new PermissionDeniedException ( ) ;
+					}
+
+					Entity targetEntity = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+
+					if ( targetEntity != null )
+					{
+						targetGroup . Members . Remove ( targetEntity ) ;
+					}
+					else
+					{
+						throw new EntityNotFoundException ( ) ;
+					}
+				}
+				else
+				{
+					throw new EntityNotFoundException ( ) ;
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException ( ) ;
+			}
 		}
 
 		protected void CheckToken ( [NotNull] EntityToken token )
@@ -754,24 +960,24 @@ namespace DreamRecorder . Directory . Services . Logic
 				EntityProperty memberProperty = group . GetMembersProperty ( ) ;
 
 				memberProperty . Permissions . Permissions . Add (
-																new Permissions . Permission ( )
+																new Permission ( )
 																{
 																	Target = requester ,
-																	Status = Permissions . PermissionStatus . Allow ,
-																	Type   = Permissions . PermissionType . Read
+																	Status = PermissionStatus . Allow ,
+																	Type   = PermissionType . Read
 																} ) ;
 
 				memberProperty . Permissions . Permissions . Add (
-																new Permissions . Permission ( )
+																new Permission ( )
 																{
 																	Target = requester ,
-																	Status = Permissions . PermissionStatus . Allow ,
-																	Type   = Permissions . PermissionType . Write
+																	Status = PermissionStatus . Allow ,
+																	Type   = PermissionType . Write
 																} ) ;
 
 				Groups . Add ( group ) ;
 
-				return group.Guid;
+				return group . Guid ;
 			}
 			else
 			{

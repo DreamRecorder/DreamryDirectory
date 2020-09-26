@@ -13,6 +13,25 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public static class EntityExtensions
 	{
+		public static readonly string DisplayName    = nameof(DisplayName);
+
+		public static readonly string DisplayNameName = $"{Consts.Namespace}.{ DisplayName}";
+
+		[CanBeNull]public static string GetDisplayName([NotNull] this Entity entity)
+		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException(nameof(entity));
+			}
+
+			if (entity.Properties.FirstOrDefault(prop => prop.Name == IsDisabledName) is EntityProperty
+					attribute)
+			{
+				return attribute . Value ;
+			}
+
+			return null;
+		}
 
 		public static readonly string IsDisabled = nameof ( IsDisabled ) ;
 
