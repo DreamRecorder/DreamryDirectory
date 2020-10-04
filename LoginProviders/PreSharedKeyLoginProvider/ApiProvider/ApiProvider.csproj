@@ -9,13 +9,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyName>DreamRecorder.Directory.Services.ApiService</AssemblyName>
-    <RootNamespace>DreamRecorder.Directory.Services.ApiService</RootNamespace>
+    <AssemblyName>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ApiService</AssemblyName>
+    <RootNamespace>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ApiService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Logic\Logic\Logic.csproj" />
-    <ProjectReference Include="..\Logic\Logic.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
   </ItemGroup>
 
 

@@ -3,6 +3,10 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
+using DreamRecorder.Directory.Logic;
+using DreamRecorder . Directory . Services . ApiService . Controllers ;
+using DreamRecorder . Directory . Services . Logic ;
+
 using Microsoft.AspNetCore.Builder ;
 using Microsoft.AspNetCore.Hosting ;
 using Microsoft.Extensions.Configuration ;
@@ -23,8 +27,17 @@ namespace DreamRecorder . Directory . Services . ApiService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-        }
+            services.AddControllers(
+									( options ) =>
+									{
+										options . ModelBinderProviders . Insert (
+										0 ,
+										new HeaderComplexModelBinderProvider ( ) ) ;
+
+									});
+
+			services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
+		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -63,8 +63,6 @@ namespace DreamRecorder . Directory . Logic . Tokens
 
 		public static bool operator != ( Token left , Token right ) => ! Equals ( left , right ) ;
 
-		public virtual XElement ToXElement ( ) { return ToXElement ( ) ; }
-
 	}
 
 }

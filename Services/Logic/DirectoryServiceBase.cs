@@ -2,6 +2,7 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
+using System . Net . Http ;
 using System . Security . Cryptography ;
 using System . Text ;
 
@@ -17,6 +18,7 @@ using ILoginProvider = DreamRecorder . Directory . Logic . ILoginProvider ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
+
 
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal

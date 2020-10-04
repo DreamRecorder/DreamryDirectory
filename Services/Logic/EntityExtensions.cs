@@ -13,24 +13,26 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public static class EntityExtensions
 	{
-		public static readonly string DisplayName    = nameof(DisplayName);
 
-		public static readonly string DisplayNameName = $"{Consts.Namespace}.{ DisplayName}";
+		public static readonly string DisplayName = nameof ( DisplayName ) ;
 
-		[CanBeNull]public static string GetDisplayName([NotNull] this Entity entity)
+		public static readonly string DisplayNameName = $"{Consts . Namespace}.{DisplayName}" ;
+
+		[CanBeNull]
+		public static string GetDisplayName ( [NotNull] this Entity entity )
 		{
-			if (entity == null)
+			if ( entity == null )
 			{
-				throw new ArgumentNullException(nameof(entity));
+				throw new ArgumentNullException ( nameof ( entity ) ) ;
 			}
 
-			if (entity.Properties.FirstOrDefault(prop => prop.Name == IsDisabledName) is EntityProperty
-					attribute)
+			if ( entity . Properties . FirstOrDefault ( prop => prop . Name == DisplayNameName) is EntityProperty
+					attribute )
 			{
 				return attribute . Value ;
 			}
 
-			return null;
+			return null ;
 		}
 
 		public static readonly string IsDisabled = nameof ( IsDisabled ) ;
@@ -45,15 +47,31 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 
 			if ( entity . Properties . FirstOrDefault ( prop => prop . Name == IsDisabledName ) is EntityProperty
-					attribute )
+					property )
 			{
-				if ( bool . TryParse ( attribute . Value , out bool result ) )
+				if ( bool . TryParse ( property . Value , out bool result ) )
 				{
 					return result ;
 				}
 			}
 
 			return false ;
+		}
+
+		public static bool SetIsDisabled([NotNull] this Entity entity,bool isDisabled)
+		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException(nameof(entity));
+			}
+
+			EntityProperty property = entity.Properties.FirstOrDefault(prop => prop.Name == IsDisabledName) ;
+			if (property is null )
+			{
+			
+			}
+
+			return false;
 		}
 
 		public static char CanLoginFromSeparator => ',' ;
@@ -100,21 +118,20 @@ namespace DreamRecorder . Directory . Services . Logic
 			{
 				property = new EntityProperty ( )
 							{
-								Name        = CanLoginFromName ,
-								Owner       = DirectoryServiceInternal.Current.
-																		KnownSpecialGroups.DirectoryServices,
-								Guid        = Guid . NewGuid ( ) ,
+								Name = CanLoginFromName ,
+								Owner = DirectoryServiceInternal . Current . KnownSpecialGroups . DirectoryServices ,
+								Guid = Guid . NewGuid ( ) ,
 								Permissions = new PermissionGroup ( ) ,
 							} ;
 
-				property.Permissions.Permissions.Add(
-													new Permission()
-													{
-														Target = DirectoryServiceInternal.Current.
-															KnownSpecialGroups.LoginServices,
-														Status = PermissionStatus.Allow,
-														Type   = PermissionType.Read
-													});
+				property . Permissions . Permissions . Add (
+															new Permission ( )
+															{
+																Target = DirectoryServiceInternal . Current .
+																	KnownSpecialGroups . LoginServices ,
+																Status = PermissionStatus . Allow ,
+																Type   = PermissionType . Read
+															} ) ;
 
 				entity . Properties . Add ( property ) ;
 			}
