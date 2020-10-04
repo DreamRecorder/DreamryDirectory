@@ -93,7 +93,8 @@ namespace DreamRecorder.Directory.ServiceProvider
 		}
 
 		public AccessType AccessProperty(EntityToken token, Guid target, string name) 
-		{ 
+		{
+			
 		}
 
 		public AccessType GrantRead(EntityToken token, Guid target, string name, Guid access) { throw new NotImplementedException(); }
