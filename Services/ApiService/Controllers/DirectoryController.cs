@@ -17,65 +17,6 @@ using Microsoft.Extensions.Logging ;
 
 namespace DreamRecorder . Directory . Services . ApiService .Controllers
 {
-	public class HeaderComplexModelBinder : IModelBinder
-	{
-		public Task BindModelAsync(ModelBindingContext bindingContext)
-		{
-			if (bindingContext == null)
-			{
-				throw new ArgumentNullException(nameof(bindingContext));
-			}
-
-			string headerKey = bindingContext.ModelMetadata.BinderModelName??bindingContext.FieldName;
-
-			if ( ! string . IsNullOrEmpty ( headerKey ) )
-			{
-				string headerValue =
-					bindingContext . HttpContext . Request . Headers [ headerKey ] . FirstOrDefault ( ) ;
-
-				if ( ! string . IsNullOrEmpty ( headerValue ) )
-				{
-					Type modelType = bindingContext.ModelMetadata.ModelType;
-
-					bindingContext. Model  = JsonSerializer . Deserialize ( headerValue , modelType ) ;
-					bindingContext . Result = ModelBindingResult . Success ( bindingContext . Model ) ;
-
-					return Task.CompletedTask;
-				}
-			}
-
-			bindingContext.Result = ModelBindingResult.Failed();
-
-			return Task.CompletedTask;
-		}
-	}
-
-	public class HeaderComplexModelBinderProvider : IModelBinderProvider
-	{
-
-		public IModelBinder GetBinder(ModelBinderProviderContext context)
-		{
-			if (context == null)
-			{
-				throw new ArgumentNullException(nameof(context));
-			}
-
-			if (context.Metadata.IsComplexType)
-			{
-				if ( context.Metadata is DefaultModelMetadata metadata )
-				{
-					object headerAttribute = metadata.Attributes.Attributes.FirstOrDefault( a => a.GetType() == typeof(FromHeaderAttribute) );
-
-					if (headerAttribute != null)
-					{
-						return new BinderTypeModelBinder(typeof(HeaderComplexModelBinder));
-					}
-				}
-			}
-	
-			return null;
-		}
-	}
 
 	[ApiController]
     public class DirectoryController : ControllerBase

@@ -987,14 +987,14 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 		}
 
-		public void RegisterLogin ( EntityToken loginServiceToken , LoginToken targetToken )
+		public void RegisterLogin ( EntityToken token , LoginToken targetToken )
 		{
-			if ( loginServiceToken == null )
+			if ( token == null )
 			{
-				throw new ArgumentNullException ( nameof ( loginServiceToken ) ) ;
+				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			CheckToken ( loginServiceToken ) ;
+			CheckToken ( token ) ;
 
 			if ( targetToken == null )
 			{

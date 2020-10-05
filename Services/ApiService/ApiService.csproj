@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -12,6 +12,10 @@
     <AssemblyName>DreamRecorder.Directory.Services.ApiService</AssemblyName>
     <RootNamespace>DreamRecorder.Directory.Services.ApiService</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DreamRecorder.ToolBox.AspNet.General" Version="1.1.5.545" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Logic\Logic\Logic.csproj" />

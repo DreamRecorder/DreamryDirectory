@@ -6,6 +6,7 @@ using System.Linq ;
 using DreamRecorder.Directory.Logic;
 using DreamRecorder . Directory . Services . ApiService . Controllers ;
 using DreamRecorder . Directory . Services . Logic ;
+using DreamRecorder . ToolBox . AspNet . General ;
 
 using Microsoft.AspNetCore.Builder ;
 using Microsoft.AspNetCore.Hosting ;
@@ -27,14 +28,7 @@ namespace DreamRecorder . Directory . Services . ApiService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(
-									( options ) =>
-									{
-										options . ModelBinderProviders . Insert (
-										0 ,
-										new HeaderComplexModelBinderProvider ( ) ) ;
-
-									});
+            services.AddControllers(HeaderComplexModelBinder.EnableHeaderComplexModelBinder());
 
 			services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
 		}

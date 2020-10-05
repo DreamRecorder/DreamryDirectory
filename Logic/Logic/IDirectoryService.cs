@@ -90,7 +90,7 @@ namespace DreamRecorder . Directory . Logic
 
 
 		void RegisterLogin (
-			[NotNull] EntityToken loginServiceToken ,
+			[NotNull] EntityToken token ,
 			[NotNull] LoginToken  targetToken ) ;
 
 	}

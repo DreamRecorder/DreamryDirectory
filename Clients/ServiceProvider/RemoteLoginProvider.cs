@@ -13,24 +13,51 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 	public class RemoteLoginProvider <TCredential> : ILoginProvider where TCredential:class
 	{
+		public string Server { get; set; }
 
-		public IPEndPoint ServiceEndPoint { get; set; }
+		public int Port { get; set; }
 
-		public LoginToken Login ( TCredential credential )
+		public virtual LoginToken Login ( TCredential credential )
 		{
+			HttpClient client = new HttpClient();
 
-			HttpClient client = new HttpClient ( ) ;
+			HttpResponseMessage response = client.PostAsJsonAsync(
+																new UriBuilder(
+																				Uri.UriSchemeHttps,
+																				Server,
+																				Port,
+																				nameof(Login)).Uri,
+																credential).
+												Result;
 
-			//client . PostAsync (
-			//					$"https://{ServiceEndPoint . Address}:{ServiceEndPoint . Port}/Login" , ) ;
+			response.EnsureSuccessStatusCode();
 
-			throw new NotImplementedException();
+			LoginToken result = response.Content.ReadAsAsync<LoginToken>().Result;
+
+			return result;
 		}
 
 		public LoginToken Login ( object credential ) => Login(credential as TCredential) ;
 
-		public bool CheckToken ( AccessToken token , LoginToken tokenToCheck ) => throw new NotImplementedException ( ) ;
+		public void CheckToken ( AccessToken token , LoginToken tokenToCheck )
+		{
+			HttpClient client = new HttpClient();
 
+			client.DefaultRequestHeaders.Add(
+											"token",
+											System.Text.Json.JsonSerializer.Serialize(token));
+
+			HttpResponseMessage response = client.PostAsJsonAsync(
+																new UriBuilder(
+																				Uri.UriSchemeHttps,
+																				Server,
+																				Port,
+																				nameof(CheckToken)).Uri,
+																tokenToCheck).
+												Result;
+
+			response.EnsureSuccessStatusCode();
+		}
 
 	}
 

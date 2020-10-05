@@ -1,8 +1,11 @@
-﻿using System;
+﻿using System ;
+using System.Collections ;
+using System.Collections.Generic ;
+using System.Linq ;
 
-namespace ServiceProvide
+namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider
 {
-	public class Class1
+	public class PreSharedKeyLoginProvider:ILoginProvider
 	{
 	}
 }

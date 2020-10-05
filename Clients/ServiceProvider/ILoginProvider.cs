@@ -16,7 +16,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		[CanBeNull]
 		LoginToken Login(object credential);
 
-		bool CheckToken ( AccessToken token , LoginToken tokenToCheck ) ;
+		void CheckToken ( AccessToken token , LoginToken tokenToCheck ) ;
 
 	}
 
