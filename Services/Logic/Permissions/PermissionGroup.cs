@@ -2,6 +2,7 @@
 using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
+using System.Text;
 
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
@@ -13,6 +14,27 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 	{
 
 		public HashSet <Permission> Permissions { get ; set ; } = new HashSet <Permission> ( ) ;
+
+		public override string ToString()
+		{
+			StringBuilder stringBuilder = new StringBuilder ( ) ;
+
+			foreach ( Permission permission in Permissions )
+			{
+				stringBuilder . Append ( $"{permission.}" ) ;
+
+			}
+
+		}
+
+		public PermissionGroup ( ) 
+		{
+		}
+
+		public PermissionGroup (string value ) 
+		{
+
+		}
 
 		public AccessType Access(Entity entity)
 		{

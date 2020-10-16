@@ -15,9 +15,9 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public HashSet<EntityProperty> Properties { get; set; }
 
-		public virtual bool Contain([CanBeNull]Entity entity, HashSet<Entity> checkedEntities = null)
+		public virtual bool Contain([CanBeNull]Entity entity, [CanBeNull]HashSet<Entity> checkedEntities = null)
 		{
-			if (checkedEntities.Contains(this))
+			if (checkedEntities?.Contains(this)==false)
 			{
 				checkedEntities.Add(this);
 			}
