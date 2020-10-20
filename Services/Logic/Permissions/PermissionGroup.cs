@@ -21,14 +21,16 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 
 			foreach ( Permission permission in Permissions )
 			{
-				stringBuilder . Append ( $"{permission.}" ) ;
+				stringBuilder . Append ( $"{permission.Target}" ) ;
 
 			}
 
+			return stringBuilder . ToString ( ) ;
 		}
 
 		public PermissionGroup ( ) 
 		{
+
 		}
 
 		public PermissionGroup (string value ) 

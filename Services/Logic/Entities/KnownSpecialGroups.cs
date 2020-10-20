@@ -8,9 +8,10 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 	public class KnownSpecialGroups
 	{
-		public Everyone Everyone { get; set; }
 
-		public AuthorizedEntities AuthorizedEntities { get; set; }
+		public Everyone Everyone { get ; set ; } = new Everyone ( ) ;
+
+		public AuthorizedEntities AuthorizedEntities { get ; set ; } = new AuthorizedEntities ( ) ;
 
 		public SpecialGroups SpecialGroups { get ; set ; }
 

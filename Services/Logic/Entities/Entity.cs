@@ -11,7 +11,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 	public class Entity : IEquatable<Entity>
 	{
 
-		public Guid Guid { get; set; }
+		public virtual Guid Guid { get; set; }
 
 		public HashSet<EntityProperty> Properties { get; set; }
 

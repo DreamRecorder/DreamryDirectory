@@ -19,6 +19,12 @@ using ILoginProvider = DreamRecorder . Directory . Logic . ILoginProvider ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
+	public class DirectoryDatabase
+	{
+
+
+
+	}
 
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal
