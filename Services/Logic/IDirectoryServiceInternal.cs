@@ -22,7 +22,7 @@ namespace DreamRecorder . Directory . Services . Logic
 		AccessToken IssueAccessToken([NotNull] Entity entity, [NotNull] Entity accessTarget, TimeSpan lifetime);
 
 		/// <summary>
-		/// Directly issue entity token
+		/// Issue entity token
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <param name="lifetime"></param>
