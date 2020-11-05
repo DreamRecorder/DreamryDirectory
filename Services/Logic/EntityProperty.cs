@@ -27,12 +27,12 @@ namespace DreamRecorder . Directory . Services . Logic
 				return true;
 			}
 
-			return Guid.Equals(other.Guid);
+			return other.Name==Name&&other.Owner ==Owner;
 		}
 
 		public override bool Equals(object obj) => ReferenceEquals(this, obj) || obj is EntityProperty other && Equals(other) ;
 
-		public override int GetHashCode() => Guid.GetHashCode() ;
+		public override int GetHashCode() =>HashCode.Combine(Owner,Name) ;
 
 		public XElement ToXElement ( )
 		{
@@ -41,7 +41,6 @@ namespace DreamRecorder . Directory . Services . Logic
 			result.SetAttributeValue(nameof(Name), Name);
 			result.SetAttributeValue(nameof(Owner),  Owner.Guid);
 			result.SetAttributeValue(nameof(Value),    Value);
-			result.SetAttributeValue(nameof(Guid),    Guid);
 
 			return result;
 		}
@@ -49,8 +48,6 @@ namespace DreamRecorder . Directory . Services . Logic
 		public static bool operator ==(EntityProperty left, EntityProperty right) => Equals(left, right) ;
 
 		public static bool operator !=(EntityProperty left, EntityProperty right) => !Equals(left, right) ;
-
-		public Guid Guid { get; set; }
 
 		public string Name { get; set; }
 
