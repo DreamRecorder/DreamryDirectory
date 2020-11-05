@@ -22,21 +22,45 @@ namespace DreamRecorder . Directory . Services . Logic
 	public class TokenStorage<TToken> where TToken:Token
 	{
 
-
-
 	}
 
 
-
-	public class DirectoryDatabase
+	public interface IDirectoryDatabase
 	{
 
+		HashSet <User> Users { get ; }
+
+		HashSet <Group> Groups { get ; set ; }
+
+		HashSet <Service> Services { get ; set ; }
+
+		HashSet <LoginService> LoginServices { get ; set ; }
+
+		HashSet <DirectoryService> DirectoryServices { get ; set ; }
+
+	}
+
+	public class DirectoryDatabase 
+	{
+
+		public class DbUser
+		{
+
+			public Guid Guid { get; set; }
+
+		}
+
+		public class DbGroup
+		{
+			public Guid Guid { get; set; }
+
+		}
 
 
 	}
 
 	[PublicAPI]
-	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal
+	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal, IDirectoryDatabase
 	{
 
 		public IAccessTokenProvider AccessTokenProvider { get ; set ; }
@@ -124,15 +148,16 @@ namespace DreamRecorder . Directory . Services . Logic
 			return token ;
 		}
 
-		public HashSet <User> Users { get ; }
+		public HashSet<User> Users { get; }
 
-		public HashSet <Group> Groups { get ; set ; }
+		public HashSet<Group> Groups { get; set; }
 
-		public HashSet <Service> Services { get ; set ; }
+		public HashSet<Service> Services { get; set; }
 
-		public HashSet <LoginService> LoginServices { get ; set ; }
+		public HashSet<LoginService> LoginServices { get; set; }
 
-		public HashSet <DirectoryService> DirectoryServices { get ; set ; }
+		public HashSet<DirectoryService> DirectoryServices { get; set; }
+
 
 		public EntityToken EveryoneToken { get ; set ; }
 
@@ -193,15 +218,23 @@ namespace DreamRecorder . Directory . Services . Logic
 						throw new EntityDisabledException ( target . Guid ) ;
 					}
 
-					ILoginProvider loginProviderService = LoginServiceProvider . GetLoginProvider ( issuer ) ;
+					if ( target.GetCanLoginFrom().Contains(issuer.Guid) )
+					{
+						ILoginProvider loginProviderService = LoginServiceProvider.GetLoginProvider(issuer);
 
-					loginProviderService . CheckToken ( AccessTokenProvider . Access ( issuer . Guid ) , token ) ;
+						loginProviderService.CheckToken(AccessTokenProvider.Access(issuer.Guid), token);
 
-					EntityToken resultToken = IssueEntityToken (
-																target ,
-																TokenPolicy . EntityTokenTimeSpan ( target ) ) ;
+						EntityToken resultToken = IssueEntityToken(
+																	target,
+																	TokenPolicy.EntityTokenTimeSpan(target));
 
-					return resultToken ;
+						return resultToken;
+					}
+					else
+					{
+						throw new PermissionDeniedException();
+					}
+					
 				}
 				else
 				{

@@ -21,8 +21,7 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 
 			foreach ( Permission permission in Permissions )
 			{
-				stringBuilder . Append ( $"{permission.Target}" ) ;
-
+				stringBuilder . AppendLine (permission.ToString()) ;
 			}
 
 			return stringBuilder . ToString ( ) ;

@@ -17,6 +17,21 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 
 		public Entity Target { get; set; }
 
+		public override string ToString ( )
+		{
+			return $"{Target.Guid},{Status},{Type}" ;
+		}
+
+		public Permission ( ) {
+		}
+
+		public Permission ( PermissionStatus status , PermissionType type , Entity target )
+		{
+			Status = status ;
+			Type   = type ;
+			Target = target ;
+		}
+
 	}
 
 }
