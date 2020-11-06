@@ -19,28 +19,6 @@ using ILoginProvider = DreamRecorder . Directory . Logic . ILoginProvider ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public class TokenStorage<TToken> where TToken:Token
-	{
-
-	}
-
-
-	public interface IDirectoryDatabase
-	{
-
-		HashSet <User> Users { get ; }
-
-		HashSet <Group> Groups { get ; set ; }
-
-		HashSet <Service> Services { get ; set ; }
-
-		HashSet <LoginService> LoginServices { get ; set ; }
-
-		HashSet <DirectoryService> DirectoryServices { get ; set ; }
-
-	}
-
-
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal, IDirectoryDatabase
 	{
@@ -139,7 +117,6 @@ namespace DreamRecorder . Directory . Services . Logic
 		public HashSet<LoginService> LoginServices { get; set; }
 
 		public HashSet<DirectoryService> DirectoryServices { get; set; }
-
 
 		public EntityToken EveryoneToken { get ; set ; }
 

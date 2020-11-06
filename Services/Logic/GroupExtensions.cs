@@ -24,7 +24,7 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( @group ) ) ;
 			}
 
-			if ( group . Properties . FirstOrDefault ( ( prop ) => prop . Name == Members ) is EntityProperty property )
+			if ( group . Properties . FirstOrDefault ( ( prop ) => prop . Name == MembersName) is EntityProperty property )
 			{
 
 			}
@@ -33,7 +33,6 @@ namespace DreamRecorder . Directory . Services . Logic
 				property = new EntityProperty ( )
 							{
 								Name  = MembersName ,
-								Guid  = Guid . NewGuid ( ) ,
 								Owner = DirectoryServiceInternal . Current . KnownSpecialGroups . DirectoryServices ,
 								Value = string . Empty
 							} ;

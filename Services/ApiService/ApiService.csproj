@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DreamRecorder.Directory.Services.ApiService</AssemblyName>
     <RootNamespace>DreamRecorder.Directory.Services.ApiService</RootNamespace>
   </PropertyGroup>
@@ -16,6 +16,10 @@
   <ItemGroup>
     <PackageReference Include="DreamRecorder.ToolBox.AspNet.General" Version="1.1.5.553" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
