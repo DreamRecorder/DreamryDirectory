@@ -120,7 +120,6 @@ namespace DreamRecorder . Directory . Services . Logic
 							{
 								Name = CanLoginFromName ,
 								Owner = DirectoryServiceInternal . Current . KnownSpecialGroups . DirectoryServices ,
-								Guid = Guid . NewGuid ( ) ,
 								Permissions = new PermissionGroup ( ) ,
 							} ;
 

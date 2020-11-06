@@ -22,15 +22,13 @@ namespace DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.Servi
 	{
 
 		public abstract Guid ? CheckCredential ( TCredential credential ) ;
-		
 
 		public LoginToken Login(object credential)
 		{
 			if (credential is TCredential tCredential)
 			{
-				if ( expr )
+				if ( CheckCredential(tCredential ) is Guid guid)
 				{
-					
 
 				}
 			}
@@ -45,21 +43,13 @@ namespace DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.Servi
 
 	}
 
-	public class PreSharedKeyLoginProvider : ILoginProvider
+	public class PreSharedKeyLoginProvider : LoginProviderBase<PreSharedKeyCredential>
 	{
-
-		public LoginToken Login ( object credential )
+		public override Guid? CheckCredential(PreSharedKeyCredential credential)
 		{
-			if ( credential is PreSharedKeyCredential preSharedKeyCredential )
-			{
-				
-			}
-			else
-			{
-				throw new InvalidOperationException();
-			}
+			throw new NotImplementedException();
 		}
 
-		public void CheckToken(AccessToken token, LoginToken tokenToCheck) { ; }
+
 	}
 }

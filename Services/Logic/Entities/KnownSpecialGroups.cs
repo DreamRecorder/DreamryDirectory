@@ -13,11 +13,11 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public AuthorizedEntities AuthorizedEntities { get ; set ; } = new AuthorizedEntities ( ) ;
 
-		public SpecialGroups SpecialGroups { get ; set ; }
+		public SpecialGroups SpecialGroups { get ; set ; } = new SpecialGroups ( ) ;
 
-		public DirectoryServices DirectoryServices { get; set; }
+		public DirectoryServices DirectoryServices { get ; set ; } = new DirectoryServices ( ) ;
 
-		public LoginServices LoginServices { get; set; }
+		public LoginServices LoginServices { get ; set ; } = new LoginServices ( ) ;
 
 		public KnownSpecialGroups ( ) {
 

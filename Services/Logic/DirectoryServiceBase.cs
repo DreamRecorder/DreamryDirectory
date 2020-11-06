@@ -40,54 +40,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	}
 
-	public class DirectoryDatabaseStorage
-	{
-
-		public class DbUser
-		{
-			public Guid Guid { get; set; }
-
-			public HashSet<DbProperty> Proprieties { get; set; }
-		}
-
-		public class DbDirectoryService
-		{
-			public Guid Guid { get; set; }
-
-			public HashSet<DbProperty> Proprieties { get; set; }
-		}
-
-		public class DbGroup
-		{
-			public Guid Guid { get; set; }
-
-			public HashSet<DbProperty> Proprieties { get; set; }
-
-			public HashSet<DbGroupMember> Members { get; set; }
-
-		}
-
-		public class DbGroupMember
-		{
-			public Guid Group { get; set; }
-
-			public Guid Member { get; set; }
-
-		}
-
-		public class DbProperty
-		{
-			public Guid Owner { get; set; }
-
-			public string Name { get; set; }
-
-			public string Value { get; set; }
-
-			public string Permission { get; set; }
-		}
-
-		
-	}
 
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal, IDirectoryDatabase
@@ -454,7 +406,6 @@ namespace DreamRecorder . Directory . Services . Logic
 						accessTarget . Properties . Add (
 														new EntityProperty ( )
 														{
-															Guid  = new Guid ( ) ,
 															Name  = name ,
 															Owner = requester ,
 															Value = value
