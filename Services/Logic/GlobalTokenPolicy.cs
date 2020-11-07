@@ -8,10 +8,10 @@ using DreamRecorder . Directory . Services . Logic . Entities ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public class TokenPolicy : ITokenPolicy
+	public class GlobalTokenPolicy : ITokenPolicy
 	{
 
-		public TimeSpan EntityTokenTimeSpan ( Entity entity ) { return TimeSpan . FromMinutes ( 10 ) ; }
+		public TimeSpan EntityTokenLife ( Entity entity ) { return TimeSpan . FromMinutes ( 10 ) ; }
 
 		public TimeSpan AccessTokenLife ( Entity entity , Entity accessTarget )
 		{

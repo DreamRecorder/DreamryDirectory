@@ -39,7 +39,10 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get ; }
 
-		public void Start ( ) { }
+		public void Start ( )
+		{
+			
+		}
 
 		public ITokenPolicy TokenPolicy { get ; set ; }
 
@@ -108,7 +111,7 @@ namespace DreamRecorder . Directory . Services . Logic
 			return token ;
 		}
 
-		public HashSet<User> Users { get; }
+		public HashSet<User> Users { get; set; }
 
 		public HashSet<Group> Groups { get; set; }
 
@@ -185,7 +188,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 						EntityToken resultToken = IssueEntityToken(
 																	target,
-																	TokenPolicy.EntityTokenTimeSpan(target));
+																	TokenPolicy.EntityTokenLife(target));
 
 						return resultToken;
 					}

@@ -13,7 +13,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public static class EntityExtensions
 	{
-
 		public static readonly string DisplayName = nameof ( DisplayName ) ;
 
 		public static readonly string DisplayNameName = $"{Consts . Namespace}.{DisplayName}" ;

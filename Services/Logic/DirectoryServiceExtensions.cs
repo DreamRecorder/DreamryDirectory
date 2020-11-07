@@ -13,18 +13,18 @@ namespace DreamRecorder . Directory . Services . Logic
 	public static class DirectoryServiceExtensions
 	{
 
-		public static readonly string ApiHost = nameof(ApiHost);
+		public static readonly string ApiEndPoints = nameof(ApiEndPoints);
 
-		public static readonly string ApiHostName = $"{Consts.Namespace}.{ApiHost}";
+		public static readonly string ApiEndPointsName = $"{Consts.Namespace}.{ApiEndPoints}";
 
-		public static EntityProperty GetMembersProperty([NotNull] this DirectoryService group)
+		public static EntityProperty GetApiEndPointsProperty([NotNull] this DirectoryService directoryService)
 		{
-			if (@group == null)
+			if (directoryService == null)
 			{
-				throw new ArgumentNullException(nameof(@group));
+				throw new ArgumentNullException(nameof(directoryService));
 			}
 
-			if (group.Properties.FirstOrDefault((prop) => prop.Name == ApiHostName) is EntityProperty property)
+			if (directoryService.Properties.FirstOrDefault((prop) => prop.Name == ApiEndPointsName) is EntityProperty property)
 			{
 
 			}
@@ -32,12 +32,12 @@ namespace DreamRecorder . Directory . Services . Logic
 			{
 				property = new EntityProperty()
 							{
-								Name  = ApiHostName,
+								Name  = ApiEndPointsName,
 								Owner = DirectoryServiceInternal.Current.KnownSpecialGroups.DirectoryServices,
 								Value = string.Empty
 							};
 
-				group.Properties.Add(property);
+				directoryService.Properties.Add(property);
 			}
 
 			return property;

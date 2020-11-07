@@ -11,7 +11,7 @@ namespace DreamRecorder . Directory . Services . Logic
 	public interface ITokenPolicy
 	{
 
-		TimeSpan EntityTokenTimeSpan ( Entity entity ) ;
+		TimeSpan EntityTokenLife ( Entity entity ) ;
 
 		TimeSpan AccessTokenLife ( Entity entity , Entity accessTarget ) ;
 
