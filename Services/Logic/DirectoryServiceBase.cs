@@ -11,6 +11,7 @@ using DreamRecorder . Directory . Logic . Tokens ;
 using DreamRecorder . Directory . ServiceProvider ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
 using DreamRecorder . Directory . Services . Logic . Permissions ;
+using DreamRecorder.Directory.Services.Logic.Storage;
 
 using JetBrains . Annotations ;
 
@@ -22,6 +23,8 @@ namespace DreamRecorder . Directory . Services . Logic
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal, IDirectoryDatabase
 	{
+
+		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
 		public IAccessTokenProvider AccessTokenProvider { get ; set ; }
 
@@ -41,7 +44,27 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public void Start ( )
 		{
-			
+			HashSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
+			foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
+			{
+				DirectoryService directoryService = new DirectoryService ( ) { Guid = dbDirectoryService . Guid ,DatabaseObject=dbDirectoryService} ;
+				DirectoryServices . Add ( directoryService ) ;
+			}
+
+			HashSet <DbUser> dbUsers = DatabaseStorage . GetDbUsers ( ) ;
+			foreach ( DbUser dbUser in dbUsers )
+			{
+				User user = new User ( ) { Guid = dbUser . Guid , DatabaseObject = dbUser } ;
+				Users.Add(user);
+			}
+
+			foreach ( DirectoryService directoryService in DirectoryServices )
+			{
+				foreach ( DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
+				{
+					EntityProperty property=new EntityProperty(){Name=dbProperty.Name,Owner=Entities.Fis}
+				}
+			}
 		}
 
 		public ITokenPolicy TokenPolicy { get ; set ; }

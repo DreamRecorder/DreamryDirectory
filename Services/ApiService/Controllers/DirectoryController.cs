@@ -29,6 +29,8 @@ namespace DreamRecorder . Directory . Services . ApiService .Controllers
 		{
 			_logger          = logger;
 			DirectoryService = directoryService ;
+
+			
 		}
 
 		[HttpPost(@"Login")]
@@ -67,13 +69,18 @@ namespace DreamRecorder . Directory . Services . ApiService .Controllers
 		}
 
 
-
-
-
 		[HttpPost(@"SetProperty/{target:guid}/{name}")]
 		public ActionResult SetProperty([FromHeader] EntityToken token, Guid target, string name,[FromBody] string value)
 		{
+			if (token is null)
+			{
+				return BadRequest();
+			}
+
+			DirectoryService . SetProperty ( token , target , name , value ) ;
+
 			return Ok ( ) ;
+
 		}
 
 
