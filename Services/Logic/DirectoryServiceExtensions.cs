@@ -1,13 +1,13 @@
-﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
-using DreamRecorder . Directory . Services . Logic . Entities ;
+using DreamRecorder.Directory.Services.Logic.Entities;
 
-using JetBrains . Annotations ;
+using JetBrains.Annotations;
 
-namespace DreamRecorder . Directory . Services . Logic
+namespace DreamRecorder.Directory.Services.Logic
 {
 
 	public static class DirectoryServiceExtensions
@@ -31,17 +31,38 @@ namespace DreamRecorder . Directory . Services . Logic
 			else
 			{
 				property = new EntityProperty()
-							{
-								Name  = ApiEndPointsName,
-								Owner = DirectoryServiceInternal.Current.KnownSpecialGroups.DirectoryServices,
-								Value = string.Empty
-							};
+				{
+					Name = ApiEndPointsName,
+					Owner = DirectoryServiceInternal.Current.KnownSpecialGroups.DirectoryServices,
+					Value = string.Empty
+				};
 
 				directoryService.Properties.Add(property);
 			}
 
 			return property;
 
+		}
+
+		public static List<(string HostName, int Port)> GetApiEndPoints(
+			[NotNull] this DirectoryService directoryService)
+		{
+			if (directoryService == null)
+			{
+				throw new ArgumentNullException(nameof(directoryService));
+			}
+
+			List <(string HostName , int Port)> result = new List<(string HostName, int Port)>();
+
+			List <string> endPointsStrings = directoryService.GetApiEndPointsProperty().
+															Value.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(str=>str.Trim()).ToList();
+
+			foreach (string endPointsString in endPointsStrings)
+			{
+				string[] endPointsParts = endPointsString . Split ( ':', StringSplitOptions.RemoveEmptyEntries).Select(str => str.Trim()).ToArray();
+
+
+			}
 		}
 
 	}

@@ -3,6 +3,8 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
+using DreamRecorder . Directory . Services . Logic . Storage ;
+
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
 
@@ -11,6 +13,8 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 	{
 
 		public HashSet<Entity> Members { get; set; }
+
+		public DbGroup DatabaseObject { get ; set ; }
 
 		public override bool Contain(Entity entity, HashSet<Entity> checkedEntities = null)
 		{

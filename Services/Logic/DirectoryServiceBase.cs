@@ -1,106 +1,174 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
-using System . Net . Http ;
-using System . Security . Cryptography ;
-using System . Text ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 
-using DreamRecorder . Directory . Logic ;
-using DreamRecorder . Directory . Logic . Tokens ;
-using DreamRecorder . Directory . ServiceProvider ;
-using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . Directory . Services . Logic . Permissions ;
+using DreamRecorder.Directory.Logic;
+using DreamRecorder.Directory.Logic.Tokens;
+using DreamRecorder.Directory.ServiceProvider;
+using DreamRecorder.Directory.Services.Logic.Entities;
+using DreamRecorder.Directory.Services.Logic.Permissions;
 using DreamRecorder.Directory.Services.Logic.Storage;
 
-using JetBrains . Annotations ;
+using JetBrains.Annotations;
 
-using ILoginProvider = DreamRecorder . Directory . Logic . ILoginProvider ;
+using Microsoft.Extensions.Logging;
 
-namespace DreamRecorder . Directory . Services . Logic
+using ILoginProvider = DreamRecorder.Directory.Logic.ILoginProvider;
+
+namespace DreamRecorder.Directory.Services.Logic
 {
 
 	[PublicAPI]
-	public class DirectoryServiceBase : IDirectoryService , IDirectoryServiceInternal, IDirectoryDatabase
+	public class DirectoryServiceBase : IDirectoryService, IDirectoryServiceInternal, IDirectoryDatabase
 	{
+
+		public Logger<DirectoryServiceBase> Logger { get; set; }
 
 		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
-		public IAccessTokenProvider AccessTokenProvider { get ; set ; }
+		public IAccessTokenProvider AccessTokenProvider { get; set; }
 
-		public IEntityTokenProvider EntityTokenProvider { get ; set ; }
+		public IEntityTokenProvider EntityTokenProvider { get; set; }
 
-		public RNGCryptoServiceProvider RngProvider { get ; set ; } = new RNGCryptoServiceProvider ( ) ;
+		public RNGCryptoServiceProvider RngProvider { get; set; } = new RNGCryptoServiceProvider();
 
-		public KnownSpecialGroups KnownSpecialGroups { get ; }
+		public KnownSpecialGroups KnownSpecialGroups { get; }
 
-		public DirectoryService ServiceEntity { get ; set ; }
+		public DirectoryService ServiceEntity { get; set; }
 
-		public EntityToken ServiceToken { get ; }
+		public EntityToken ServiceToken { get; }
 
-		public virtual ILoginServiceProvider LoginServiceProvider { get ; }
+		public virtual ILoginServiceProvider LoginServiceProvider { get; }
 
-		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get ; }
+		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get; }
 
-		public void Start ( )
+		public void Start()
 		{
-			HashSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
+			HashSet<DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
 			foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
 			{
-				DirectoryService directoryService = new DirectoryService ( ) { Guid = dbDirectoryService . Guid ,DatabaseObject=dbDirectoryService} ;
-				DirectoryServices . Add ( directoryService ) ;
+				DirectoryService directoryService = new DirectoryService()
+				{
+					Guid = dbDirectoryService.Guid,
+					DatabaseObject = dbDirectoryService
+				};
+				DirectoryServices.Add(directoryService);
 			}
 
-			HashSet <DbUser> dbUsers = DatabaseStorage . GetDbUsers ( ) ;
-			foreach ( DbUser dbUser in dbUsers )
+			HashSet<DbLoginService> dbLoginServices = DatabaseStorage.GetDbLoginServices();
+			foreach (DbLoginService dbLoginService in dbLoginServices)
 			{
-				User user = new User ( ) { Guid = dbUser . Guid , DatabaseObject = dbUser } ;
+				LoginService loginService = new LoginService()
+				{
+					Guid = dbLoginService.Guid,
+					DatabaseObject = dbLoginService
+				};
+				LoginServices.Add(loginService);
+			}
+
+			HashSet<DbUser> dbUsers = DatabaseStorage.GetDbUsers();
+			foreach (DbUser dbUser in dbUsers)
+			{
+				User user = new User() { Guid = dbUser.Guid, DatabaseObject = dbUser };
 				Users.Add(user);
 			}
 
-			foreach ( DirectoryService directoryService in DirectoryServices )
+			HashSet<DbGroup> dbGroups = DatabaseStorage.GetDbGroups();
+			foreach (DbGroup dbGroup in dbGroups)
 			{
-				foreach ( DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
+				Group group = new Group() { Guid = dbGroup.Guid, DatabaseObject = dbGroup };
+				Groups.Add(group);
+			}
+
+			
+
+			foreach (DirectoryService directoryService in DirectoryServices)
+			{
+				foreach (DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
 				{
-					EntityProperty property=new EntityProperty(){Name=dbProperty.Name,Owner=Entities.Fis}
+					Entity propertyOwner = FindEntity(dbProperty.Owner);
+
+					if (propertyOwner is null)
+					{
+						propertyOwner = ServiceEntity;
+
+					}
+
+					EntityProperty property = new EntityProperty()
+					{
+						Name = dbProperty.Name,
+						Owner = propertyOwner,
+						Permissions = new PermissionGroup(dbProperty.Permission),
+						Value = dbProperty.Value,
+					};
+
+					directoryService . Properties . Add ( property ) ;
+				}
+			}
+
+			foreach ( LoginService loginService in LoginServices)
+			{
+				foreach (DbProperty dbProperty in loginService.DatabaseObject.Proprieties)
+				{
+					Entity propertyOwner = FindEntity(dbProperty.Owner);
+
+					if (propertyOwner is null)
+					{
+						propertyOwner = ServiceEntity;
+
+					}
+
+					EntityProperty property = new EntityProperty()
+											{
+												Name        = dbProperty.Name,
+												Owner       = propertyOwner,
+												Permissions = new PermissionGroup(dbProperty.Permission),
+												Value       = dbProperty.Value,
+											};
+
+					loginService.Properties.Add(property);
 				}
 			}
 		}
 
-		public ITokenPolicy TokenPolicy { get ; set ; }
+		public ITokenPolicy TokenPolicy { get; set; }
 
-		public AccessToken IssueAccessToken (
-			[NotNull] Entity entity ,
-			[NotNull] Entity accessTarget ,
-			TimeSpan         lifetime )
+		public AccessToken IssueAccessToken(
+			[NotNull] Entity entity,
+			[NotNull] Entity accessTarget,
+			TimeSpan lifetime)
 		{
-			if ( entity == null )
+			if (entity == null)
 			{
-				throw new ArgumentNullException ( nameof ( entity ) ) ;
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			if ( accessTarget == null )
+			if (accessTarget == null)
 			{
-				throw new ArgumentNullException ( nameof ( accessTarget ) ) ;
+				throw new ArgumentNullException(nameof(accessTarget));
 			}
 
-			DateTimeOffset now = DateTimeOffset . UtcNow ;
+			DateTimeOffset now = DateTimeOffset.UtcNow;
 
 			AccessToken token = new AccessToken
-								{
-									Owner     = entity . Guid ,
-									Target    = accessTarget . Guid ,
-									NotBefore = now ,
-									NotAfter  = now + lifetime ,
-									Issuer    = ServiceEntity . Guid ,
-									Secret    = new byte[ 1024 ] ,
-								} ;
+			{
+				Owner = entity.Guid,
+				Target = accessTarget.Guid,
+				NotBefore = now,
+				NotAfter = now + lifetime,
+				Issuer = ServiceEntity.Guid,
+				Secret = new byte[1024],
+			};
 
-			RngProvider . GetBytes ( token . Secret ) ;
+			RngProvider.GetBytes(token.Secret);
 
-			IssuedAccessTokens . Add ( token ) ;
+			IssuedAccessTokens.Add(token);
 
-			return token ;
+			return token;
 		}
 
 		/// <summary>
@@ -109,29 +177,29 @@ namespace DreamRecorder . Directory . Services . Logic
 		/// <param name="entity"></param>
 		/// <param name="lifetime"></param>
 		/// <returns></returns>
-		public EntityToken IssueEntityToken ( [NotNull] Entity entity , TimeSpan lifetime )
+		public EntityToken IssueEntityToken([NotNull] Entity entity, TimeSpan lifetime)
 		{
-			if ( entity == null )
+			if (entity == null)
 			{
-				throw new ArgumentNullException ( nameof ( entity ) ) ;
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			DateTimeOffset now = DateTimeOffset . UtcNow ;
+			DateTimeOffset now = DateTimeOffset.UtcNow;
 
 			EntityToken token = new EntityToken
-								{
-									Owner     = entity . Guid ,
-									NotBefore = now ,
-									NotAfter  = now + lifetime ,
-									Issuer    = ServiceEntity . Guid ,
-									Secret    = new byte[ 1024 ] ,
-								} ;
+			{
+				Owner = entity.Guid,
+				NotBefore = now,
+				NotAfter = now + lifetime,
+				Issuer = ServiceEntity.Guid,
+				Secret = new byte[1024],
+			};
 
-			RngProvider . GetBytes ( token . Secret ) ;
+			RngProvider.GetBytes(token.Secret);
 
-			IssuedEntityTokens . Add ( token ) ;
+			IssuedEntityTokens.Add(token);
 
-			return token ;
+			return token;
 		}
 
 		public HashSet<User> Users { get; set; }
@@ -144,66 +212,68 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public HashSet<DirectoryService> DirectoryServices { get; set; }
 
-		public EntityToken EveryoneToken { get ; set ; }
+		public EntityToken EveryoneToken { get; set; }
 
-		public IEnumerable <Entity> Entities
-			=> Users . Union <Entity> ( Groups ) .
-						Union ( Services ) .
-						Union ( LoginServices ) .
-						Union ( DirectoryServices ) .
-						Union ( KnownSpecialGroups . Entities ) ;
+		public IEnumerable<Entity> Entities
+			=> Users.Union<Entity>(Groups).
+						Union(Services).
+						Union(LoginServices).
+						Union(DirectoryServices).
+						Union(KnownSpecialGroups.Entities);
 
-		public HashSet <EntityToken> IssuedEntityTokens { get ; set ; }
+		public Entity FindEntity(Guid guid) => Entities.SingleOrDefault((entity) => entity.Guid == guid);
 
-		public HashSet <AccessToken> IssuedAccessTokens { get ; set ; }
+		public HashSet<EntityToken> IssuedEntityTokens { get; set; }
+
+		public HashSet<AccessToken> IssuedAccessTokens { get; set; }
 
 
 		/// <summary>
 		/// Check if a token is in valid time
 		/// </summary>
 		/// <param name="token"></param>
-		public void CheckTokenTime ( [NotNull] Token token )
+		public void CheckTokenTime([NotNull] Token token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			if ( token . NotAfter    > DateTimeOffset . UtcNow
-				&& token . NotBefore < DateTimeOffset . UtcNow )
+			if (token.NotAfter > DateTimeOffset.UtcNow
+				&& token.NotBefore < DateTimeOffset.UtcNow)
 			{
-				return ;
+				return;
 			}
 			else
 			{
-				throw new InvalidTimeException ( ) ;
+				throw new InvalidTimeException();
 			}
 		}
 
-		public EntityToken Login ( LoginToken token )
+		public EntityToken Login(LoginToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				return EveryoneToken ;
+				return EveryoneToken;
 			}
 
-			CheckTokenTime ( token ) ;
+			CheckTokenTime(token);
 
 			LoginService issuer =
-				LoginServices . SingleOrDefault ( loginProvider => loginProvider . Guid == token . Issuer ) ;
+				LoginServices.SingleOrDefault(loginProvider => loginProvider.Guid == token.Issuer);
 
-			if ( ! ( issuer is null ) )
+			if (!(issuer is null))
 			{
-				Entity target = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+				Entity target = FindEntity(token.Owner);
 
-				if ( target != null )
+				if (target != null)
 				{
-					if ( target . GetIsDisabled ( ) )
+					if (target.GetIsDisabled())
 					{
-						throw new EntityDisabledException ( target . Guid ) ;
+						throw new EntityDisabledException(target.Guid);
 					}
 
-					if ( target.GetCanLoginFrom().Contains(issuer.Guid) )
+					if (target.GetCanLoginFrom().Contains(issuer.Guid))
 					{
 						ILoginProvider loginProviderService = LoginServiceProvider.GetLoginProvider(issuer);
 
@@ -219,821 +289,820 @@ namespace DreamRecorder . Directory . Services . Logic
 					{
 						throw new PermissionDeniedException();
 					}
-					
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new InvalidIssuerException ( ) ;
+				throw new InvalidIssuerException();
 			}
 		}
 
-		public EntityToken UpdateToken ( EntityToken token )
+		public EntityToken UpdateToken(EntityToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity target = Entities . FirstOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity target = Entities.FirstOrDefault((entity) => entity.Guid == token.Owner);
 
-			if ( target != null )
+			if (target != null)
 			{
-				if ( target . GetIsDisabled ( ) )
+				if (target.GetIsDisabled())
 				{
-					throw new EntityDisabledException ( target . Guid ) ;
+					throw new EntityDisabledException(target.Guid);
 				}
 
-				return IssueEntityToken ( target , TimeSpan . FromHours ( 1 ) ) ;
+				return IssueEntityToken(target, TimeSpan.FromHours(1));
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public void DisposeToken ( [NotNull] EntityToken token )
+		public void DisposeToken([NotNull] EntityToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			if ( token . Issuer == ServiceEntity . Guid )
+			if (token.Issuer == ServiceEntity.Guid)
 			{
-				IssuedEntityTokens . Remove ( token ) ;
+				IssuedEntityTokens.Remove(token);
 			}
 			else
 			{
 				DirectoryService issuer =
-					DirectoryServices . FirstOrDefault (
-														( directoryService )
-															=> directoryService . Guid == token . Issuer ) ;
-				if ( ! ( issuer is null ) )
+					DirectoryServices.FirstOrDefault(
+														(directoryService)
+															=> directoryService.Guid == token.Issuer);
+				if (!(issuer is null))
 				{
-					IDirectoryService issuerService = DirectoryServiceProvider . GetDirectoryProvider ( issuer ) ;
+					IDirectoryService issuerService = DirectoryServiceProvider.GetDirectoryProvider(issuer);
 
-					issuerService . DisposeToken ( token ) ;
+					issuerService.DisposeToken(token);
 				}
 			}
 		}
 
-		public AccessToken Access ( EntityToken token , Guid target )
+		public AccessToken Access(EntityToken token, Guid target)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity accessTarget = FindEntity(target);
 
-				if ( accessTarget != null )
+				if (accessTarget != null)
 				{
-					return IssueAccessToken (
-											requester ,
-											accessTarget ,
-											TokenPolicy . AccessTokenLife ( requester , accessTarget ) ) ;
+					return IssueAccessToken(
+											requester,
+											accessTarget,
+											TokenPolicy.AccessTokenLife(requester, accessTarget));
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public string GetProperty ( EntityToken token , Guid target , string name )
+		public string GetProperty(EntityToken token, Guid target, string name)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity accessTarget = FindEntity(target);
 
-				if ( accessTarget != null )
+				if (accessTarget != null)
 				{
-					name = name . Normalize ( NormalizationForm . FormD ) ;
+					name = name.Normalize(NormalizationForm.FormD);
 
 					EntityProperty property =
-						accessTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+						accessTarget.Properties.SingleOrDefault(prop => prop.Name == name);
 
-					if ( property != null )
+					if (property != null)
 					{
-						AccessType validAccess = property . Access ( requester ) ;
+						AccessType validAccess = property.Access(requester);
 
-						if ( validAccess . HasFlag ( AccessType . Read ) )
+						if (validAccess.HasFlag(AccessType.Read))
 						{
-							return property . Value ;
+							return property.Value;
 						}
 						else
 						{
-							throw new PermissionDeniedException ( ) ;
+							throw new PermissionDeniedException();
 						}
 					}
 					else
 					{
-						return null ;
+						return null;
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
 
-		public void SetProperty ( EntityToken token , Guid target , string name , string value )
+		public void SetProperty(EntityToken token, Guid target, string name, string value)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity accessTarget = FindEntity(target);
 
-				if ( accessTarget != null )
+				if (accessTarget != null)
 				{
-					name = name . Normalize ( NormalizationForm . FormD ) ;
+					name = name.Normalize(NormalizationForm.FormD);
 
 					EntityProperty property =
-						accessTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+						accessTarget.Properties.SingleOrDefault(prop => prop.Name == name);
 
-					if ( property != null )
+					if (property != null)
 					{
-						AccessType validAccess = property . Access ( requester ) ;
+						AccessType validAccess = property.Access(requester);
 
-						if ( validAccess . HasFlag ( AccessType . Write ) )
+						if (validAccess.HasFlag(AccessType.Write))
 						{
-							property . Value = value ;
+							property.Value = value;
 						}
 						else
 						{
-							throw new PermissionDeniedException ( ) ;
+							throw new PermissionDeniedException();
 						}
 					}
 					else
 					{
-						accessTarget . Properties . Add (
-														new EntityProperty ( )
+						accessTarget.Properties.Add(
+														new EntityProperty()
 														{
-															Name  = name ,
-															Owner = requester ,
+															Name = name,
+															Owner = requester,
 															Value = value
-														} ) ;
+														});
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public AccessType AccessProperty ( EntityToken token , Guid target , string name )
+		public AccessType AccessProperty(EntityToken token, Guid target, string name)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Entity propertyTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity propertyTarget = FindEntity(target);
 
-				if ( propertyTarget != null )
+				if (propertyTarget != null)
 				{
-					name = name . Normalize ( NormalizationForm . FormD ) ;
+					name = name.Normalize(NormalizationForm.FormD);
 
 					EntityProperty property =
-						propertyTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+						propertyTarget.Properties.SingleOrDefault(prop => prop.Name == name);
 
-					if ( property != null )
+					if (property != null)
 					{
-						AccessType validAccess = property . Access ( requester ) ;
+						AccessType validAccess = property.Access(requester);
 
-						return validAccess ;
+						return validAccess;
 					}
 					else
 					{
-						throw new PropertyNotFoundException ( ) ;
+						throw new PropertyNotFoundException();
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public AccessType GrantRead ( EntityToken token , Guid target , string name , Guid access )
+		public AccessType GrantRead(EntityToken token, Guid target, string name, Guid access)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Entity propertyTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity propertyTarget = FindEntity(target);
 
-				if ( propertyTarget != null )
+				if (propertyTarget != null)
 				{
-					name = name . Normalize ( NormalizationForm . FormD ) ;
+					name = name.Normalize(NormalizationForm.FormD);
 
 					EntityProperty property =
-						propertyTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+						propertyTarget.Properties.SingleOrDefault(prop => prop.Name == name);
 
-					if ( property != null )
+					if (property != null)
 					{
-						if ( property . Owner == requester )
+						if (property.Owner == requester)
 						{
-							Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == access ) ;
+							Entity accessTarget = FindEntity(access);
 
-							if ( accessTarget != null )
+							if (accessTarget != null)
 							{
 								Permission permission =
-									property . Permissions . Permissions . FirstOrDefault (
+									property.Permissions.Permissions.FirstOrDefault(
 									p
-										=> p . Target     == accessTarget
-											&& p . Status == PermissionStatus . Allow
-											&& p . Type   == PermissionType . Read ) ;
+										=> p.Target == accessTarget
+											&& p.Status == PermissionStatus.Allow
+											&& p.Type == PermissionType.Read);
 
-								if ( permission is null )
+								if (permission is null)
 								{
-									permission = new Permission ( )
-												{
-													Status = PermissionStatus . Allow ,
-													Target = propertyTarget ,
-													Type   = PermissionType . Read
-												} ;
+									permission = new Permission()
+									{
+										Status = PermissionStatus.Allow,
+										Target = propertyTarget,
+										Type = PermissionType.Read
+									};
 
-									property . Permissions . Permissions . Add ( permission ) ;
+									property.Permissions.Permissions.Add(permission);
 								}
 
-								return property . Access ( accessTarget ) ;
+								return property.Access(accessTarget);
 							}
 
 							else
 							{
-								throw new EntityNotFoundException ( ) ;
+								throw new EntityNotFoundException();
 							}
 						}
 						else
 						{
-							throw new PermissionDeniedException ( ) ;
+							throw new PermissionDeniedException();
 						}
 					}
 					else
 					{
-						throw new PropertyNotFoundException ( ) ;
+						throw new PropertyNotFoundException();
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public AccessType GrantWrite ( EntityToken token , Guid target , string name , Guid access )
+		public AccessType GrantWrite(EntityToken token, Guid target, string name, Guid access)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Entity propertyTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+				Entity propertyTarget = FindEntity(target);
 
-				if ( propertyTarget != null )
+				if (propertyTarget != null)
 				{
-					name = name . Normalize ( NormalizationForm . FormD ) ;
+					name = name.Normalize(NormalizationForm.FormD);
 
 					EntityProperty property =
-						propertyTarget . Properties . SingleOrDefault ( prop => prop . Name == name ) ;
+						propertyTarget.Properties.SingleOrDefault(prop => prop.Name == name);
 
-					if ( property != null )
+					if (property != null)
 					{
-						if ( property . Owner == requester )
+						if (property.Owner == requester)
 						{
-							Entity accessTarget = Entities . SingleOrDefault ( ( entity ) => entity . Guid == access ) ;
+							Entity accessTarget = FindEntity(access);
 
-							if ( accessTarget != null )
+							if (accessTarget != null)
 							{
 								Permission permission =
-									property . Permissions . Permissions . FirstOrDefault (
+									property.Permissions.Permissions.FirstOrDefault(
 									p
-										=> p . Target     == accessTarget
-											&& p . Status == PermissionStatus . Allow
-											&& p . Type   == PermissionType . Write ) ;
+										=> p.Target == accessTarget
+											&& p.Status == PermissionStatus.Allow
+											&& p.Type == PermissionType.Write);
 
-								if ( permission is null )
+								if (permission is null)
 								{
-									permission = new Permission ( )
-												{
-													Status = PermissionStatus . Allow ,
-													Target = propertyTarget ,
-													Type   = PermissionType . Write
-												} ;
+									permission = new Permission()
+									{
+										Status = PermissionStatus.Allow,
+										Target = propertyTarget,
+										Type = PermissionType.Write
+									};
 
-									property . Permissions . Permissions . Add ( permission ) ;
+									property.Permissions.Permissions.Add(permission);
 								}
 
-								return property . Access ( accessTarget ) ;
+								return property.Access(accessTarget);
 							}
 
 							else
 							{
-								throw new EntityNotFoundException ( ) ;
+								throw new EntityNotFoundException();
 							}
 						}
 						else
 						{
-							throw new PermissionDeniedException ( ) ;
+							throw new PermissionDeniedException();
 						}
 					}
 					else
 					{
-						throw new PropertyNotFoundException ( ) ;
+						throw new PropertyNotFoundException();
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public bool Contain ( EntityToken token , Guid @group , Guid target )
+		public bool Contain(EntityToken token, Guid @group, Guid target)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
 
-				if ( targetGroup != null )
+				if (targetGroup != null)
 				{
-					if ( ! targetGroup . GetMembersProperty ( ) . Access ( requester ) . HasFlag ( AccessType . Read ) )
+					if (!targetGroup.GetMembersProperty().Access(requester).HasFlag(AccessType.Read))
 					{
-						throw new PermissionDeniedException ( ) ;
+						throw new PermissionDeniedException();
 					}
 
-					Entity targetEntity = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+					Entity targetEntity = FindEntity(target);
 
-					if ( targetEntity != null )
+					if (targetEntity != null)
 					{
-						return targetGroup . Contain ( targetEntity ) ;
+						return targetGroup.Contain(targetEntity);
 					}
 					else
 					{
-						throw new EntityNotFoundException ( ) ;
+						throw new EntityNotFoundException();
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public ICollection <Guid> ListGroup ( EntityToken token , Guid @group )
+		public ICollection<Guid> ListGroup(EntityToken token, Guid @group)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
 
-				if ( targetGroup != null )
+				if (targetGroup != null)
 				{
-					if ( ! targetGroup . GetMembersProperty ( ) . Access ( requester ) . HasFlag ( AccessType . Read ) )
+					if (!targetGroup.GetMembersProperty().Access(requester).HasFlag(AccessType.Read))
 					{
-						throw new PermissionDeniedException ( ) ;
+						throw new PermissionDeniedException();
 					}
 
-					return targetGroup . Members . Select ( entity => entity . Guid ) . ToHashSet ( ) ;
+					return targetGroup.Members.Select(entity => entity.Guid).ToHashSet();
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public void AddToGroup ( EntityToken token , Guid @group , Guid target )
+		public void AddToGroup(EntityToken token, Guid @group, Guid target)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
 
-				if ( targetGroup != null )
+				if (targetGroup != null)
 				{
-					if ( ! targetGroup . GetMembersProperty ( ) .
-										Access ( requester ) .
-										HasFlag ( AccessType . Write ) )
+					if (!targetGroup.GetMembersProperty().
+										Access(requester).
+										HasFlag(AccessType.Write))
 					{
-						throw new PermissionDeniedException ( ) ;
+						throw new PermissionDeniedException();
 					}
 
-					Entity targetEntity = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+					Entity targetEntity = FindEntity(target);
 
-					if ( targetEntity != null )
+					if (targetEntity != null)
 					{
-						targetGroup . Members . Add ( targetEntity ) ;
+						targetGroup.Members.Add(targetEntity);
 					}
 					else
 					{
-						throw new EntityNotFoundException ( ) ;
+						throw new EntityNotFoundException();
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public void RemoveFromGroup ( EntityToken token , Guid @group , Guid target )
+		public void RemoveFromGroup(EntityToken token, Guid @group, Guid target)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Group targetGroup = Groups . SingleOrDefault ( grp => grp . Guid == group ) ;
+				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
 
-				if ( targetGroup != null )
+				if (targetGroup != null)
 				{
-					if ( ! targetGroup . GetMembersProperty ( ) .
-										Access ( requester ) .
-										HasFlag ( AccessType . Write ) )
+					if (!targetGroup.GetMembersProperty().
+										Access(requester).
+										HasFlag(AccessType.Write))
 					{
-						throw new PermissionDeniedException ( ) ;
+						throw new PermissionDeniedException();
 					}
 
-					Entity targetEntity = Entities . SingleOrDefault ( ( entity ) => entity . Guid == target ) ;
+					Entity targetEntity = FindEntity(target);
 
-					if ( targetEntity != null )
+					if (targetEntity != null)
 					{
-						targetGroup . Members . Remove ( targetEntity ) ;
+						targetGroup.Members.Remove(targetEntity);
 					}
 					else
 					{
-						throw new EntityNotFoundException ( ) ;
+						throw new EntityNotFoundException();
 					}
 				}
 				else
 				{
-					throw new EntityNotFoundException ( ) ;
+					throw new EntityNotFoundException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		protected void CheckToken ( [NotNull] EntityToken token )
+		protected void CheckToken([NotNull] EntityToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckTokenTime ( token ) ;
+			CheckTokenTime(token);
 
-			if ( token . Issuer == ServiceEntity . Guid )
+			if (token.Issuer == ServiceEntity.Guid)
 			{
-				if ( IssuedEntityTokens . Contains ( token ) )
+				if (IssuedEntityTokens.Contains(token))
 				{
-					return ;
+					return;
 				}
 				else
 				{
-					throw new InvalidTokenException ( ) ;
+					throw new InvalidTokenException();
 				}
 			}
 			else
 			{
 				DirectoryService issuer =
-					DirectoryServices . FirstOrDefault (
-														( directoryService )
-															=> directoryService . Guid == token . Issuer ) ;
-				if ( ! ( issuer is null ) )
+					DirectoryServices.FirstOrDefault(
+														(directoryService)
+															=> directoryService.Guid == token.Issuer);
+				if (!(issuer is null))
 				{
-					IDirectoryService issuerService = DirectoryServiceProvider . GetDirectoryProvider ( issuer ) ;
+					IDirectoryService issuerService = DirectoryServiceProvider.GetDirectoryProvider(issuer);
 
-					issuerService . CheckToken ( EntityTokenProvider . GetToken ( ) , token ) ;
+					issuerService.CheckToken(EntityTokenProvider.GetToken(), token);
 				}
 			}
 		}
 
-		protected void CheckToken ( [NotNull] AccessToken token )
+		protected void CheckToken([NotNull] AccessToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckTokenTime ( token ) ;
+			CheckTokenTime(token);
 
-			if ( token . Issuer == ServiceEntity . Guid )
+			if (token.Issuer == ServiceEntity.Guid)
 			{
-				if ( IssuedAccessTokens . Contains ( token ) )
+				if (IssuedAccessTokens.Contains(token))
 				{
-					return ;
+					return;
 				}
 				else
 				{
-					throw new InvalidTokenException ( ) ;
+					throw new InvalidTokenException();
 				}
 			}
 			else
 			{
 				DirectoryService issuer =
-					DirectoryServices . FirstOrDefault (
-														( directoryService )
-															=> directoryService . Guid == token . Issuer ) ;
-				if ( ! ( issuer is null ) )
+					DirectoryServices.FirstOrDefault(
+														(directoryService)
+															=> directoryService.Guid == token.Issuer);
+				if (!(issuer is null))
 				{
-					IDirectoryService issuerService = DirectoryServiceProvider . GetDirectoryProvider ( issuer ) ;
+					IDirectoryService issuerService = DirectoryServiceProvider.GetDirectoryProvider(issuer);
 
-					issuerService . CheckToken ( EntityTokenProvider . GetToken ( ) , token ) ;
+					issuerService.CheckToken(EntityTokenProvider.GetToken(), token);
 				}
 			}
 		}
 
-		protected void CheckToken ( LoginToken token )
+		protected void CheckToken(LoginToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckTokenTime ( token ) ;
+			CheckTokenTime(token);
 
 			LoginService issuer =
-				LoginServices . FirstOrDefault ( ( loginService ) => loginService . Guid == token . Issuer ) ;
-			if ( ! ( issuer is null ) )
+				LoginServices.FirstOrDefault((loginService) => loginService.Guid == token.Issuer);
+			if (!(issuer is null))
 			{
-				ILoginProvider issuerService = LoginServiceProvider . GetLoginProvider ( issuer ) ;
+				ILoginProvider issuerService = LoginServiceProvider.GetLoginProvider(issuer);
 
-				issuerService . CheckToken ( AccessTokenProvider . Access ( issuer . Guid ) , token ) ;
+				issuerService.CheckToken(AccessTokenProvider.Access(issuer.Guid), token);
 			}
 		}
 
 
-		public void CheckToken ( EntityToken token , EntityToken tokenToCheck )
+		public void CheckToken(EntityToken token, EntityToken tokenToCheck)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			if ( tokenToCheck == null )
+			if (tokenToCheck == null)
 			{
-				throw new ArgumentNullException ( nameof ( tokenToCheck ) ) ;
+				throw new ArgumentNullException(nameof(tokenToCheck));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
 			DirectoryService directory =
-				DirectoryServices . SingleOrDefault ( ( entity => entity . Guid == token . Issuer ) ) ;
+				DirectoryServices.SingleOrDefault((entity => entity.Guid == token.Issuer));
 
-			if ( directory != null )
+			if (directory != null)
 			{
-				CheckToken ( tokenToCheck ) ;
+				CheckToken(tokenToCheck);
 			}
 			else
 			{
-				throw new PermissionDeniedException ( ) ;
+				throw new PermissionDeniedException();
 			}
 		}
 
-		public void CheckToken ( [NotNull] EntityToken token , [NotNull] AccessToken tokenToCheck )
+		public void CheckToken([NotNull] EntityToken token, [NotNull] AccessToken tokenToCheck)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			if ( tokenToCheck == null )
+			if (tokenToCheck == null)
 			{
-				throw new ArgumentNullException ( nameof ( tokenToCheck ) ) ;
+				throw new ArgumentNullException(nameof(tokenToCheck));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				if ( tokenToCheck . Target == requester . Guid
-					|| ( requester is DirectoryService directoryService
-						&& DirectoryServices . Contains ( directoryService ) ) )
+				if (tokenToCheck.Target == requester.Guid
+					|| (requester is DirectoryService directoryService
+						&& DirectoryServices.Contains(directoryService)))
 				{
-					CheckToken ( tokenToCheck ) ;
+					CheckToken(tokenToCheck);
 				}
 				else
 				{
-					throw new PermissionDeniedException ( ) ;
+					throw new PermissionDeniedException();
 				}
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public Guid CreateUser ( EntityToken token )
+		public Guid CreateUser(EntityToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			LoginService requester = LoginServices . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			LoginService requester = LoginServices.SingleOrDefault((entity) => entity.Guid == token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				User user = new User ( ) { } ;
+				User user = new User() { };
 
-				Users . Add ( user ) ;
+				Users.Add(user);
 
-				user . AddCanLoginFrom ( requester ) ;
+				user.AddCanLoginFrom(requester);
 
-				return user . Guid ;
+				return user.Guid;
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public Guid CreateGroup ( EntityToken token )
+		public Guid CreateGroup(EntityToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			Entity requester = Entities . SingleOrDefault ( ( entity ) => entity . Guid == token . Owner ) ;
+			Entity requester = FindEntity(token.Owner);
 
-			if ( requester != null )
+			if (requester != null)
 			{
-				Group group = new Group ( ) ;
+				Group group = new Group();
 
-				EntityProperty memberProperty = group . GetMembersProperty ( ) ;
+				EntityProperty memberProperty = group.GetMembersProperty();
 
-				memberProperty . Permissions . Permissions . Add (
-																new Permission ( )
+				memberProperty.Permissions.Permissions.Add(
+																new Permission()
 																{
-																	Target = requester ,
-																	Status = PermissionStatus . Allow ,
-																	Type   = PermissionType . Read
-																} ) ;
+																	Target = requester,
+																	Status = PermissionStatus.Allow,
+																	Type = PermissionType.Read
+																});
 
-				memberProperty . Permissions . Permissions . Add (
-																new Permission ( )
+				memberProperty.Permissions.Permissions.Add(
+																new Permission()
 																{
-																	Target = requester ,
-																	Status = PermissionStatus . Allow ,
-																	Type   = PermissionType . Write
-																} ) ;
+																	Target = requester,
+																	Status = PermissionStatus.Allow,
+																	Type = PermissionType.Write
+																});
 
-				Groups . Add ( group ) ;
+				Groups.Add(group);
 
-				return group . Guid ;
+				return group.Guid;
 			}
 			else
 			{
-				throw new EntityNotFoundException ( ) ;
+				throw new EntityNotFoundException();
 			}
 		}
 
-		public void RegisterLogin ( EntityToken token , LoginToken targetToken )
+		public void RegisterLogin(EntityToken token, LoginToken targetToken)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckToken ( token ) ;
+			CheckToken(token);
 
-			if ( targetToken == null )
+			if (targetToken == null)
 			{
-				throw new ArgumentNullException ( nameof ( targetToken ) ) ;
+				throw new ArgumentNullException(nameof(targetToken));
 			}
 
-			CheckToken ( targetToken ) ;
+			CheckToken(targetToken);
 		}
 
 	}
