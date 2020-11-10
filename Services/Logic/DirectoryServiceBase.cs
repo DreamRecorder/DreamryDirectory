@@ -12,6 +12,7 @@ using DreamRecorder.Directory.ServiceProvider;
 using DreamRecorder.Directory.Services.Logic.Entities;
 using DreamRecorder.Directory.Services.Logic.Permissions;
 using DreamRecorder.Directory.Services.Logic.Storage;
+using DreamRecorder.ToolBox.General;
 
 using JetBrains.Annotations;
 
@@ -26,7 +27,7 @@ namespace DreamRecorder.Directory.Services.Logic
 	public class DirectoryServiceBase : IDirectoryService, IDirectoryServiceInternal, IDirectoryDatabase
 	{
 
-		public Logger<DirectoryServiceBase> Logger { get; set; }
+		public Logger<DirectoryServiceBase> Logger { get; set; }=StaticServiceProvider.Provider.
 
 		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
@@ -36,7 +37,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public RNGCryptoServiceProvider RngProvider { get; set; } = new RNGCryptoServiceProvider();
 
-		public KnownSpecialGroups KnownSpecialGroups { get; }
+		public KnownSpecialGroups KnownSpecialGroups { get; set; }=new KnownSpecialGroups ( ) ;
 
 		public DirectoryService ServiceEntity { get; set; }
 
@@ -46,46 +47,55 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get; }
 
+		public void InitializeDatabase ( )
+		{
+			void InitializeEntities( )
+			{
+				HashSet<DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
+				foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
+				{
+					DirectoryService directoryService = new DirectoryService()
+														{
+															Guid           = dbDirectoryService.Guid,
+															DatabaseObject = dbDirectoryService
+														};
+					DirectoryServices.Add(directoryService);
+				}
+
+				HashSet<DbLoginService> dbLoginServices = DatabaseStorage.GetDbLoginServices();
+				foreach (DbLoginService dbLoginService in dbLoginServices)
+				{
+					LoginService loginService = new LoginService()
+												{
+													Guid           = dbLoginService.Guid,
+													DatabaseObject = dbLoginService
+												};
+					LoginServices.Add(loginService);
+				}
+
+				HashSet<DbUser> dbUsers = DatabaseStorage.GetDbUsers();
+				foreach (DbUser dbUser in dbUsers)
+				{
+					User user = new User() { Guid = dbUser.Guid, DatabaseObject = dbUser };
+					Users.Add(user);
+				}
+
+				HashSet<DbGroup> dbGroups = DatabaseStorage.GetDbGroups();
+				foreach (DbGroup dbGroup in dbGroups)
+				{
+					Group group = new Group() { Guid = dbGroup.Guid, DatabaseObject = dbGroup };
+					Groups.Add(group);
+				}
+
+
+
+			}
+		}
+
 		public void Start()
 		{
-			HashSet<DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
-			foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
-			{
-				DirectoryService directoryService = new DirectoryService()
-				{
-					Guid = dbDirectoryService.Guid,
-					DatabaseObject = dbDirectoryService
-				};
-				DirectoryServices.Add(directoryService);
-			}
-
-			HashSet<DbLoginService> dbLoginServices = DatabaseStorage.GetDbLoginServices();
-			foreach (DbLoginService dbLoginService in dbLoginServices)
-			{
-				LoginService loginService = new LoginService()
-				{
-					Guid = dbLoginService.Guid,
-					DatabaseObject = dbLoginService
-				};
-				LoginServices.Add(loginService);
-			}
-
-			HashSet<DbUser> dbUsers = DatabaseStorage.GetDbUsers();
-			foreach (DbUser dbUser in dbUsers)
-			{
-				User user = new User() { Guid = dbUser.Guid, DatabaseObject = dbUser };
-				Users.Add(user);
-			}
-
-			HashSet<DbGroup> dbGroups = DatabaseStorage.GetDbGroups();
-			foreach (DbGroup dbGroup in dbGroups)
-			{
-				Group group = new Group() { Guid = dbGroup.Guid, DatabaseObject = dbGroup };
-				Groups.Add(group);
-			}
 
 			
-
 			foreach (DirectoryService directoryService in DirectoryServices)
 			{
 				foreach (DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
