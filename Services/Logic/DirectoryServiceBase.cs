@@ -17,6 +17,8 @@ using DreamRecorder.ToolBox.General;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+
 
 using ILoginProvider = DreamRecorder.Directory.Logic.ILoginProvider;
 
@@ -27,7 +29,7 @@ namespace DreamRecorder.Directory.Services.Logic
 	public class DirectoryServiceBase : IDirectoryService, IDirectoryServiceInternal, IDirectoryDatabase
 	{
 
-		public Logger<DirectoryServiceBase> Logger { get; set; }=StaticServiceProvider.Provider.
+		public ILogger<DirectoryServiceBase> Logger { get; set; }= StaticServiceProvider.Provider.GetService<ILoggerFactory>().CreateLogger<DirectoryServiceBase>();
 
 		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
@@ -86,8 +88,6 @@ namespace DreamRecorder.Directory.Services.Logic
 					Group group = new Group() { Guid = dbGroup.Guid, DatabaseObject = dbGroup };
 					Groups.Add(group);
 				}
-
-
 
 			}
 		}

@@ -1,40 +1,63 @@
-﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-using DreamRecorder . Directory . Logic ;
-using DreamRecorder . Directory . Services . Logic . Entities ;
+using DreamRecorder.Directory.Logic;
+using DreamRecorder.Directory.Services.Logic.Entities;
 
-namespace DreamRecorder . Directory . Services . Logic . Permissions
+using JetBrains . Annotations ;
+
+namespace DreamRecorder.Directory.Services.Logic.Permissions
 {
 
 	public class PermissionGroup
 	{
 
-		public HashSet <Permission> Permissions { get ; set ; } = new HashSet <Permission> ( ) ;
+		public HashSet<Permission> Permissions { get; set; } = new HashSet<Permission>();
 
 		public override string ToString()
 		{
-			StringBuilder stringBuilder = new StringBuilder ( ) ;
+			StringBuilder stringBuilder = new StringBuilder();
 
-			foreach ( Permission permission in Permissions )
+			foreach (Permission permission in Permissions)
 			{
-				stringBuilder . AppendLine (permission.ToString()) ;
+				stringBuilder.AppendLine(permission.ToString());
 			}
 
-			return stringBuilder . ToString ( ) ;
+			return stringBuilder.ToString();
 		}
 
-		public PermissionGroup ( ) 
+		public PermissionGroup()
 		{
 
 		}
 
-		public PermissionGroup (string value ) 
+		public Permission CreatePermission([NotNull] string permission)
 		{
+			if (permission == null)
+			{
+				throw new ArgumentNullException(nameof(permission));
+			}
 
+
+			string[] parts = permission.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(str => str.Trim()).ToArray();
+
+			if (parts.Length == 3)
+			{
+				Permission result = new Permission ( ) ;
+
+			}
+			else
+			{
+				throw new ArgumentException();
+			}
+		}
+
+		public PermissionGroup(string value)
+		{
+			value.Split(Environment.NewLine,StringSplitOptions.RemoveEmptyEntries).Select(str=>str.Trim()).
 		}
 
 		public AccessType Access(Entity entity)
@@ -45,7 +68,7 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 			}
 
 			bool? write = null;
-			bool? read  = null;
+			bool? read = null;
 
 			List<Permission> affectedPermission = Permissions.Where((perm) => perm.Target.Contain(entity)).ToList();
 
@@ -54,50 +77,50 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 				switch (permission.Status)
 				{
 					case PermissionStatus.Allow:
-					{
-						switch (permission.Type)
 						{
-							case PermissionType.Read:
+							switch (permission.Type)
 							{
-								if (read != false)
-								{
-									read = true;
-								}
-								break;
+								case PermissionType.Read:
+									{
+										if (read != false)
+										{
+											read = true;
+										}
+										break;
+									}
+								case PermissionType.Write:
+									{
+										if (write != false)
+										{
+											write = true;
+										}
+										break;
+									}
 							}
-							case PermissionType.Write:
-							{
-								if (write != false)
-								{
-									write = true;
-								}
-								break;
-							}
+							break;
 						}
-						break;
-					}
 					case PermissionStatus.Deny:
-					{
-						switch (permission.Type)
 						{
-							case PermissionType.Read:
+							switch (permission.Type)
 							{
-								read = false;
-								break;
+								case PermissionType.Read:
+									{
+										read = false;
+										break;
+									}
+								case PermissionType.Write:
+									{
+										write = false;
+										break;
+									}
 							}
-							case PermissionType.Write:
-							{
-								write = false;
-								break;
-							}
+							break;
 						}
-						break;
-					}
 				}
 			}
 
 			bool writeResult = write ?? false;
-			bool readResult  = read  ?? false;
+			bool readResult = read ?? false;
 
 			if (readResult)
 			{
