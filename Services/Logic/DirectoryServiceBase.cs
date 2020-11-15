@@ -28,8 +28,54 @@ namespace DreamRecorder.Directory.Services.Logic
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService, IDirectoryServiceInternal, IDirectoryDatabase
 	{
+		
 
-		public ILogger<DirectoryServiceBase> Logger { get; set; }= StaticServiceProvider.Provider.GetService<ILoggerFactory>().CreateLogger<DirectoryServiceBase>();
+		public PermissionGroup CreatePermissionGroup( [NotNull] string value)
+		{
+			if ( value == null )
+			{
+				throw new ArgumentNullException ( nameof ( value ) ) ;
+			}
+
+			PermissionGroup result = new PermissionGroup ( ) ;
+
+			List<string[]> permissions = value.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).
+												Select(line => line.Trim()).
+												Select(
+														(line)
+															=> line.Split(',', StringSplitOptions.RemoveEmptyEntries).
+																	Select(part => part.Trim()).ToArray()).
+												ToList();
+
+			foreach (string[] permissionStrings in permissions)
+			{
+				if (permissionStrings.Length == 3)
+				{
+					Guid   guid       = Guid . Parse ( permissionStrings [ 0 ] ) ;
+					Entity target     = FindEntity ( guid ) ;
+
+					if ( target!=null )
+					{
+						Permission permission =
+							new Permission(target, Enum.Parse<PermissionStatus>(permissionStrings[1]), Enum.Parse<PermissionType>(permissionStrings
+												[2]));
+
+						result.Permissions.Add(permission);
+					}
+				}
+				else
+				{
+					
+				}
+			}
+
+			return result;
+
+		}
+
+		public DirectoryServiceBase ( ) { }
+
+		public ILogger<DirectoryServiceBase> Logger { get; set; } = StaticServiceProvider.Provider.GetService<ILoggerFactory>().CreateLogger<DirectoryServiceBase>();
 
 		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
@@ -39,7 +85,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public RNGCryptoServiceProvider RngProvider { get; set; } = new RNGCryptoServiceProvider();
 
-		public KnownSpecialGroups KnownSpecialGroups { get; set; }=new KnownSpecialGroups ( ) ;
+		public KnownSpecialGroups KnownSpecialGroups { get; set; }
 
 		public DirectoryService ServiceEntity { get; set; }
 
@@ -49,45 +95,34 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public virtual IDirectoryServiceProvider DirectoryServiceProvider { get; }
 
-		public void InitializeDatabase ( )
+		public void InitializeDatabase()
 		{
-			void InitializeEntities( )
+			void InitializeEntities()
 			{
+				KnownSpecialGroups = new KnownSpecialGroups();
+
+				DirectoryServices??=new HashSet <DirectoryService> ( ) ;
 				HashSet<DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
 				foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
 				{
-					DirectoryService directoryService = new DirectoryService()
-														{
-															Guid           = dbDirectoryService.Guid,
-															DatabaseObject = dbDirectoryService
-														};
-					DirectoryServices.Add(directoryService);
+					DirectoryService directoryService =
+						DirectoryServices . FirstOrDefault ( service => service . Guid == dbDirectoryService . Guid ) ;
+					if (directoryService is null)
+					{
+						directoryService = new DirectoryService()
+											{
+												Guid           = dbDirectoryService.Guid,
+												DatabaseObject = dbDirectoryService
+											};
+						DirectoryServices.Add(directoryService);
+					}
+					else
+					{
+						directoryService . DatabaseObject = dbDirectoryService ;
+					}
 				}
 
-				HashSet<DbLoginService> dbLoginServices = DatabaseStorage.GetDbLoginServices();
-				foreach (DbLoginService dbLoginService in dbLoginServices)
-				{
-					LoginService loginService = new LoginService()
-												{
-													Guid           = dbLoginService.Guid,
-													DatabaseObject = dbLoginService
-												};
-					LoginServices.Add(loginService);
-				}
-
-				HashSet<DbUser> dbUsers = DatabaseStorage.GetDbUsers();
-				foreach (DbUser dbUser in dbUsers)
-				{
-					User user = new User() { Guid = dbUser.Guid, DatabaseObject = dbUser };
-					Users.Add(user);
-				}
-
-				HashSet<DbGroup> dbGroups = DatabaseStorage.GetDbGroups();
-				foreach (DbGroup dbGroup in dbGroups)
-				{
-					Group group = new Group() { Guid = dbGroup.Guid, DatabaseObject = dbGroup };
-					Groups.Add(group);
-				}
+			//todo
 
 			}
 		}
@@ -95,7 +130,7 @@ namespace DreamRecorder.Directory.Services.Logic
 		public void Start()
 		{
 
-			
+
 			foreach (DirectoryService directoryService in DirectoryServices)
 			{
 				foreach (DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
@@ -105,44 +140,21 @@ namespace DreamRecorder.Directory.Services.Logic
 					if (propertyOwner is null)
 					{
 						propertyOwner = ServiceEntity;
-
 					}
 
 					EntityProperty property = new EntityProperty()
 					{
 						Name = dbProperty.Name,
 						Owner = propertyOwner,
-						Permissions = new PermissionGroup(dbProperty.Permission),
+						Permissions = CreatePermissionGroup(dbProperty.Permission),
 						Value = dbProperty.Value,
 					};
 
-					directoryService . Properties . Add ( property ) ;
+					directoryService.Properties.Add(property);
 				}
 			}
 
-			foreach ( LoginService loginService in LoginServices)
-			{
-				foreach (DbProperty dbProperty in loginService.DatabaseObject.Proprieties)
-				{
-					Entity propertyOwner = FindEntity(dbProperty.Owner);
-
-					if (propertyOwner is null)
-					{
-						propertyOwner = ServiceEntity;
-
-					}
-
-					EntityProperty property = new EntityProperty()
-											{
-												Name        = dbProperty.Name,
-												Owner       = propertyOwner,
-												Permissions = new PermissionGroup(dbProperty.Permission),
-												Value       = dbProperty.Value,
-											};
-
-					loginService.Properties.Add(property);
-				}
-			}
+			
 		}
 
 		public ITokenPolicy TokenPolicy { get; set; }

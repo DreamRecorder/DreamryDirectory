@@ -21,6 +21,11 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		HashSet <DirectoryService> DirectoryServices { get ; set ; }
 
+		KnownSpecialGroups KnownSpecialGroups { get; set; }
+
+		Entity FindEntity ( Guid guid ) ;
+
+
 	}
 
 }

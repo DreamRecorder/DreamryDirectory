@@ -34,32 +34,6 @@ namespace DreamRecorder.Directory.Services.Logic.Permissions
 
 		}
 
-		public Permission CreatePermission([NotNull] string permission)
-		{
-			if (permission == null)
-			{
-				throw new ArgumentNullException(nameof(permission));
-			}
-
-
-			string[] parts = permission.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(str => str.Trim()).ToArray();
-
-			if (parts.Length == 3)
-			{
-				Permission result = new Permission ( ) ;
-
-			}
-			else
-			{
-				throw new ArgumentException();
-			}
-		}
-
-		public PermissionGroup(string value)
-		{
-			value.Split(Environment.NewLine,StringSplitOptions.RemoveEmptyEntries).Select(str=>str.Trim()).
-		}
-
 		public AccessType Access(Entity entity)
 		{
 			if (entity == null)

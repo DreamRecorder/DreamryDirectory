@@ -29,11 +29,11 @@ namespace DreamRecorder.Directory.Services.Logic.Permissions
 		}
 
 
-		public Permission(PermissionStatus status, PermissionType type, Entity target)
+		public Permission(Entity target,PermissionStatus status, PermissionType type)
 		{
+			Target = target;
 			Status = status;
 			Type = type;
-			Target = target;
 		}
 
 	}
