@@ -6,6 +6,7 @@ using System.Linq ;
 using DreamRecorder.Directory.Logic;
 using DreamRecorder . Directory . Services . ApiService . Controllers ;
 using DreamRecorder . Directory . Services . Logic ;
+using DreamRecorder.Directory.Services.Logic.Storage;
 using DreamRecorder . ToolBox . AspNet . General ;
 
 using Microsoft.AspNetCore.Builder ;
@@ -31,6 +32,7 @@ namespace DreamRecorder . Directory . Services . ApiService
             services.AddControllers(HeaderComplexModelBinder.EnableHeaderComplexModelBinder());
 
 			services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
+            services.AddTransient<IDirectoryDatabaseStorage,Di>
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

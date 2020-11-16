@@ -13,6 +13,12 @@ namespace DreamRecorder.Directory.Services.Logic
 	public static class DirectoryServiceExtensions
 	{
 
+		public static readonly string DatabaseConnectionString = nameof ( DatabaseConnectionString ) ;
+
+		public static readonly string DatabaseConnectionStringName = $"{Consts.Namespace}.{ DatabaseConnectionString }";
+
+
+
 		public static readonly string ApiEndPoints = nameof(ApiEndPoints);
 
 		public static readonly string ApiEndPointsName = $"{Consts.Namespace}.{ApiEndPoints}";
