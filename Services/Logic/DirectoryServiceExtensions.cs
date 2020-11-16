@@ -57,12 +57,29 @@ namespace DreamRecorder.Directory.Services.Logic
 			List <string> endPointsStrings = directoryService.GetApiEndPointsProperty().
 															Value.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(str=>str.Trim()).ToList();
 
+
 			foreach (string endPointsString in endPointsStrings)
 			{
 				string[] endPointsParts = endPointsString . Split ( ':', StringSplitOptions.RemoveEmptyEntries).Select(str => str.Trim()).ToArray();
 
+				if (  string.IsNullOrEmpty(endPointsParts.FirstOrDefault()) )
+				{
+					string hostname = endPointsParts [ 0 ] ;
+
+					if ( endPointsParts.Length==2 )
+					{
+						result . Add ( ( hostname , int . Parse ( endPointsParts [ 1 ] ) )) ;
+					}
+					else
+					{
+						result.Add((hostname, 443));
+					}
+
+				}
 
 			}
+
+			return result;
 		}
 
 	}
