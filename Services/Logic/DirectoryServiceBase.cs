@@ -27,6 +27,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 	public class DirectoryDatabase: IDirectoryDatabase
 	{
+		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
 		public HashSet<User> Users { get; set; }
 
@@ -49,12 +50,42 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public KnownSpecialGroups KnownSpecialGroups { get; set; }
 
+		void InitializeEntities()
+		{
+			KnownSpecialGroups = new KnownSpecialGroups();
+
+			DirectoryServices ??= new HashSet<DirectoryService>();
+			HashSet<DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
+			foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
+			{
+				DirectoryService directoryService =
+					DirectoryServices.FirstOrDefault(service => service.Guid == dbDirectoryService.Guid);
+				if (directoryService is null)
+				{
+					directoryService = new DirectoryService()
+										{
+											Guid           = dbDirectoryService.Guid,
+											DatabaseObject = dbDirectoryService
+										};
+					DirectoryServices.Add(directoryService);
+				}
+				else
+				{
+					directoryService.DatabaseObject = dbDirectoryService;
+				}
+			}
+
+			//todo
+
+		}
+
 
 	}
 
 	[PublicAPI]
 	public class DirectoryServiceBase : IDirectoryService, IDirectoryServiceInternal
 	{
+		public IDirectoryDatabase DirectoryDatabase { get; set; }
 
 
 		public PermissionGroup CreatePermissionGroup([NotNull] string value)
@@ -79,7 +110,7 @@ namespace DreamRecorder.Directory.Services.Logic
 				if (permissionStrings.Length == 3)
 				{
 					Guid guid = Guid.Parse(permissionStrings[0]);
-					Entity target = FindEntity(guid);
+					Entity target = DirectoryDatabase. FindEntity(guid);
 
 					if (target != null)
 					{
@@ -104,7 +135,6 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public ILogger<DirectoryServiceBase> Logger { get; set; } = StaticServiceProvider.Provider.GetService<ILoggerFactory>().CreateLogger<DirectoryServiceBase>();
 
-		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
 		public IAccessTokenProvider AccessTokenProvider { get; set; }
 
@@ -123,34 +153,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public void InitializeDatabase()
 		{
-			void InitializeEntities()
-			{
-				KnownSpecialGroups = new KnownSpecialGroups();
-
-				DirectoryServices ??= new HashSet<DirectoryService>();
-				HashSet<DbDirectoryService> dbDirectoryServices = DatabaseStorage.GetDbDirectoryServices();
-				foreach (DbDirectoryService dbDirectoryService in dbDirectoryServices)
-				{
-					DirectoryService directoryService =
-						DirectoryServices.FirstOrDefault(service => service.Guid == dbDirectoryService.Guid);
-					if (directoryService is null)
-					{
-						directoryService = new DirectoryService()
-						{
-							Guid = dbDirectoryService.Guid,
-							DatabaseObject = dbDirectoryService
-						};
-						DirectoryServices.Add(directoryService);
-					}
-					else
-					{
-						directoryService.DatabaseObject = dbDirectoryService;
-					}
-				}
-
-				//todo
-
-			}
+			
 		}
 
 		public void Start()

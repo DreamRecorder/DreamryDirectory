@@ -13,8 +13,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public interface IDirectoryServiceInternal
 	{
-		KnownSpecialGroups KnownSpecialGroups{ get; }
-
 		DirectoryService ServiceEntity { get; }
 
 		ITokenPolicy TokenPolicy { get; }
@@ -29,6 +27,7 @@ namespace DreamRecorder . Directory . Services . Logic
 		/// <returns></returns>
 		EntityToken IssueEntityToken([NotNull] Entity entity, TimeSpan lifetime);
 
+		IDirectoryDatabase  DirectoryDatabase{ get; set; }
 	}
 
 }
