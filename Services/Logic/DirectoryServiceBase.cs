@@ -27,6 +27,12 @@ namespace DreamRecorder.Directory.Services.Logic
 
 	public class DirectoryDatabase: IDirectoryDatabase
 	{
+
+		public DirectoryDatabase ( IDirectoryDatabaseStorage databaseStorage )
+		{
+			DatabaseStorage = databaseStorage ;
+		}
+
 		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
 		public HashSet<User> Users { get; set; }
@@ -50,7 +56,82 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public KnownSpecialGroups KnownSpecialGroups { get; set; }
 
-		void InitializeEntities()
+		public void Init ( )
+		{
+			InitializeEntities ( ) ;
+		}
+
+		public PermissionGroup CreatePermissionGroup([NotNull] string value)
+		{
+			if (value == null)
+			{
+				throw new ArgumentNullException(nameof(value));
+			}
+
+			PermissionGroup result = new PermissionGroup();
+
+			List<string[]> permissions = value.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).
+												Select(line => line.Trim()).
+												Select(
+														(line)
+															=> line.Split(',', StringSplitOptions.RemoveEmptyEntries).
+																	Select(part => part.Trim()).ToArray()).
+												ToList();
+
+			foreach (string[] permissionStrings in permissions)
+			{
+				if (permissionStrings.Length == 3)
+				{
+					Guid   guid   = Guid.Parse(permissionStrings[0]);
+					Entity target = FindEntity(guid);
+
+					if (target != null)
+					{
+						Permission permission =
+							new Permission(target, Enum.Parse<PermissionStatus>(permissionStrings[1]), Enum.Parse<PermissionType>(permissionStrings
+												[2]));
+
+						result.Permissions.Add(permission);
+					}
+				}
+				else
+				{
+
+				}
+			}
+
+			return result;
+
+		}
+
+
+		private void InitProp ( )
+		{
+			foreach (DirectoryService directoryService in DirectoryServices)
+			{
+				foreach (DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
+				{
+					Entity propertyOwner = FindEntity(dbProperty.Owner);
+
+					if (propertyOwner is null)
+					{
+						propertyOwner =;
+					}
+
+					EntityProperty property = new EntityProperty()
+											{
+												Name        = dbProperty.Name,
+												Owner       = propertyOwner,
+												Permissions = CreatePermissionGroup(dbProperty.Permission),
+												Value       = dbProperty.Value,
+											};
+
+					directoryService.Properties.Add(property);
+				}
+			}
+		}
+
+		private void InitializeEntities()
 		{
 			KnownSpecialGroups = new KnownSpecialGroups();
 
@@ -88,48 +169,6 @@ namespace DreamRecorder.Directory.Services.Logic
 		public IDirectoryDatabase DirectoryDatabase { get; set; }
 
 
-		public PermissionGroup CreatePermissionGroup([NotNull] string value)
-		{
-			if (value == null)
-			{
-				throw new ArgumentNullException(nameof(value));
-			}
-
-			PermissionGroup result = new PermissionGroup();
-
-			List<string[]> permissions = value.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).
-												Select(line => line.Trim()).
-												Select(
-														(line)
-															=> line.Split(',', StringSplitOptions.RemoveEmptyEntries).
-																	Select(part => part.Trim()).ToArray()).
-												ToList();
-
-			foreach (string[] permissionStrings in permissions)
-			{
-				if (permissionStrings.Length == 3)
-				{
-					Guid guid = Guid.Parse(permissionStrings[0]);
-					Entity target = DirectoryDatabase. FindEntity(guid);
-
-					if (target != null)
-					{
-						Permission permission =
-							new Permission(target, Enum.Parse<PermissionStatus>(permissionStrings[1]), Enum.Parse<PermissionType>(permissionStrings
-												[2]));
-
-						result.Permissions.Add(permission);
-					}
-				}
-				else
-				{
-
-				}
-			}
-
-			return result;
-
-		}
 
 		public DirectoryServiceBase() { }
 
@@ -160,28 +199,7 @@ namespace DreamRecorder.Directory.Services.Logic
 		{
 
 
-			foreach (DirectoryService directoryService in DirectoryServices)
-			{
-				foreach (DbProperty dbProperty in directoryService.DatabaseObject.Proprieties)
-				{
-					Entity propertyOwner = FindEntity(dbProperty.Owner);
-
-					if (propertyOwner is null)
-					{
-						propertyOwner = ServiceEntity;
-					}
-
-					EntityProperty property = new EntityProperty()
-					{
-						Name = dbProperty.Name,
-						Owner = propertyOwner,
-						Permissions = CreatePermissionGroup(dbProperty.Permission),
-						Value = dbProperty.Value,
-					};
-
-					directoryService.Properties.Add(property);
-				}
-			}
+			
 
 
 		}
@@ -296,11 +314,11 @@ namespace DreamRecorder.Directory.Services.Logic
 			CheckTokenTime(token);
 
 			LoginService issuer =
-				LoginServices.SingleOrDefault(loginProvider => loginProvider.Guid == token.Issuer);
+				DirectoryDatabase.LoginServices.SingleOrDefault(loginProvider => loginProvider.Guid == token.Issuer);
 
 			if (!(issuer is null))
 			{
-				Entity target = FindEntity(token.Owner);
+				Entity target = DirectoryDatabase.FindEntity(token.Owner);
 
 				if (target != null)
 				{
@@ -346,7 +364,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity target = Entities.FirstOrDefault((entity) => entity.Guid == token.Owner);
+			Entity target = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (target != null)
 			{
