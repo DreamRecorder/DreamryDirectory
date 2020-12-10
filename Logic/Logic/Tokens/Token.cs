@@ -6,6 +6,8 @@ using System . Xml . Linq ;
 
 using DreamRecorder.ToolBox.General;
 
+using JetBrains . Annotations ;
+
 namespace DreamRecorder . Directory . Logic . Tokens
 {
 
@@ -64,5 +66,8 @@ namespace DreamRecorder . Directory . Logic . Tokens
 		public static bool operator != ( Token left , Token right ) => ! Equals ( left , right ) ;
 
 	}
+
+	
+
 
 }

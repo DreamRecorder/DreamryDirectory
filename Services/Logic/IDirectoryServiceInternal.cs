@@ -27,7 +27,7 @@ namespace DreamRecorder . Directory . Services . Logic
 		/// <returns></returns>
 		EntityToken IssueEntityToken([NotNull] Entity entity, TimeSpan lifetime);
 
-		IDirectoryDatabase  DirectoryDatabase{ get; set; }
+		IDirectoryDatabase DirectoryDatabase{ get; set; }
 	}
 
 }

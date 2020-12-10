@@ -11,6 +11,7 @@ using DreamRecorder . ToolBox . AspNet . General ;
 
 using Microsoft.AspNetCore.Builder ;
 using Microsoft.AspNetCore.Hosting ;
+using Microsoft . EntityFrameworkCore ;
 using Microsoft.Extensions.Configuration ;
 using Microsoft.Extensions.DependencyInjection ;
 using Microsoft.Extensions.Hosting ;
@@ -31,8 +32,12 @@ namespace DreamRecorder . Directory . Services . ApiService
         {
             services.AddControllers(HeaderComplexModelBinder.EnableHeaderComplexModelBinder());
 
-			services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
-            services.AddTransient<IDirectoryDatabaseStorage,Di>
+			services.AddDbContext<DirectoryDatabaseStorage>(options
+																=> options.UseSqlServer(Configuration.
+																	GetConnectionString(nameof(DirectoryDatabaseStorage))));
+
+            services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
+            services.AddTransient<IDirectoryDatabaseStorage, DirectoryDatabaseStorage>();
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

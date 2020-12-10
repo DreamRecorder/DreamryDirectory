@@ -38,8 +38,8 @@ namespace DreamRecorder.Directory.Services.Logic
 			{
 				property = new EntityProperty()
 				{
-					Name = ApiEndPointsName,
-					Owner = DirectoryServiceInternal.Current.KnownSpecialGroups.DirectoryServices,
+					Name  = ApiEndPointsName,
+					Owner = DirectoryServiceInternal.Current.DirectoryDatabase.KnownSpecialGroups.DirectoryServices,
 					Value = string.Empty
 				};
 

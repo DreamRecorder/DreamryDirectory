@@ -118,7 +118,7 @@ namespace DreamRecorder . Directory . Services . Logic
 				property = new EntityProperty ( )
 							{
 								Name = CanLoginFromName ,
-								Owner = DirectoryServiceInternal . Current . KnownSpecialGroups . DirectoryServices ,
+								Owner = DirectoryServiceInternal . Current .DirectoryDatabase.KnownSpecialGroups . DirectoryServices ,
 								Permissions = new PermissionGroup ( ) ,
 							} ;
 
@@ -126,7 +126,7 @@ namespace DreamRecorder . Directory . Services . Logic
 															new Permission ( )
 															{
 																Target = DirectoryServiceInternal . Current .
-																	KnownSpecialGroups . LoginServices ,
+																	DirectoryDatabase.KnownSpecialGroups . LoginServices ,
 																Status = PermissionStatus . Allow ,
 																Type   = PermissionType . Read
 															} ) ;

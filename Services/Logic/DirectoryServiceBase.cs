@@ -35,6 +35,8 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
+		public IDirectoryServiceInternal DirectoryServiceInternal{ get; set; }
+
 		public HashSet<User> Users { get; set; }
 
 		public HashSet<Group> Groups { get; set; }
@@ -115,7 +117,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 					if (propertyOwner is null)
 					{
-						propertyOwner =;
+						propertyOwner =DirectoryServiceInternal.ServiceEntity;
 					}
 
 					EntityProperty property = new EntityProperty()
@@ -168,19 +170,15 @@ namespace DreamRecorder.Directory.Services.Logic
 	{
 		public IDirectoryDatabase DirectoryDatabase { get; set; }
 
-
-
 		public DirectoryServiceBase() { }
 
 		public ILogger<DirectoryServiceBase> Logger { get; set; } = StaticServiceProvider.Provider.GetService<ILoggerFactory>().CreateLogger<DirectoryServiceBase>();
-
 
 		public IAccessTokenProvider AccessTokenProvider { get; set; }
 
 		public IEntityTokenProvider EntityTokenProvider { get; set; }
 
 		public RNGCryptoServiceProvider RngProvider { get; set; } = new RNGCryptoServiceProvider();
-
 
 		public DirectoryService ServiceEntity { get; set; }
 
@@ -197,10 +195,6 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public void Start()
 		{
-
-
-			
-
 
 		}
 
@@ -235,7 +229,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			RngProvider.GetBytes(token.Secret);
 
-			IssuedAccessTokens.Add(token);
+			IssuedAccessTokens.AddToken(token);
 
 			return token;
 		}
@@ -266,43 +260,16 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			RngProvider.GetBytes(token.Secret);
 
-			IssuedEntityTokens.Add(token);
+			IssuedEntityTokens.AddToken(token);
 
 			return token;
 		}
 
-	
-
 		public EntityToken EveryoneToken { get; set; }
 
-	
+		public TokenStorage<EntityToken> IssuedEntityTokens { get; set; }
 
-		public HashSet<EntityToken> IssuedEntityTokens { get; set; }
-
-		public HashSet<AccessToken> IssuedAccessTokens { get; set; }
-
-
-		/// <summary>
-		/// Check if a token is in valid time
-		/// </summary>
-		/// <param name="token"></param>
-		public void CheckTokenTime([NotNull] Token token)
-		{
-			if (token == null)
-			{
-				throw new ArgumentNullException(nameof(token));
-			}
-
-			if (token.NotAfter > DateTimeOffset.UtcNow
-				&& token.NotBefore < DateTimeOffset.UtcNow)
-			{
-				return;
-			}
-			else
-			{
-				throw new InvalidTimeException();
-			}
-		}
+		public TokenStorage<AccessToken> IssuedAccessTokens { get; set; }
 
 		public EntityToken Login(LoginToken token)
 		{
@@ -311,7 +278,7 @@ namespace DreamRecorder.Directory.Services.Logic
 				return EveryoneToken;
 			}
 
-			CheckTokenTime(token);
+			token . CheckTokenTime ( ) ;
 
 			LoginService issuer =
 				DirectoryDatabase.LoginServices.SingleOrDefault(loginProvider => loginProvider.Guid == token.Issuer);
@@ -390,14 +357,14 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			if (token.Issuer == ServiceEntity.Guid)
 			{
-				IssuedEntityTokens.Remove(token);
+				IssuedEntityTokens.DisposeToken(token);
 			}
 			else
 			{
 				DirectoryService issuer =
-					DirectoryServices.FirstOrDefault(
-														(directoryService)
-															=> directoryService.Guid == token.Issuer);
+					DirectoryDatabase.DirectoryServices.FirstOrDefault(
+																		(directoryService)
+																			=> directoryService.Guid == token.Issuer);
 				if (!(issuer is null))
 				{
 					IDirectoryService issuerService = DirectoryServiceProvider.GetDirectoryProvider(issuer);
@@ -416,11 +383,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Entity accessTarget = FindEntity(target);
+				Entity accessTarget = DirectoryDatabase.FindEntity(target);
 
 				if (accessTarget != null)
 				{
@@ -449,11 +416,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Entity accessTarget = FindEntity(target);
+				Entity accessTarget = DirectoryDatabase.FindEntity(target);
 
 				if (accessTarget != null)
 				{
@@ -501,11 +468,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Entity accessTarget = FindEntity(target);
+				Entity accessTarget = DirectoryDatabase.FindEntity(target);
 
 				if (accessTarget != null)
 				{
@@ -558,11 +525,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Entity propertyTarget = FindEntity(target);
+				Entity propertyTarget = DirectoryDatabase.FindEntity(target);
 
 				if (propertyTarget != null)
 				{
@@ -602,11 +569,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Entity propertyTarget = FindEntity(target);
+				Entity propertyTarget = DirectoryDatabase.FindEntity(target);
 
 				if (propertyTarget != null)
 				{
@@ -619,7 +586,7 @@ namespace DreamRecorder.Directory.Services.Logic
 					{
 						if (property.Owner == requester)
 						{
-							Entity accessTarget = FindEntity(access);
+							Entity accessTarget = DirectoryDatabase.FindEntity(access);
 
 							if (accessTarget != null)
 							{
@@ -680,11 +647,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Entity propertyTarget = FindEntity(target);
+				Entity propertyTarget = DirectoryDatabase.FindEntity(target);
 
 				if (propertyTarget != null)
 				{
@@ -697,7 +664,7 @@ namespace DreamRecorder.Directory.Services.Logic
 					{
 						if (property.Owner == requester)
 						{
-							Entity accessTarget = FindEntity(access);
+							Entity accessTarget = DirectoryDatabase.FindEntity(access);
 
 							if (accessTarget != null)
 							{
@@ -758,11 +725,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
+				Group targetGroup = DirectoryDatabase.Groups.SingleOrDefault(grp => grp.Guid == group);
 
 				if (targetGroup != null)
 				{
@@ -771,7 +738,7 @@ namespace DreamRecorder.Directory.Services.Logic
 						throw new PermissionDeniedException();
 					}
 
-					Entity targetEntity = FindEntity(target);
+					Entity targetEntity = DirectoryDatabase.FindEntity(target);
 
 					if (targetEntity != null)
 					{
@@ -802,11 +769,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
+				Group targetGroup = DirectoryDatabase.Groups.SingleOrDefault(grp => grp.Guid == group);
 
 				if (targetGroup != null)
 				{
@@ -819,6 +786,10 @@ namespace DreamRecorder.Directory.Services.Logic
 				}
 				else
 				{
+					SpecialGroup targetSpecialGroup=DirectoryDatabase.KnownSpecialGroups.Entities.SingleOrDefault(grp => grp.Guid == group);
+
+
+
 					throw new EntityNotFoundException();
 				}
 			}
@@ -837,11 +808,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
+				Group targetGroup = DirectoryDatabase.Groups.SingleOrDefault(grp => grp.Guid == group);
 
 				if (targetGroup != null)
 				{
@@ -852,7 +823,7 @@ namespace DreamRecorder.Directory.Services.Logic
 						throw new PermissionDeniedException();
 					}
 
-					Entity targetEntity = FindEntity(target);
+					Entity targetEntity = DirectoryDatabase.FindEntity(target);
 
 					if (targetEntity != null)
 					{
@@ -883,11 +854,11 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
-				Group targetGroup = Groups.SingleOrDefault(grp => grp.Guid == group);
+				Group targetGroup = DirectoryDatabase.Groups.SingleOrDefault(grp => grp.Guid == group);
 
 				if (targetGroup != null)
 				{
@@ -898,7 +869,7 @@ namespace DreamRecorder.Directory.Services.Logic
 						throw new PermissionDeniedException();
 					}
 
-					Entity targetEntity = FindEntity(target);
+					Entity targetEntity = DirectoryDatabase.FindEntity(target);
 
 					if (targetEntity != null)
 					{
@@ -927,25 +898,18 @@ namespace DreamRecorder.Directory.Services.Logic
 				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckTokenTime(token);
+			token . CheckTokenTime ( ) ;
 
 			if (token.Issuer == ServiceEntity.Guid)
 			{
-				if (IssuedEntityTokens.Contains(token))
-				{
-					return;
-				}
-				else
-				{
-					throw new InvalidTokenException();
-				}
+				IssuedEntityTokens.CheckToken(token);
 			}
 			else
 			{
 				DirectoryService issuer =
-					DirectoryServices.FirstOrDefault(
-														(directoryService)
-															=> directoryService.Guid == token.Issuer);
+					DirectoryDatabase.DirectoryServices.FirstOrDefault(
+																		(directoryService)
+																			=> directoryService.Guid == token.Issuer);
 				if (!(issuer is null))
 				{
 					IDirectoryService issuerService = DirectoryServiceProvider.GetDirectoryProvider(issuer);
@@ -962,25 +926,18 @@ namespace DreamRecorder.Directory.Services.Logic
 				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckTokenTime(token);
+			token . CheckTokenTime ( ) ;
 
 			if (token.Issuer == ServiceEntity.Guid)
 			{
-				if (IssuedAccessTokens.Contains(token))
-				{
-					return;
-				}
-				else
-				{
-					throw new InvalidTokenException();
-				}
+				IssuedAccessTokens . CheckToken ( token ) ;
 			}
 			else
 			{
 				DirectoryService issuer =
-					DirectoryServices.FirstOrDefault(
-														(directoryService)
-															=> directoryService.Guid == token.Issuer);
+					DirectoryDatabase.DirectoryServices.FirstOrDefault(
+																		(directoryService)
+																			=> directoryService.Guid == token.Issuer);
 				if (!(issuer is null))
 				{
 					IDirectoryService issuerService = DirectoryServiceProvider.GetDirectoryProvider(issuer);
@@ -997,10 +954,10 @@ namespace DreamRecorder.Directory.Services.Logic
 				throw new ArgumentNullException(nameof(token));
 			}
 
-			CheckTokenTime(token);
+			token . CheckTokenTime ( ) ;
 
 			LoginService issuer =
-				LoginServices.FirstOrDefault((loginService) => loginService.Guid == token.Issuer);
+				DirectoryDatabase.LoginServices.FirstOrDefault((loginService) => loginService.Guid == token.Issuer);
 			if (!(issuer is null))
 			{
 				ILoginProvider issuerService = LoginServiceProvider.GetLoginProvider(issuer);
@@ -1025,7 +982,7 @@ namespace DreamRecorder.Directory.Services.Logic
 			CheckToken(token);
 
 			DirectoryService directory =
-				DirectoryServices.SingleOrDefault((entity => entity.Guid == token.Issuer));
+				DirectoryDatabase.DirectoryServices.SingleOrDefault((entity => entity.Guid == token.Issuer));
 
 			if (directory != null)
 			{
@@ -1051,13 +1008,13 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
 				if (tokenToCheck.Target == requester.Guid
 					|| (requester is DirectoryService directoryService
-						&& DirectoryServices.Contains(directoryService)))
+						&& DirectoryDatabase.DirectoryServices.Contains(directoryService)))
 				{
 					CheckToken(tokenToCheck);
 				}
@@ -1081,13 +1038,13 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			LoginService requester = LoginServices.SingleOrDefault((entity) => entity.Guid == token.Owner);
+			LoginService requester = DirectoryDatabase.LoginServices.SingleOrDefault((entity) => entity.Guid == token.Owner);
 
 			if (requester != null)
 			{
 				User user = new User() { };
 
-				Users.Add(user);
+				DirectoryDatabase.Users.Add(user);
 
 				user.AddCanLoginFrom(requester);
 
@@ -1108,7 +1065,7 @@ namespace DreamRecorder.Directory.Services.Logic
 
 			CheckToken(token);
 
-			Entity requester = FindEntity(token.Owner);
+			Entity requester = DirectoryDatabase.FindEntity(token.Owner);
 
 			if (requester != null)
 			{
@@ -1132,7 +1089,7 @@ namespace DreamRecorder.Directory.Services.Logic
 																	Type = PermissionType.Write
 																});
 
-				Groups.Add(group);
+				DirectoryDatabase.Groups.Add(group);
 
 				return group.Guid;
 			}
