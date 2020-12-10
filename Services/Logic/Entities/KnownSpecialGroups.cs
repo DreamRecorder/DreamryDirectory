@@ -23,13 +23,13 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		}
 
-		public List <SpecialGroup> Entities
+		public HashSet <SpecialGroup> Entities
 			=> typeof ( KnownSpecialGroups ) . GetProperties ( ) .
 												Where (
 														prop
 															=> typeof ( SpecialGroup ) . IsAssignableFrom (
 															prop . PropertyType ) ).Select(prop=>prop.GetValue(this) as SpecialGroup) .
-												ToList ( ) ;
+												ToHashSet ( ) ;
 
 	}
 

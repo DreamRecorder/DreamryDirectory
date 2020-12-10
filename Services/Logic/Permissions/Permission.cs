@@ -37,5 +37,5 @@ namespace DreamRecorder.Directory.Services.Logic.Permissions
 		}
 
 	}
-
+	
 }
