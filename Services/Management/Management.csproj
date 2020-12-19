@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -8,10 +8,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DreamRecorder.Directory.Services.Management</AssemblyName>
     <RootNamespace>DreamRecorder.Directory.Services.Management</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DreamRecorder.ToolBox.CommandLine" Version="1.1.5.596" />
+  </ItemGroup>
 
 
 
