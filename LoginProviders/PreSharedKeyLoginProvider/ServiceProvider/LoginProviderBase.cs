@@ -14,14 +14,15 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 
 		public abstract Guid ? CheckCredential ( TCredential credential ) ;
 
+		TokenStorage<LoginToken>
+
 		public LoginToken Login(object credential)
 		{
-			
 			if (credential is TCredential tCredential)
 			{
 				if ( CheckCredential(tCredential ) is Guid guid)
 				{
-
+					
 				}
 			}
 			else

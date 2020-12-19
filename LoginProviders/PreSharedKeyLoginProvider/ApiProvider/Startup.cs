@@ -35,6 +35,7 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
             }
 
             app.UseHttpsRedirection();
+			app.UseStaticFiles();
 
             app.UseRouting();
 
