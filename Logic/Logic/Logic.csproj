@@ -8,13 +8,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DreamRecorder.Directory.Logic</AssemblyName>
     <RootNamespace>DreamRecorder.Directory.Logic</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DreamRecorder.ToolBox" Version="1.1.5.553" />
+    <PackageReference Include="DreamRecorder.ToolBox" Version="1.1.5.594" />
   </ItemGroup>
 
 </Project>

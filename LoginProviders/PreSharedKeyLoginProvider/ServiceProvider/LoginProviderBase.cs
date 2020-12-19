@@ -16,7 +16,7 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 
 		public LoginToken Login(object credential)
 		{
-			throw null;
+			
 			if (credential is TCredential tCredential)
 			{
 				if ( CheckCredential(tCredential ) is Guid guid)

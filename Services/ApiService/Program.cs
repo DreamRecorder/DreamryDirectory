@@ -3,7 +3,10 @@ using System.Collections ;
 using System.Collections.Generic ;
 using System.Linq ;
 
+using DreamRecorder.ToolBox.General;
+
 using Microsoft.AspNetCore.Hosting ;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting ;
 
 namespace DreamRecorder . Directory . Services . ApiService
@@ -16,10 +19,12 @@ namespace DreamRecorder . Directory . Services . ApiService
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+            Host.CreateDefaultBuilder(args).UseServiceProviderFactory(StaticServiceFac)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
     }
+
+
 }

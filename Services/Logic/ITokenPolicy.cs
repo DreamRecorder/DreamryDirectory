@@ -15,6 +15,8 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		TimeSpan AccessTokenLife ( Entity entity , Entity accessTarget ) ;
 
+		TimeSpan LoginTokenLife (Entity loginService, Entity entity ) ;
+
 	}
 
 }

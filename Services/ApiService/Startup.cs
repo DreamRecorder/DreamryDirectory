@@ -36,7 +36,7 @@ namespace DreamRecorder . Directory . Services . ApiService
 																=> options.UseSqlServer(Configuration.
 																	GetConnectionString(nameof(DirectoryDatabaseStorage))));
 
-            services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
+            services.AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
             services.AddTransient<IDirectoryDatabaseStorage, DirectoryDatabaseStorage>();
 		}
 
