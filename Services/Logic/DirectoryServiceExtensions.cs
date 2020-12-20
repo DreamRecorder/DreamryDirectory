@@ -15,13 +15,13 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public static readonly string DatabaseConnectionString = nameof ( DatabaseConnectionString ) ;
 
-		public static readonly string DatabaseConnectionStringName = $"{Consts.Namespace}.{ DatabaseConnectionString }";
+		public static readonly string DatabaseConnectionStringName = $"{Constants.Namespace}.{ DatabaseConnectionString }";
 
 
 
 		public static readonly string ApiEndPoints = nameof(ApiEndPoints);
 
-		public static readonly string ApiEndPointsName = $"{Consts.Namespace}.{ApiEndPoints}";
+		public static readonly string ApiEndPointsName = $"{Constants.Namespace}.{ApiEndPoints}";
 
 		public static EntityProperty GetApiEndPointsProperty([NotNull] this DirectoryService directoryService)
 		{

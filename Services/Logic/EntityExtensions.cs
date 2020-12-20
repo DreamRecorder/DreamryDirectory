@@ -15,7 +15,7 @@ namespace DreamRecorder . Directory . Services . Logic
 	{
 		public static readonly string DisplayName = nameof ( DisplayName ) ;
 
-		public static readonly string DisplayNameName = $"{Consts . Namespace}.{DisplayName}" ;
+		public static readonly string DisplayNameName = $"{Constants . Namespace}.{DisplayName}" ;
 
 		[CanBeNull]
 		public static string GetDisplayName ( [NotNull] this Entity entity )
@@ -36,7 +36,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static readonly string IsDisabled = nameof ( IsDisabled ) ;
 
-		public static readonly string IsDisabledName = $"{Consts . Namespace}.{IsDisabled}" ;
+		public static readonly string IsDisabledName = $"{Constants . Namespace}.{IsDisabled}" ;
 
 		public static bool GetIsDisabled ( [NotNull] this Entity entity )
 		{
@@ -77,7 +77,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static readonly string CanLoginFrom = nameof ( CanLoginFrom ) ;
 
-		public static readonly string CanLoginFromName = $"{Consts . Namespace}.{CanLoginFrom}" ;
+		public static readonly string CanLoginFromName = $"{Constants . Namespace}.{CanLoginFrom}" ;
 
 		public static ICollection <Guid> GetCanLoginFrom ( [NotNull] this Entity entity )
 		{

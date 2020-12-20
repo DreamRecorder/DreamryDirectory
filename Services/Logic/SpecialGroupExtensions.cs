@@ -15,7 +15,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static readonly string Members = nameof(Members);
 
-		public static readonly string MembersName = $"{Consts.Namespace}.{Members}";
+		public static readonly string MembersName = $"{Constants.Namespace}.{Members}";
 
 		public static EntityProperty GetMembersProperty([NotNull] this SpecialGroup specialGroup)
 		{
