@@ -1,41 +1,34 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
-using DreamRecorder.Directory.Services.Logic.Entities;
+using DreamRecorder . Directory . Services . Logic . Entities ;
 
-using JetBrains.Annotations;
-
-namespace DreamRecorder.Directory.Services.Logic.Permissions
+namespace DreamRecorder . Directory . Services . Logic . Permissions
 {
 
 	public class Permission
 	{
 
-		public PermissionStatus Status { get; set; }
+		public PermissionStatus Status { get ; set ; }
 
-		public PermissionType Type { get; set; }
+		public PermissionType Type { get ; set ; }
 
-		public Entity Target { get; set; }
+		public Entity Target { get ; set ; }
 
-		public override string ToString()
+		public Permission ( ) { }
+
+
+		public Permission ( Entity target , PermissionStatus status , PermissionType type )
 		{
-			return $"{Target.Guid},{Status},{Type}";
+			Target = target ;
+			Status = status ;
+			Type   = type ;
 		}
 
-		public Permission()
-		{
-		}
-
-
-		public Permission(Entity target,PermissionStatus status, PermissionType type)
-		{
-			Target = target;
-			Status = status;
-			Type = type;
-		}
+		public override string ToString ( ) { return $"{Target . Guid},{Status},{Type}" ; }
 
 	}
-	
+
 }

@@ -10,5 +10,5 @@ using JetBrains . Annotations ;
 [assembly : AssemblyTrademark ( "DreamryDirectory" )]
 [assembly : ComVisible ( true )]
 [assembly : CLSCompliant ( true )]
-[assembly : Guid( "05EBECBE-6B8F-4B78-B194-454D2714642E")]
+[assembly : Guid ( "05EBECBE-6B8F-4B78-B194-454D2714642E" )]
 [assembly : PublicAPI]

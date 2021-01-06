@@ -3,7 +3,7 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 using System . Net . Http ;
-using System . Text ;
+using System . Text . Json ;
 
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
@@ -42,9 +42,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -82,9 +80,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -107,9 +103,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -132,9 +126,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (
@@ -153,9 +145,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -178,9 +168,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -203,9 +191,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -224,13 +210,11 @@ namespace DreamRecorder . Directory . ServiceProvider
 			return result ;
 		}
 
-		public bool Contain ( EntityToken token , Guid @group , Guid target )
+		public bool Contain ( EntityToken token , Guid group , Guid target )
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -249,13 +233,11 @@ namespace DreamRecorder . Directory . ServiceProvider
 			return result ;
 		}
 
-		public ICollection <Guid> ListGroup ( EntityToken token , Guid @group )
+		public ICollection <Guid> ListGroup ( EntityToken token , Guid group )
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -274,13 +256,11 @@ namespace DreamRecorder . Directory . ServiceProvider
 			return result ;
 		}
 
-		public void AddToGroup ( EntityToken token , Guid @group , Guid target )
+		public void AddToGroup ( EntityToken token , Guid group , Guid target )
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -295,13 +275,11 @@ namespace DreamRecorder . Directory . ServiceProvider
 			response . EnsureSuccessStatusCode ( ) ;
 		}
 
-		public void RemoveFromGroup ( EntityToken token , Guid @group , Guid target )
+		public void RemoveFromGroup ( EntityToken token , Guid group , Guid target )
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -320,9 +298,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (
@@ -340,9 +316,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (
@@ -360,9 +334,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -384,9 +356,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
@@ -408,9 +378,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = new HttpClient ( ) ;
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												System . Text . Json . JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (

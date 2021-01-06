@@ -23,9 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Management", "Services\Mana
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PreSharedKeyLoginProvider", "PreSharedKeyLoginProvider", "{6601BC90-A5C2-4EAB-9192-E369BAAAE5EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiProvider", "LoginProviders\PreSharedKeyLoginProvider\ApiProvider\ApiProvider.csproj", "{7B6B07B7-AA68-4150-99F9-41EEBB36B2F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "General", "Services\General\General.csproj", "{39B6A5F7-E353-41C0-80DD-D0EE1D2919A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceProvider", "LoginProviders\PreSharedKeyLoginProvider\ServiceProvider\ServiceProvider.csproj", "{B662755F-1CE8-43CF-A110-46430539D188}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiProvider", "Services\LoginProviders\PreSharedKeyLoginProvider\ApiProvider\ApiProvider.csproj", "{B78CE3E4-A7A5-4D29-A02D-1F3BA9B7E3C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceProvider", "Services\LoginProviders\PreSharedKeyLoginProvider\ServiceProvider\ServiceProvider.csproj", "{3E694EE9-578D-4E34-8609-6BC98DCFA61E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,14 +55,18 @@ Global
 		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B6B07B7-AA68-4150-99F9-41EEBB36B2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B6B07B7-AA68-4150-99F9-41EEBB36B2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B6B07B7-AA68-4150-99F9-41EEBB36B2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B6B07B7-AA68-4150-99F9-41EEBB36B2F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B662755F-1CE8-43CF-A110-46430539D188}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B662755F-1CE8-43CF-A110-46430539D188}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B662755F-1CE8-43CF-A110-46430539D188}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B662755F-1CE8-43CF-A110-46430539D188}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39B6A5F7-E353-41C0-80DD-D0EE1D2919A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39B6A5F7-E353-41C0-80DD-D0EE1D2919A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39B6A5F7-E353-41C0-80DD-D0EE1D2919A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39B6A5F7-E353-41C0-80DD-D0EE1D2919A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78CE3E4-A7A5-4D29-A02D-1F3BA9B7E3C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78CE3E4-A7A5-4D29-A02D-1F3BA9B7E3C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78CE3E4-A7A5-4D29-A02D-1F3BA9B7E3C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78CE3E4-A7A5-4D29-A02D-1F3BA9B7E3C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E694EE9-578D-4E34-8609-6BC98DCFA61E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E694EE9-578D-4E34-8609-6BC98DCFA61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E694EE9-578D-4E34-8609-6BC98DCFA61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E694EE9-578D-4E34-8609-6BC98DCFA61E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,14 +79,15 @@ Global
 		{1806CFA6-2743-441E-AD87-67E502F1D2F5} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
 		{4FABA70A-A08A-43BE-BBFA-4D5C8DB25DD5} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
 		{6601BC90-A5C2-4EAB-9192-E369BAAAE5EE} = {28BDA5EA-EBBB-4B85-85DC-E47ACA7A73D3}
-		{7B6B07B7-AA68-4150-99F9-41EEBB36B2F3} = {6601BC90-A5C2-4EAB-9192-E369BAAAE5EE}
-		{B662755F-1CE8-43CF-A110-46430539D188} = {6601BC90-A5C2-4EAB-9192-E369BAAAE5EE}
+		{39B6A5F7-E353-41C0-80DD-D0EE1D2919A0} = {1C07A50F-C9C7-4BD8-BA6B-68121DB67CD3}
+		{B78CE3E4-A7A5-4D29-A02D-1F3BA9B7E3C2} = {6601BC90-A5C2-4EAB-9192-E369BAAAE5EE}
+		{3E694EE9-578D-4E34-8609-6BC98DCFA61E} = {28BDA5EA-EBBB-4B85-85DC-E47ACA7A73D3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3812D07C-6F92-4F95-9D16-7B4EE2492BD2}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 8
+		SccNumberOfProjects = 9
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://vsts.dreamry.org/defaultcollection
 		SccLocalPath0 = .
@@ -104,13 +111,17 @@ Global
 		SccProjectTopLevelParentUniqueName5 = DreamryDirectory.sln
 		SccProjectName5 = Services/Management
 		SccLocalPath5 = Services\\Management
-		SccProjectUniqueName6 = LoginProviders\\PreSharedKeyLoginProvider\\ApiProvider\\ApiProvider.csproj
+		SccProjectUniqueName6 = Services\\General\\General.csproj
 		SccProjectTopLevelParentUniqueName6 = DreamryDirectory.sln
-		SccProjectName6 = LoginProviders/PreSharedKeyLoginProvider/ApiProvider
-		SccLocalPath6 = LoginProviders\\PreSharedKeyLoginProvider\\ApiProvider
-		SccProjectUniqueName7 = LoginProviders\\PreSharedKeyLoginProvider\\ServiceProvider\\ServiceProvider.csproj
+		SccProjectName6 = Services/General
+		SccLocalPath6 = Services\\General
+		SccProjectUniqueName7 = Services\\LoginProviders\\PreSharedKeyLoginProvider\\ApiProvider\\ApiProvider.csproj
 		SccProjectTopLevelParentUniqueName7 = DreamryDirectory.sln
-		SccProjectName7 = LoginProviders/PreSharedKeyLoginProvider/ServiceProvider
-		SccLocalPath7 = LoginProviders\\PreSharedKeyLoginProvider\\ServiceProvider
+		SccProjectName7 = Services/LoginProviders/PreSharedKeyLoginProvider/ApiProvider
+		SccLocalPath7 = Services\\LoginProviders\\PreSharedKeyLoginProvider\\ApiProvider
+		SccProjectUniqueName8 = Services\\LoginProviders\\PreSharedKeyLoginProvider\\ServiceProvider\\ServiceProvider.csproj
+		SccProjectTopLevelParentUniqueName8 = DreamryDirectory.sln
+		SccProjectName8 = Services/LoginProviders/PreSharedKeyLoginProvider/ServiceProvider
+		SccLocalPath8 = Services\\LoginProviders\\PreSharedKeyLoginProvider\\ServiceProvider
 	EndGlobalSection
 EndGlobal

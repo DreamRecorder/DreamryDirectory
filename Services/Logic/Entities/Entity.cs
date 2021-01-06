@@ -1,65 +1,65 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
-using JetBrains.Annotations ;
+using JetBrains . Annotations ;
 
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
 
-	public class Entity : IEquatable<Entity>
+	public class Entity : IEquatable <Entity>
 	{
 
-		public virtual Guid Guid { get; set; }
+		public virtual Guid Guid { get ; set ; }
 
-		public HashSet<EntityProperty> Properties { get; set; }
+		public HashSet <EntityProperty> Properties { get ; set ; }
 
-		public virtual bool Contain([CanBeNull]Entity entity, [CanBeNull]HashSet<Entity> checkedEntities = null)
+		public bool Equals ( Entity other )
 		{
-			if (checkedEntities?.Contains(this)==false)
+			if ( other is null )
 			{
-				checkedEntities.Add(this);
+				return false ;
 			}
 
-			return this == entity;
+			if ( ReferenceEquals ( this , other ) )
+			{
+				return true ;
+			}
+
+			return Guid . Equals ( other . Guid ) ;
 		}
 
-		public bool Equals(Entity other)
+		public virtual bool Contain ( [CanBeNull] Entity entity , [CanBeNull] HashSet <Entity> checkedEntities = null )
 		{
-			if (other is null)
+			if ( checkedEntities ? . Contains ( this ) == false )
 			{
-				return false;
+				checkedEntities . Add ( this ) ;
 			}
 
-			if (ReferenceEquals(this, other))
-			{
-				return true;
-			}
-
-			return Guid.Equals(other.Guid);
+			return this == entity ;
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals ( object obj )
 		{
-			if (obj is null)
+			if ( obj is null )
 			{
-				return false;
+				return false ;
 			}
 
-			if (ReferenceEquals(this, obj))
+			if ( ReferenceEquals ( this , obj ) )
 			{
-				return true;
+				return true ;
 			}
 
-			return obj.GetType() == GetType() && Equals((Entity)obj);
+			return obj . GetType ( ) == GetType ( ) && Equals ( ( Entity ) obj ) ;
 		}
 
-		public override int GetHashCode() => Guid.GetHashCode() ;
+		public override int GetHashCode ( ) { return Guid . GetHashCode ( ) ; }
 
-		public static bool operator ==(Entity left, Entity right) => Equals(left, right) ;
+		public static bool operator == ( Entity left , Entity right ) { return Equals ( left , right ) ; }
 
-		public static bool operator !=(Entity left, Entity right) => !Equals(left, right) ;
+		public static bool operator != ( Entity left , Entity right ) { return ! Equals ( left , right ) ; }
 
 	}
 

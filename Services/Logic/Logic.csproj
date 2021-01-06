@@ -1,21 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" >
 
-  <PropertyGroup Label="Globals">
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-  </PropertyGroup>
+	<PropertyGroup Label="Globals" >
+		<SccProjectName>SAK</SccProjectName>
+		<SccProvider>SAK</SccProvider>
+		<SccAuxPath>SAK</SccAuxPath>
+		<SccLocalPath>SAK</SccLocalPath>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>DreamRecorder.Directory.Services.Logic</AssemblyName>
-    <RootNamespace>DreamRecorder.Directory.Services.Logic</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<AssemblyName>DreamRecorder.Directory.Services.Logic</AssemblyName>
+		<RootNamespace>DreamRecorder.Directory.Services.Logic</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Clients\ServiceProvider\ServiceProvider.csproj" />
-    <ProjectReference Include="..\..\Logic\Logic\Logic.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Clients\ServiceProvider\ServiceProvider.csproj" />
+		<ProjectReference Include="..\..\Logic\Logic\Logic.csproj" />
+		<ProjectReference Include="..\General\General.csproj" />
+	</ItemGroup>
 
 </Project>

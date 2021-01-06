@@ -8,7 +8,6 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
 		<AssemblyName>DreamRecorder.Directory.ServiceProvider</AssemblyName>
 		<RootNamespace>DreamRecorder.Directory.ServiceProvider</RootNamespace>
 		<PackageId>DreamRecorder.Directory.ServiceProvider</PackageId>

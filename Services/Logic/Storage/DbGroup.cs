@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
@@ -9,9 +9,15 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbGroup : IEquatable <DbGroup>
 	{
 
+		public Guid Guid { get ; set ; }
+
+		public HashSet <DbProperty> Proprieties { get ; set ; }
+
+		public HashSet <DbGroupMember> Members { get ; set ; }
+
 		public bool Equals ( DbGroup other )
 		{
-			if ( other is null)
+			if ( other is null )
 			{
 				return false ;
 			}
@@ -26,7 +32,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null)
+			if ( obj is null )
 			{
 				return false ;
 			}
@@ -49,12 +55,6 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		public static bool operator == ( DbGroup left , DbGroup right ) { return Equals ( left , right ) ; }
 
 		public static bool operator != ( DbGroup left , DbGroup right ) { return ! Equals ( left , right ) ; }
-
-		public Guid Guid { get ; set ; }
-
-		public HashSet <DbProperty> Proprieties { get ; set ; }
-
-		public HashSet <DbGroupMember> Members { get ; set ; }
 
 	}
 

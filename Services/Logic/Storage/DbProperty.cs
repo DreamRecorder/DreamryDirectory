@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
@@ -9,9 +9,17 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbProperty : IEquatable <DbProperty>
 	{
 
+		public Guid Owner { get ; set ; }
+
+		public string Name { get ; set ; }
+
+		public string Value { get ; set ; }
+
+		public string Permission { get ; set ; }
+
 		public bool Equals ( DbProperty other )
 		{
-			if ( other is null)
+			if ( other is null )
 			{
 				return false ;
 			}
@@ -49,14 +57,6 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		public static bool operator == ( DbProperty left , DbProperty right ) { return Equals ( left , right ) ; }
 
 		public static bool operator != ( DbProperty left , DbProperty right ) { return ! Equals ( left , right ) ; }
-
-		public Guid Owner { get ; set ; }
-
-		public string Name { get ; set ; }
-
-		public string Value { get ; set ; }
-
-		public string Permission { get ; set ; }
 
 	}
 

@@ -1,64 +1,62 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
-using DreamRecorder.Directory.Logic.Tokens;
+using DreamRecorder . Directory . Logic . Tokens ;
+using DreamRecorder . Directory . Services . General ;
 
 using JetBrains . Annotations ;
 
-namespace DreamRecorder.Directory.Services.Logic
+namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public class TokenStorage<TToken> where TToken : Token
+	public class TokenStorage <TToken> where TToken : Token
 	{
-		public HashSet<TToken> Tokens { get; set; }
 
-		public void Gc ( )
-		{
-			Tokens . RemoveWhere ( ( token ) => token . NotAfter < DateTimeOffset . UtcNow ) ;
-		}
+		public HashSet <TToken> Tokens { get ; set ; }
 
-		public void AddToken( [NotNull] TToken token)
+		public void Gc ( ) { Tokens . RemoveWhere ( token => token . NotAfter < DateTimeOffset . UtcNow ) ; }
+
+		public void AddToken ( [NotNull] TToken token )
 		{
 			if ( token == null )
 			{
 				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			if (token.NotAfter > DateTimeOffset.UtcNow)
+			if ( token . NotAfter > DateTimeOffset . UtcNow )
 			{
 				Tokens . Add ( token ) ;
 			}
-			
 		}
 
 		public void DisposeToken ( [NotNull] TToken token )
 		{
-			if (token == null)
+			if ( token == null )
 			{
-				throw new ArgumentNullException(nameof(token));
+				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			Tokens.Remove(token);
+			Tokens . Remove ( token ) ;
 		}
 
-		public void CheckToken( [NotNull] TToken token)
+		public void CheckToken ( [NotNull] TToken token )
 		{
 			if ( token == null )
 			{
 				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			if (Tokens.Contains(token))
+			if ( Tokens . Contains ( token ) )
 			{
-				return;
 			}
 			else
 			{
-				throw new InvalidTokenException();
+				throw new InvalidTokenException ( ) ;
 			}
 		}
+
 	}
 
 }

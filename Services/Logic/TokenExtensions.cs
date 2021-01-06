@@ -1,9 +1,10 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 using DreamRecorder . Directory . Logic . Tokens ;
+using DreamRecorder . Directory . Services . General ;
 
 using JetBrains . Annotations ;
 
@@ -14,24 +15,23 @@ namespace DreamRecorder . Directory . Services . Logic
 	{
 
 		/// <summary>
-		/// Check if a token is in valid time
+		///     Check if a token is in valid time
 		/// </summary>
 		/// <param name="token"></param>
-		public static void CheckTokenTime([NotNull] this Token token)
+		public static void CheckTokenTime ( [NotNull] this Token token )
 		{
-			if (token == null)
+			if ( token == null )
 			{
-				throw new ArgumentNullException(nameof(token));
+				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			if (token.NotAfter     > DateTimeOffset.UtcNow
-				&& token.NotBefore < DateTimeOffset.UtcNow)
+			if ( token . NotAfter    > DateTimeOffset . UtcNow
+				&& token . NotBefore < DateTimeOffset . UtcNow )
 			{
-				return;
 			}
 			else
 			{
-				throw new InvalidTimeException();
+				throw new InvalidTimeException ( ) ;
 			}
 		}
 

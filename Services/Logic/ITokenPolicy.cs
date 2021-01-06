@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
@@ -15,7 +15,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		TimeSpan AccessTokenLife ( Entity entity , Entity accessTarget ) ;
 
-		TimeSpan LoginTokenLife (Entity loginService, Entity entity ) ;
+		TimeSpan LoginTokenLife ( Entity loginService , Entity entity ) ;
 
 	}
 

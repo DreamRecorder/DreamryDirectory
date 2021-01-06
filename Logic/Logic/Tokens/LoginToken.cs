@@ -1,16 +1,15 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
-using System . Xml . Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Logic . Tokens
 {
 
-    public class LoginToken : Token
-    {
+	public class LoginToken : Token
+	{
 
-        public string DisplayName { get; set; }
+		public string DisplayName { get ; set ; }
 
 	}
 

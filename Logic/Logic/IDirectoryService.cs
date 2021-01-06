@@ -27,14 +27,10 @@ namespace DreamRecorder . Directory . Logic
 		[CanBeNull]
 		string GetProperty ( [NotNull] EntityToken token , Guid target , string name ) ;
 
-		void SetProperty (
-			[NotNull] EntityToken token ,
-			Guid                  target ,
-			string                name ,
-			string                value ) ;
+		void SetProperty ( [NotNull] EntityToken token , Guid target , string name , string value ) ;
 
 		/// <summary>
-		/// Get Access of Property
+		///     Get Access of Property
 		/// </summary>
 		/// <param name="token"></param>
 		/// <param name="target"></param>
@@ -47,7 +43,7 @@ namespace DreamRecorder . Directory . Logic
 		AccessType GrantWrite ( [NotNull] EntityToken token , Guid target , string name , Guid access ) ;
 
 		/// <summary>
-		/// Check if an entity is a member of a group
+		///     Check if an entity is a member of a group
 		/// </summary>
 		/// <param name="token"></param>
 		/// <param name="group"></param>
@@ -59,7 +55,7 @@ namespace DreamRecorder . Directory . Logic
 		ICollection <Guid> ListGroup ( [NotNull] EntityToken token , Guid group ) ;
 
 		/// <summary>
-		/// Add a entity to a group
+		///     Add a entity to a group
 		/// </summary>
 		/// <param name="token"></param>
 		/// <param name="group"></param>
@@ -69,7 +65,7 @@ namespace DreamRecorder . Directory . Logic
 		void RemoveFromGroup ( [NotNull] EntityToken token , Guid group , Guid target ) ;
 
 		/// <summary>
-		/// Allow other entity to check if this token is valid
+		///     Allow other entity to check if this token is valid
 		/// </summary>
 		/// <param name="token">Entity's Entity Token</param>
 		/// <param name="tokenToCheck">the token to check</param>
@@ -77,7 +73,7 @@ namespace DreamRecorder . Directory . Logic
 		void CheckToken ( [NotNull] EntityToken token , AccessToken tokenToCheck ) ;
 
 		/// <summary>
-		/// Allow other Directory Service to check if this token is valid
+		///     Allow other Directory Service to check if this token is valid
 		/// </summary>
 		/// <param name="token">Directory‘s Entity Token</param>
 		/// <param name="tokenToCheck">the token to check</param>
@@ -89,9 +85,7 @@ namespace DreamRecorder . Directory . Logic
 		Guid CreateGroup ( [NotNull] EntityToken token ) ;
 
 
-		void RegisterLogin (
-			[NotNull] EntityToken token ,
-			[NotNull] LoginToken  targetToken ) ;
+		void RegisterLogin ( [NotNull] EntityToken token , [NotNull] LoginToken targetToken ) ;
 
 	}
 

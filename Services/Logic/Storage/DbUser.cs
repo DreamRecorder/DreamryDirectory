@@ -1,6 +1,7 @@
 ﻿using System ;
+using System . Collections ;
 using System . Collections . Generic ;
-using System . Text ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
@@ -10,9 +11,11 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public Guid Guid { get ; set ; }
 
+		public HashSet <DbProperty> Proprieties { get ; set ; }
+
 		public bool Equals ( DbUser other )
 		{
-			if ( other is null)
+			if ( other is null )
 			{
 				return false ;
 			}
@@ -27,7 +30,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null)
+			if ( obj is null )
 			{
 				return false ;
 			}
@@ -50,8 +53,6 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		public static bool operator == ( DbUser left , DbUser right ) { return Equals ( left , right ) ; }
 
 		public static bool operator != ( DbUser left , DbUser right ) { return ! Equals ( left , right ) ; }
-
-		public HashSet <DbProperty> Proprieties { get ; set ; }
 
 	}
 

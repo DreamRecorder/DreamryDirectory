@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
@@ -9,9 +9,13 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbDirectoryService : IEquatable <DbDirectoryService>
 	{
 
+		public Guid Guid { get ; set ; }
+
+		public HashSet <DbProperty> Proprieties { get ; set ; }
+
 		public bool Equals ( DbDirectoryService other )
 		{
-			if ( other is null)
+			if ( other is null )
 			{
 				return false ;
 			}
@@ -26,7 +30,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null)
+			if ( obj is null )
 			{
 				return false ;
 			}
@@ -55,10 +59,6 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		{
 			return ! Equals ( left , right ) ;
 		}
-
-		public Guid Guid { get ; set ; }
-
-		public HashSet <DbProperty> Proprieties { get ; set ; }
 
 	}
 

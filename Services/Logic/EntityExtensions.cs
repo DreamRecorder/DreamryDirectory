@@ -13,9 +13,20 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public static class EntityExtensions
 	{
+
+		public static char CanLoginFromSeparator => ',' ;
+
 		public static readonly string DisplayName = nameof ( DisplayName ) ;
 
 		public static readonly string DisplayNameName = $"{Constants . Namespace}.{DisplayName}" ;
+
+		public static readonly string IsDisabled = nameof ( IsDisabled ) ;
+
+		public static readonly string IsDisabledName = $"{Constants . Namespace}.{IsDisabled}" ;
+
+		public static readonly string CanLoginFrom = nameof ( CanLoginFrom ) ;
+
+		public static readonly string CanLoginFromName = $"{Constants . Namespace}.{CanLoginFrom}" ;
 
 		[CanBeNull]
 		public static string GetDisplayName ( [NotNull] this Entity entity )
@@ -25,7 +36,7 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( entity ) ) ;
 			}
 
-			if ( entity . Properties . FirstOrDefault ( prop => prop . Name == DisplayNameName) is EntityProperty
+			if ( entity . Properties . FirstOrDefault ( prop => prop . Name == DisplayNameName ) is EntityProperty
 					attribute )
 			{
 				return attribute . Value ;
@@ -33,10 +44,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			return null ;
 		}
-
-		public static readonly string IsDisabled = nameof ( IsDisabled ) ;
-
-		public static readonly string IsDisabledName = $"{Constants . Namespace}.{IsDisabled}" ;
 
 		public static bool GetIsDisabled ( [NotNull] this Entity entity )
 		{
@@ -57,27 +64,20 @@ namespace DreamRecorder . Directory . Services . Logic
 			return false ;
 		}
 
-		public static bool SetIsDisabled([NotNull] this Entity entity,bool isDisabled)
+		public static bool SetIsDisabled ( [NotNull] this Entity entity , bool isDisabled )
 		{
-			if (entity == null)
+			if ( entity == null )
 			{
-				throw new ArgumentNullException(nameof(entity));
+				throw new ArgumentNullException ( nameof ( entity ) ) ;
 			}
 
-			EntityProperty property = entity.Properties.FirstOrDefault(prop => prop.Name == IsDisabledName) ;
-			if (property is null )
+			EntityProperty property = entity . Properties . FirstOrDefault ( prop => prop . Name == IsDisabledName ) ;
+			if ( property is null )
 			{
-			
 			}
 
-			return false;
+			return false ;
 		}
-
-		public static char CanLoginFromSeparator => ',' ;
-
-		public static readonly string CanLoginFrom = nameof ( CanLoginFrom ) ;
-
-		public static readonly string CanLoginFromName = $"{Constants . Namespace}.{CanLoginFrom}" ;
 
 		public static ICollection <Guid> GetCanLoginFrom ( [NotNull] this Entity entity )
 		{
@@ -86,7 +86,7 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( entity ) ) ;
 			}
 
-			if ( entity . Properties . FirstOrDefault ( ( prop ) => prop . Name == CanLoginFromName ) is EntityProperty
+			if ( entity . Properties . FirstOrDefault ( prop => prop . Name == CanLoginFromName ) is EntityProperty
 					property )
 			{
 				return property . Value . Split ( CanLoginFromSeparator , StringSplitOptions . RemoveEmptyEntries ) .
@@ -110,23 +110,24 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			canLoginFrom . Add ( loginService . Guid ) ;
 
-			EntityProperty property =
-				entity . Properties . FirstOrDefault ( ( prop ) => prop . Name == CanLoginFromName ) ;
+			EntityProperty property = entity . Properties . FirstOrDefault ( prop => prop . Name == CanLoginFromName ) ;
 
 			if ( property is null )
 			{
-				property = new EntityProperty ( )
+				property = new EntityProperty
 							{
 								Name = CanLoginFromName ,
-								Owner = DirectoryServiceInternal . Current .DirectoryDatabase.KnownSpecialGroups . DirectoryServices ,
+								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
+																	DirectoryServices ,
 								Permissions = new PermissionGroup ( ) ,
 							} ;
 
 				property . Permissions . Permissions . Add (
-															new Permission ( )
+															new Permission
 															{
 																Target = DirectoryServiceInternal . Current .
-																	DirectoryDatabase.KnownSpecialGroups . LoginServices ,
+																	DirectoryDatabase . KnownSpecialGroups .
+																	LoginServices ,
 																Status = PermissionStatus . Allow ,
 																Type   = PermissionType . Read
 															} ) ;
@@ -136,9 +137,8 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			property . Value = string . Concat (
 												canLoginFrom . Select (
-																		( guid )
-																			=> guid . ToString ( )
-																				+ CanLoginFromSeparator ) ) ;
+																		guid => guid . ToString ( )
+																			+ CanLoginFromSeparator ) ) ;
 
 			return canLoginFrom ;
 		}

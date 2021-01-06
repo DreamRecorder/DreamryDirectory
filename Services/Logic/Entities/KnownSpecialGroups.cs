@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
@@ -19,16 +19,13 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public LoginServices LoginServices { get ; set ; } = new LoginServices ( ) ;
 
-		public KnownSpecialGroups ( ) {
-
-		}
-
 		public HashSet <SpecialGroup> Entities
 			=> typeof ( KnownSpecialGroups ) . GetProperties ( ) .
 												Where (
 														prop
 															=> typeof ( SpecialGroup ) . IsAssignableFrom (
-															prop . PropertyType ) ).Select(prop=>prop.GetValue(this) as SpecialGroup) .
+															prop . PropertyType ) ) .
+												Select ( prop => prop . GetValue ( this ) as SpecialGroup ) .
 												ToHashSet ( ) ;
 
 	}
