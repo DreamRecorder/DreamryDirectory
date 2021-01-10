@@ -21,6 +21,10 @@ namespace DreamRecorder . Directory . Logic
 
 		void DisposeToken ( [NotNull] EntityToken token ) ;
 
+		void DisposeToken ( [NotNull] LoginToken token ) ;
+
+		void DisposeToken ( [NotNull] AccessToken token ) ;
+
 		[CanBeNull]
 		AccessToken Access ( [NotNull] EntityToken token , Guid target ) ;
 
@@ -84,8 +88,9 @@ namespace DreamRecorder . Directory . Logic
 
 		Guid CreateGroup ( [NotNull] EntityToken token ) ;
 
-
 		void RegisterLogin ( [NotNull] EntityToken token , [NotNull] LoginToken targetToken ) ;
+
+		TimeSpan GetLoginTokenLife ( [NotNull] EntityToken token , Guid target ) ;
 
 	}
 

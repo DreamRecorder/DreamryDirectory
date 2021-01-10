@@ -5,13 +5,16 @@ using System . Linq ;
 using System . Net . Http ;
 using System . Text . Json ;
 
+using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
 
 namespace DreamRecorder . Directory . ServiceProvider
 {
 
-	public class RemoteLoginProvider <TCredential> : ILoginProvider where TCredential : class
+	public class RemoteLoginService <TCredential> : ILoginService where TCredential : class
 	{
+
+		public Func <HttpClient> HttpClientFactory { get ; set ; } = ( ) => new HttpClient ( ) ;
 
 		public string Server { get ; set ; }
 
@@ -21,7 +24,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void CheckToken ( AccessToken token , LoginToken tokenToCheck )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -37,9 +40,25 @@ namespace DreamRecorder . Directory . ServiceProvider
 			response . EnsureSuccessStatusCode ( ) ;
 		}
 
+		public void DisposeToken ( LoginToken token )
+		{
+			HttpClient client = HttpClientFactory ( ) ;
+
+			HttpResponseMessage response = client . PostAsJsonAsync (
+																	new UriBuilder (
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	nameof ( DisposeToken ) ) . Uri ,
+																	token ) .
+													Result ;
+
+			response . EnsureSuccessStatusCode ( ) ;
+		}
+
 		public virtual LoginToken Login ( TCredential credential )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (

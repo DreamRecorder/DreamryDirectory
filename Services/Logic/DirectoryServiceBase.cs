@@ -18,8 +18,6 @@ using JetBrains . Annotations ;
 using Microsoft . Extensions . DependencyInjection ;
 using Microsoft . Extensions . Logging ;
 
-using ILoginProvider = DreamRecorder . Directory . Logic . ILoginProvider ;
-
 namespace DreamRecorder . Directory . Services . Logic
 {
 
@@ -76,9 +74,9 @@ namespace DreamRecorder . Directory . Services . Logic
 
 					if ( target . GetCanLoginFrom ( ) . Contains ( issuer . Guid ) )
 					{
-						ILoginProvider loginProviderService = LoginServiceProvider . GetLoginProvider ( issuer ) ;
+						ILoginService loginService = LoginServiceProvider . GetLoginService ( issuer ) ;
 
-						loginProviderService . CheckToken ( AccessTokenProvider . Access ( issuer . Guid ) , token ) ;
+						loginService . CheckToken ( AccessTokenProvider . Access ( issuer . Guid ) , token ) ;
 
 						EntityToken resultToken = IssueEntityToken (
 																	target ,
@@ -138,6 +136,53 @@ namespace DreamRecorder . Directory . Services . Logic
 			if ( token . Issuer == ServiceEntity . Guid )
 			{
 				IssuedEntityTokens . DisposeToken ( token ) ;
+			}
+			else
+			{
+				DirectoryService issuer =
+					DirectoryDatabase . DirectoryServices . FirstOrDefault (
+																			directoryService
+																				=> directoryService . Guid
+																					== token . Issuer ) ;
+				if ( ! ( issuer is null ) )
+				{
+					IDirectoryService issuerService = DirectoryServiceProvider . GetDirectoryProvider ( issuer ) ;
+
+					issuerService . DisposeToken ( token ) ;
+				}
+			}
+		}
+
+		public void DisposeToken ( LoginToken token )
+		{
+			if ( token == null )
+			{
+				throw new ArgumentNullException ( nameof ( token ) ) ;
+			}
+
+
+			LoginService issuer =
+				DirectoryDatabase . LoginServices . FirstOrDefault (
+																	directoryService
+																		=> directoryService . Guid == token . Issuer ) ;
+			if ( ! ( issuer is null ) )
+			{
+				ILoginService issuerService = LoginServiceProvider . GetLoginService ( issuer ) ;
+
+				issuerService . DisposeToken ( token ) ;
+			}
+		}
+
+		public void DisposeToken ( AccessToken token )
+		{
+			if ( token == null )
+			{
+				throw new ArgumentNullException ( nameof ( token ) ) ;
+			}
+
+			if ( token . Issuer == ServiceEntity . Guid )
+			{
+				IssuedAccessTokens . DisposeToken ( token ) ;
 			}
 			else
 			{
@@ -720,8 +765,7 @@ namespace DreamRecorder . Directory . Services . Logic
 			if ( requester != null )
 			{
 				if ( tokenToCheck . Target == requester . Guid
-					|| ( requester is DirectoryService directoryService
-						&& DirectoryDatabase . DirectoryServices . Contains ( directoryService ) ) )
+					|| ( requester is DirectoryService ) )
 				{
 					CheckToken ( tokenToCheck ) ;
 				}
@@ -821,7 +865,59 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( targetToken ) ) ;
 			}
 
-			CheckToken ( targetToken ) ;
+			LoginService requester =
+				DirectoryDatabase . LoginServices . SingleOrDefault ( entity => entity . Guid == token . Owner ) ;
+
+			if ( requester != null )
+			{
+				CheckToken ( targetToken ) ;
+
+				Entity targetEntity = DirectoryDatabase . FindEntity ( targetToken . Owner ) ;
+
+				if ( targetEntity != null )
+				{
+					targetEntity . AddCanLoginFrom ( requester ) ;
+				}
+				else
+				{
+					throw new EntityNotFoundException ( ) ;
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException ( ) ;
+			}
+		}
+
+		public TimeSpan GetLoginTokenLife ( EntityToken token , Guid target )
+		{
+			if ( token == null )
+			{
+				throw new ArgumentNullException ( nameof ( token ) ) ;
+			}
+
+			CheckToken ( token ) ;
+
+			LoginService requester =
+				DirectoryDatabase . LoginServices . SingleOrDefault ( entity => entity . Guid == token . Owner ) ;
+
+			if ( requester != null )
+			{
+				Entity targetEntity = DirectoryDatabase . FindEntity ( target ) ;
+
+				if ( targetEntity != null )
+				{
+					return TokenPolicy . LoginTokenLife ( requester , targetEntity ) ;
+				}
+				else
+				{
+					throw new EntityNotFoundException ( ) ;
+				}
+			}
+			else
+			{
+				throw new EntityNotFoundException ( ) ;
+			}
 		}
 
 		public IDirectoryDatabase DirectoryDatabase { get ; set ; }
@@ -972,7 +1068,7 @@ namespace DreamRecorder . Directory . Services . Logic
 																		=> loginService . Guid == token . Issuer ) ;
 			if ( ! ( issuer is null ) )
 			{
-				ILoginProvider issuerService = LoginServiceProvider . GetLoginProvider ( issuer ) ;
+				ILoginService issuerService = LoginServiceProvider . GetLoginService ( issuer ) ;
 
 				issuerService . CheckToken ( AccessTokenProvider . Access ( issuer . Guid ) , token ) ;
 			}

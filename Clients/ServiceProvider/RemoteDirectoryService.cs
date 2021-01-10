@@ -14,13 +14,15 @@ namespace DreamRecorder . Directory . ServiceProvider
 	public class RemoteDirectoryService : IDirectoryService
 	{
 
+		public Func <HttpClient> HttpClientFactory { get ; set ; } = ( ) => new HttpClient ( ) ;
+
 		public string Server { get ; set ; }
 
 		public int Port { get ; set ; }
 
 		public EntityToken Login ( LoginToken token )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (
@@ -40,7 +42,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public EntityToken UpdateToken ( EntityToken token )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -62,7 +64,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void DisposeToken ( EntityToken token )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
 																	new UriBuilder (
@@ -78,7 +80,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public AccessToken Access ( EntityToken token , Guid target )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -101,7 +103,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public string GetProperty ( EntityToken token , Guid target , string name )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -124,7 +126,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void SetProperty ( EntityToken token , Guid target , string name , string value )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -143,7 +145,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public AccessType AccessProperty ( EntityToken token , Guid target , string name )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -166,7 +168,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public AccessType GrantRead ( EntityToken token , Guid target , string name , Guid access )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -189,7 +191,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public AccessType GrantWrite ( EntityToken token , Guid target , string name , Guid access )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -212,7 +214,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public bool Contain ( EntityToken token , Guid group , Guid target )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -235,7 +237,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public ICollection <Guid> ListGroup ( EntityToken token , Guid group )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -258,7 +260,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void AddToGroup ( EntityToken token , Guid group , Guid target )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -277,7 +279,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void RemoveFromGroup ( EntityToken token , Guid group , Guid target )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -296,7 +298,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void CheckToken ( EntityToken token , AccessToken tokenToCheck )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -314,7 +316,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void CheckToken ( EntityToken token , EntityToken tokenToCheck )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -332,7 +334,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public Guid CreateUser ( EntityToken token )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -354,7 +356,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public Guid CreateGroup ( EntityToken token )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -376,7 +378,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public void RegisterLogin ( EntityToken token , LoginToken targetToken )
 		{
-			HttpClient client = new HttpClient ( ) ;
+			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
@@ -390,6 +392,29 @@ namespace DreamRecorder . Directory . ServiceProvider
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
+		}
+
+		public TimeSpan GetLoginTokenLife ( EntityToken token , Guid target )
+		{
+			HttpClient client = HttpClientFactory ( ) ;
+
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+
+			HttpResponseMessage response = client . PostAsync (
+																new UriBuilder (
+																				Uri . UriSchemeHttps ,
+																				Server ,
+																				Port ,
+																				$"{nameof ( GetLoginTokenLife )}" ) .
+																	Uri ,
+																null ) .
+													Result ;
+
+			response . EnsureSuccessStatusCode ( ) ;
+
+			TimeSpan result = response . Content . ReadAsAsync <TimeSpan> ( ) . Result ;
+
+			return result ;
 		}
 
 	}

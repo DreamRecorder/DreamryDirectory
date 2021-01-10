@@ -8,12 +8,14 @@ using DreamRecorder . Directory . Logic . Tokens ;
 namespace DreamRecorder . Directory . Logic
 {
 
-	public interface ILoginProvider
+	public interface ILoginService
 	{
 
 		LoginToken Login ( object credential ) ;
 
 		void CheckToken ( AccessToken token , LoginToken tokenToCheck ) ;
+
+		void DisposeToken ( LoginToken token ) ;
 
 	}
 

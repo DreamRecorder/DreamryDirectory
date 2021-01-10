@@ -4,11 +4,10 @@ using System . Collections . Generic ;
 using System . Linq ;
 
 using DreamRecorder . Directory . Logic . Tokens ;
-using DreamRecorder . Directory . Services . General ;
 
 using JetBrains . Annotations ;
 
-namespace DreamRecorder . Directory . Services . Logic
+namespace DreamRecorder . Directory . Services . General
 {
 
 	public static class TokenExtensions
