@@ -6,13 +6,6 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Permissions
 {
 
-	public enum PermissionStatus
-	{
-
-		Allow ,
-
-		Deny
-
-	}
+	
 
 }

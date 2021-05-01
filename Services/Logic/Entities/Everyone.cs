@@ -8,10 +8,9 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 	public class Everyone : SpecialGroup
 	{
-
 		public override Guid Guid
 		{
-			get => Guid . Parse ( "00000000-0000-0000-0000-000000000000" ) ;
+			get => Guid . Parse ("CCAD71E9-041B-4190-AE0D-1B7034FF2E15") ;
 			set => throw new InvalidOperationException ( ) ;
 		}
 

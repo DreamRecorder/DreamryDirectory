@@ -5,26 +5,61 @@ using System . Linq ;
 using System . Text ;
 
 using DreamRecorder . Directory . Logic ;
+using DreamRecorder.Directory.Services.General;
 using DreamRecorder . Directory . Services . Logic . Entities ;
+
+using JetBrains . Annotations ;
 
 namespace DreamRecorder . Directory . Services . Logic . Permissions
 {
-
+	
 	public class PermissionGroup
 	{
 
+		public Guid Guid { get ; set ; }
+
+		public Entity Owner { get ; set ; }
+
 		public HashSet <Permission> Permissions { get ; set ; } = new HashSet <Permission> ( ) ;
 
-		public override string ToString ( )
+		public DreamRecorder . Directory . Logic . PermissionGroup ToClientSidePermissionGroup ( )
 		{
-			StringBuilder stringBuilder = new StringBuilder ( ) ;
+			Directory . Logic . PermissionGroup result = new DreamRecorder.Directory.Logic.PermissionGroup(  );
 
-			foreach ( Permission permission in Permissions )
+			result.Guid    = Guid;
+			result . Owner = Owner . Guid ;
+
+			result . Permissions = Permissions . Select ( permission => permission . ToClientSidePermission ( ) ) . ToHashSet ( ) ;
+
+			return result ;
+
+		}
+
+		public void Edit ( [NotNull] DreamRecorder . Directory . Logic . PermissionGroup permissionGroup )
+		{
+			if ( permissionGroup == null )
 			{
-				stringBuilder . AppendLine ( permission . ToString ( ) ) ;
+				throw new ArgumentNullException ( nameof ( permissionGroup ) ) ;
 			}
 
-			return stringBuilder . ToString ( ) ;
+
+
+			Entity newOwner =
+				DirectoryServiceInternal . Current . DirectoryDatabase . FindEntity ( permissionGroup . Owner ) ;
+
+			if ( newOwner == null )
+			{
+				throw new TargetEntityNotFoundException ( permissionGroup . Owner ) ;
+			}
+
+			HashSet <Permission> newPermissions = new HashSet <Permission> ( ) ;
+
+			foreach ( Directory . Logic . Permission permission in permissionGroup.Permissions )
+			{
+				 newPermissions.Add( Permission . Create ( permission ) );
+			}
+
+			Permissions = newPermissions ;
 		}
 
 		public AccessType Access ( Entity entity )

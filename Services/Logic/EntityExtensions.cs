@@ -3,10 +3,14 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
+using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . Directory . Services . Logic . Permissions ;
 
 using JetBrains . Annotations ;
+
+using KnownPermissionGroups = DreamRecorder . Directory . Services . Logic . Entities . KnownPermissionGroups ;
+using Permission = DreamRecorder . Directory . Services . Logic . Permissions . Permission ;
+using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -27,6 +31,11 @@ namespace DreamRecorder . Directory . Services . Logic
 		public static readonly string CanLoginFrom = nameof ( CanLoginFrom ) ;
 
 		public static readonly string CanLoginFromName = $"{Constants . Namespace}.{CanLoginFrom}" ;
+
+
+		public static readonly string StopRenewEntityToken = nameof(StopRenewEntityToken);
+
+		public static readonly string StopRenewEntityTokenName = $"{Constants.Namespace}.{StopRenewEntityToken}";
 
 		[CanBeNull]
 		public static string GetDisplayName ( [NotNull] this Entity entity )
@@ -119,7 +128,7 @@ namespace DreamRecorder . Directory . Services . Logic
 								Name = CanLoginFromName ,
 								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
 																	DirectoryServices ,
-								Permissions = new PermissionGroup ( ) ,
+								Permissions = KnownPermissionGroups.DirectoryServicesReadWrite,
 							} ;
 
 				property . Permissions . Permissions . Add (

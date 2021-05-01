@@ -3,11 +3,15 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
+using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . Directory . Services . Logic . Permissions ;
 using DreamRecorder . Directory . Services . Logic . Storage ;
 
 using JetBrains . Annotations ;
+
+using KnownSpecialGroups = DreamRecorder . Directory . Services . Logic . Entities . KnownSpecialGroups ;
+using Permission = DreamRecorder . Directory . Services . Logic . Permissions . Permission ;
+using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -24,9 +28,11 @@ namespace DreamRecorder . Directory . Services . Logic
 						Union ( Services ) .
 						Union ( LoginServices ) .
 						Union ( DirectoryServices ) .
-						Union ( KnownSpecialGroups . Entities ) ;
+						Union ( KnownSpecialGroups . Entities ) .Union(new []{ Anonymous } );
 
 		public DirectoryDatabase ( IDirectoryDatabaseStorage databaseStorage ) { DatabaseStorage = databaseStorage ; }
+
+		public Anonymous Anonymous{ get; set; }
 
 		public HashSet <User> Users { get ; set ; }
 
@@ -38,12 +44,24 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public HashSet <DirectoryService> DirectoryServices { get ; set ; }
 
+		public HashSet <PermissionGroup> PermissionGroups { get ; set ; }
+
+		public PermissionGroup FindPermissionGroup(Guid guid)
+		{
+			return PermissionGroups.SingleOrDefault(permissionGroup => permissionGroup.Guid == guid);
+		}
+
 		public Entity FindEntity ( Guid guid )
 		{
 			return Entities . SingleOrDefault ( entity => entity . Guid == guid ) ;
 		}
 
 		public KnownSpecialGroups KnownSpecialGroups { get ; set ; }
+
+		public void CreateNew ( )
+		{
+
+		}
 
 		public void Init ( ) { InitializeEntities ( ) ; }
 
@@ -144,6 +162,29 @@ namespace DreamRecorder . Directory . Services . Logic
 					directoryService . DatabaseObject = dbDirectoryService ;
 				}
 			}
+
+			LoginServices ??= new HashSet<LoginService>();
+			HashSet<DbLoginService> dbLoginServices = DatabaseStorage.GetDbLoginServices();
+			foreach (DbLoginService dbLoginService in dbLoginServices)
+			{
+				LoginService loginService =
+					LoginServices.FirstOrDefault(service => service.Guid == dbLoginService.Guid);
+				if (loginService is null)
+				{
+					loginService = new LoginService
+										{
+											Guid           = dbLoginService.Guid,
+											DatabaseObject = dbLoginService
+										};
+					LoginServices.Add(loginService);
+				}
+				else
+				{
+					loginService.DatabaseObject = dbLoginService;
+				}
+			}
+			
+			
 
 			//todo
 		}

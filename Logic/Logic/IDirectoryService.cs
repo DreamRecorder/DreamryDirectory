@@ -33,6 +33,8 @@ namespace DreamRecorder . Directory . Logic
 
 		void SetProperty ( [NotNull] EntityToken token , Guid target , string name , string value ) ;
 
+		void TransferProperty( [NotNull] EntityToken token , Guid target , string name , Guid newOwner ) ;
+
 		/// <summary>
 		///     Get Access of Property
 		/// </summary>
@@ -42,9 +44,12 @@ namespace DreamRecorder . Directory . Logic
 		/// <returns></returns>
 		AccessType AccessProperty ( [NotNull] EntityToken token , Guid target , string name ) ;
 
-		AccessType GrantRead ( [NotNull] EntityToken token , Guid target , string name , Guid access ) ;
+		void SetPropertyPermission ( [NotNull] EntityToken token , Guid target , string name , Guid permissionGroup ) ;
 
-		AccessType GrantWrite ( [NotNull] EntityToken token , Guid target , string name , Guid access ) ;
+		[CanBeNull] 
+		PermissionGroup GetPermissionGroup ( [NotNull] EntityToken token , Guid target ) ;
+
+		PermissionGroup UpdatePermissionGroup ( [NotNull] EntityToken token , PermissionGroup target ) ;
 
 		/// <summary>
 		///     Check if an entity is a member of a group

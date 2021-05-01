@@ -11,13 +11,13 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public override Guid Guid
 		{
-			get => Guid . Parse ( "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" ) ;
+			get => Guid . Parse ("D7A1809A-2E3B-4BCD-8927-3E2D96751F1F") ;
 			set => throw new InvalidOperationException ( ) ;
 		}
 
 		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null )
 		{
-			return ( ( ! ( entity is null ) ) && ( ! ( entity is Everyone ) ) ) ;
+			return ( ( ! ( entity is null ) ) && ( ! ( entity is Anonymous ) ) ) ;
 		}
 
 	}

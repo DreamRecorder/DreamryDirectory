@@ -17,11 +17,15 @@ namespace DreamRecorder . Directory . Logic . Tokens
 
 		public DateTimeOffset NotAfter { get ; set ; }
 
+		public Guid Guid { get ; set ; }
+
 		public Guid Issuer { get ; set ; }
+
+		public Guid Domain { get ; set ; }
 
 		public bool Equals ( Token other )
 		{
-			if ( other is null )
+			if ( ReferenceEquals ( null , other ) )
 			{
 				return false ;
 			}
@@ -31,16 +35,12 @@ namespace DreamRecorder . Directory . Logic . Tokens
 				return true ;
 			}
 
-			return Owner . Equals ( other . Owner )
-					&& Equals ( Secret , other . Secret )
-					&& NotBefore . Equals ( other . NotBefore )
-					&& NotAfter . Equals ( other . NotAfter )
-					&& Issuer . Equals ( other . Issuer ) ;
+			return Owner . Equals ( other . Owner ) && Equals ( Secret , other . Secret ) && NotBefore . Equals ( other . NotBefore ) && NotAfter . Equals ( other . NotAfter ) && Guid . Equals ( other . Guid ) && Issuer . Equals ( other . Issuer ) ;
 		}
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null )
+			if ( obj is null)
 			{
 				return false ;
 			}
@@ -60,7 +60,7 @@ namespace DreamRecorder . Directory . Logic . Tokens
 
 		public override int GetHashCode ( )
 		{
-			return HashCode . Combine ( Owner , Secret , NotBefore , NotAfter , Issuer ) ;
+			return HashCode . Combine ( Owner , Secret , NotBefore , NotAfter , Guid , Issuer ) ;
 		}
 
 		public static bool operator == ( Token left , Token right ) { return Equals ( left , right ) ; }

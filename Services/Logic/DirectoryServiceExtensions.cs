@@ -19,6 +19,36 @@ namespace DreamRecorder . Directory . Services . Logic
 			$"{Constants . Namespace}.{DatabaseConnectionString}" ;
 
 
+		public static EntityProperty GetDatabaseConnectionStringProperty (
+			[NotNull] this DirectoryService directoryService )
+		{
+			if ( directoryService == null )
+			{
+				throw new ArgumentNullException ( nameof ( directoryService ) ) ;
+			}
+
+			if ( directoryService . Properties . FirstOrDefault ( prop => prop . Name == DatabaseConnectionString ) is
+					EntityProperty property )
+			{
+			}
+			else
+			{
+				property = new EntityProperty
+							{
+								Name = DatabaseConnectionString ,
+								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
+																	DirectoryServices ,
+								Value = string . Empty,
+								Permissions=KnownPermissionGroups.InternalApiOnly
+							} ;
+
+				directoryService . Properties . Add ( property ) ;
+			}
+
+			return property ;
+		}
+
+
 		public static readonly string ApiEndPoints = nameof ( ApiEndPoints ) ;
 
 		public static readonly string ApiEndPointsName = $"{Constants . Namespace}.{ApiEndPoints}" ;
