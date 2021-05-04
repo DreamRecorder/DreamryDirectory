@@ -9,6 +9,8 @@ using DreamRecorder . Directory . Services . Logic . Entities ;
 using DreamRecorder . Directory . Services . Logic . Permissions ;
 using DreamRecorder . ToolBox . General ;
 
+using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
+
 namespace DreamRecorder . Directory . Services . Logic
 {
 

@@ -42,13 +42,14 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 			{
 				Permission result = new Permission ( )
 									{
-										Status = permission . Status , Target = target , Type = permission . Type
+										Status = permission . Status , Target = target , Type = permission . Type ,
 									} ;
 
+				return result;
 			}
 			else
 			{
-				throw new TargetEntityNotFoundException ( ) ;
+				throw new TargetEntityNotFoundException (permission.Target ) ;
 			}
 
 		}

@@ -27,6 +27,15 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		void DeleteProperty ( DbProperty property ) ;
 
+		HashSet <DbService> GetDbServices ( ) ;
+
+	}
+
+	public class DbService
+	{
+		public Guid Guid { get; set; }
+
+		public HashSet<DbProperty> Proprieties { get; set; }
 	}
 
 }

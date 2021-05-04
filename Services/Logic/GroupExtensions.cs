@@ -24,20 +24,18 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( group ) ) ;
 			}
 
-			if ( group . Properties . FirstOrDefault ( prop => prop . Name == MembersName ) is EntityProperty property )
-			{
-			}
-			else
+			if ( @group . Properties . FirstOrDefault ( prop => prop . Name == MembersName ) is not EntityProperty
+					property )
 			{
 				property = new EntityProperty
 							{
 								Name = MembersName ,
 								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
 																	DirectoryServices ,
-								Value = string . Empty
+								Value = string . Empty ,
 							} ;
 
-				group . Properties . Add ( property ) ;
+				@group . Properties . Add ( property ) ;
 			}
 
 			return property ;

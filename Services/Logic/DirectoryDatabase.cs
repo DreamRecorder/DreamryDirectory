@@ -28,11 +28,11 @@ namespace DreamRecorder . Directory . Services . Logic
 						Union ( Services ) .
 						Union ( LoginServices ) .
 						Union ( DirectoryServices ) .
-						Union ( KnownSpecialGroups . Entities ) .Union(new []{ Anonymous } );
+						Union ( KnownSpecialGroups . Entities ) .Union(new []{ Anonymous , } );
 
 		public DirectoryDatabase ( IDirectoryDatabaseStorage databaseStorage ) { DatabaseStorage = databaseStorage ; }
 
-		public Anonymous Anonymous{ get; set; }
+		public Anonymous Anonymous { get ; set ; } = new Anonymous ( ) ;
 
 		public HashSet <User> Users { get ; set ; }
 
@@ -153,7 +153,7 @@ namespace DreamRecorder . Directory . Services . Logic
 				{
 					directoryService = new DirectoryService
 										{
-											Guid = dbDirectoryService . Guid , DatabaseObject = dbDirectoryService
+											Guid = dbDirectoryService . Guid , DatabaseObject = dbDirectoryService ,
 										} ;
 					DirectoryServices . Add ( directoryService ) ;
 				}
@@ -174,7 +174,7 @@ namespace DreamRecorder . Directory . Services . Logic
 					loginService = new LoginService
 										{
 											Guid           = dbLoginService.Guid,
-											DatabaseObject = dbLoginService
+											DatabaseObject = dbLoginService ,
 										};
 					LoginServices.Add(loginService);
 				}
@@ -183,8 +183,27 @@ namespace DreamRecorder . Directory . Services . Logic
 					loginService.DatabaseObject = dbLoginService;
 				}
 			}
-			
-			
+
+			Services ??= new HashSet<Service>();
+			HashSet<DbService> dbServices = DatabaseStorage.GetDbServices();
+			foreach (DbService dbService in dbServices)
+			{
+				Service service =
+					Services.FirstOrDefault(service => service.Guid == dbService.Guid);
+				if (service is null)
+				{
+					service = new Service
+									{
+										Guid           = dbService.Guid,
+										DatabaseObject = dbService,
+									};
+					Services.Add(service);
+				}
+				else
+				{
+					service.DatabaseObject = dbService;
+				}
+			}
 
 			//todo
 		}
