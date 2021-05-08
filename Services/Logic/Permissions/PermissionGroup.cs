@@ -28,7 +28,6 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 
 			result.Guid    = Guid;
 			result . Owner = Owner . Guid ;
-
 			result . Permissions = Permissions . Select ( permission => permission . ToClientSidePermission ( ) ) . ToHashSet ( ) ;
 
 			return result ;
@@ -41,8 +40,6 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 			{
 				throw new ArgumentNullException ( nameof ( permissionGroup ) ) ;
 			}
-
-
 
 			Entity newOwner =
 				DirectoryServiceInternal . Current . DirectoryDatabase . FindEntity ( permissionGroup . Owner ) ;

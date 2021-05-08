@@ -15,7 +15,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public string Value { get ; set ; }
 
-		public string Permission { get ; set ; }
+		public DbPermissionGroup Permission { get ; set ; }
 
 		public bool Equals ( DbProperty other )
 		{

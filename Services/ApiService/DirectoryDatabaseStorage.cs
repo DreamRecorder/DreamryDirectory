@@ -40,7 +40,7 @@ namespace DreamRecorder . Directory . Services . ApiService
 			return new HashSet <DbLoginService> ( DbLoginServices ) ;
 		}
 
-		public HashSet <DbGroup> GetDbGroups ( ) { return new HashSet <DbGroup> ( DbGroups ) ; }
+		public HashSet <DbGroup> GetDbGroups ( ) => new HashSet <DbGroup> ( DbGroups ) ;
 
 		public HashSet <DbGroupMember> GetDbGroupMembers ( ) { return new HashSet <DbGroupMember> ( DbGroupMembers ) ; }
 
@@ -69,6 +69,11 @@ namespace DreamRecorder . Directory . Services . ApiService
 			DbProperties . Remove ( property ) ;
 			Save ( ) ;
 		}
+
+		public HashSet <DbService> GetDbServices ( ) { return new HashSet <DbService> ( DbServices ) ; }
+
+		public DbSet<DbService> DbServices
+		{ get ; set ; }
 
 		protected override void OnConfiguring ( DbContextOptionsBuilder optionsBuilder )
 		{
@@ -106,9 +111,16 @@ namespace DreamRecorder . Directory . Services . ApiService
 							WithOne ( ) .
 							HasForeignKey ( member => member . Group ) ;
 
+			modelBuilder.Entity<DbService>().HasKey(service => service.Guid);
+			modelBuilder.Entity<DbService>().
+						HasMany(service => service.Proprieties).
+						WithOne().
+						HasForeignKey(prop => prop.Owner);
+
 			modelBuilder . Entity <DbGroupMember> ( ) .
 							HasKey ( groupMember => new { groupMember . Group , groupMember . Member } ) ;
 			modelBuilder . Entity <DbProperty> ( ) . HasKey ( property => new { property . Owner , property . Name } ) ;
+			modelBuilder.Entity<DbProperty>().HasOne(prop=>prop.Permission);
 		}
 
 	}

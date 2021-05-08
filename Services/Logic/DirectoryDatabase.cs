@@ -112,8 +112,17 @@ namespace DreamRecorder . Directory . Services . Logic
 			return result ;
 		}
 
+		private void InitializeGroupMembers ( )
+		{
 
-		private void InitProp ( )
+		}
+
+		private void InitializePermissionGroups()
+		{
+
+		}
+
+		private void InitializeProperties ( )
 		{
 			foreach ( DirectoryService directoryService in DirectoryServices )
 			{
@@ -205,7 +214,47 @@ namespace DreamRecorder . Directory . Services . Logic
 				}
 			}
 
+			Groups ??= new HashSet<Group>();
+			HashSet<DbGroup> dbGroups = DatabaseStorage.GetDbGroups();
+			foreach (DbGroup dbGroup in dbGroups)
+			{
+				Group group =
+					Groups.FirstOrDefault(group => group.Guid == dbGroup.Guid);
+				if (group is null)
+				{
+					group = new Group
+							{
+								Guid           = dbGroup.Guid,
+								DatabaseObject = dbGroup,
+							};
+					Groups.Add(group);
+				}
+				else
+				{
+					group.DatabaseObject = dbGroup;
+				}
+			}
 
+			Users ??= new HashSet<User>();
+			HashSet<DbUser> dbUsers = DatabaseStorage.GetDbUsers();
+			foreach (DbUser dbUser in dbUsers)
+			{
+				User user =
+					Users.FirstOrDefault(user => user.Guid == dbUser.Guid);
+				if (user is null)
+				{
+					user = new User
+							{
+								Guid           = dbUser.Guid,
+								DatabaseObject = dbUser,
+							};
+					Users.Add(user);
+				}
+				else
+				{
+					user.DatabaseObject = dbUser;
+				}
+			}
 
 			//todo
 		}

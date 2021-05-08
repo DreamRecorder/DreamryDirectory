@@ -38,4 +38,5 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		public HashSet<DbProperty> Proprieties { get; set; }
 	}
 
+
 }
