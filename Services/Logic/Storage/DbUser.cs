@@ -1,4 +1,6 @@
-﻿using System ;
+﻿using DreamRecorder.Directory.Services.Logic.Entities;
+
+using System ;
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
@@ -6,7 +8,7 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
 
-	public class DbUser : IEquatable <DbUser>
+	public class DbUser : IEquatable <DbUser>,IDatabaseObject
 	{
 
 		public Guid Guid { get ; set ; }

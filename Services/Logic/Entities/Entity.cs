@@ -3,12 +3,35 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
+using DreamRecorder . Directory . Services . Logic . Storage ;
+
 using JetBrains . Annotations ;
 
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
 
-	public class Entity : IEquatable <Entity>
+	public interface IDatabaseObject
+	{
+
+		HashSet<DbProperty> Proprieties { get; }
+
+	}
+
+	public interface IEntity
+	{
+
+		IDatabaseObject DatabaseObject{ get; }
+
+	}
+
+	public interface IEntity<out T>:IEntity where T:IDatabaseObject
+	{
+
+		T DatabaseObject { get; }
+
+	}
+
+	public abstract class Entity : IEquatable <Entity>
 	{
 
 		public virtual Guid Guid { get ; set ; }

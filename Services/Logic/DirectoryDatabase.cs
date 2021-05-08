@@ -63,54 +63,60 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		}
 
-		public void Init ( ) { InitializeEntities ( ) ; }
-
-		public PermissionGroup CreatePermissionGroup ( [NotNull] string value )
+		public void Init ( )
 		{
-			if ( value == null )
-			{
-				throw new ArgumentNullException ( nameof ( value ) ) ;
-			}
-
-			PermissionGroup result = new PermissionGroup ( ) ;
-
-			List <string [ ]> permissions = value .
-											Split ( Environment . NewLine , StringSplitOptions . RemoveEmptyEntries ) .
-											Select ( line => line . Trim ( ) ) .
-											Select (
-													line
-														=> line .
-															Split ( ',' , StringSplitOptions . RemoveEmptyEntries ) .
-															Select ( part => part . Trim ( ) ) .
-															ToArray ( ) ) .
-											ToList ( ) ;
-
-			foreach ( string [ ] permissionStrings in permissions )
-			{
-				if ( permissionStrings . Length == 3 )
-				{
-					Guid   guid   = Guid . Parse ( permissionStrings [ 0 ] ) ;
-					Entity target = FindEntity ( guid ) ;
-
-					if ( target != null )
-					{
-						Permission permission = new Permission (
-																target ,
-																Enum . Parse <PermissionStatus> (
-																permissionStrings [ 1 ] ) ,
-																Enum . Parse <PermissionType> (
-																permissionStrings [ 2 ] ) ) ;
-
-						result . Permissions . Add ( permission ) ;
-					}
-				}
-				else
-				{
-				}
-			}
-
-			return result ;
+			InitializeEntities ( ) ;
+			InitializeGroupMembers();
+			InitializePermissionGroups( ) ;
+			InitializeProperties ( ) ;
 		}
+
+		//public PermissionGroup CreatePermissionGroup ( [NotNull] string value )
+		//{
+		//	if ( value == null )
+		//	{
+		//		throw new ArgumentNullException ( nameof ( value ) ) ;
+		//	}
+
+		//	PermissionGroup result = new PermissionGroup ( ) ;
+
+		//	List <string [ ]> permissions = value .
+		//									Split ( Environment . NewLine , StringSplitOptions . RemoveEmptyEntries ) .
+		//									Select ( line => line . Trim ( ) ) .
+		//									Select (
+		//											line
+		//												=> line .
+		//													Split ( ',' , StringSplitOptions . RemoveEmptyEntries ) .
+		//													Select ( part => part . Trim ( ) ) .
+		//													ToArray ( ) ) .
+		//									ToList ( ) ;
+
+		//	foreach ( string [ ] permissionStrings in permissions )
+		//	{
+		//		if ( permissionStrings . Length == 3 )
+		//		{
+		//			Guid   guid   = Guid . Parse ( permissionStrings [ 0 ] ) ;
+		//			Entity target = FindEntity ( guid ) ;
+
+		//			if ( target != null )
+		//			{
+		//				Permission permission = new Permission (
+		//														target ,
+		//														Enum . Parse <PermissionStatus> (
+		//														permissionStrings [ 1 ] ) ,
+		//														Enum . Parse <PermissionType> (
+		//														permissionStrings [ 2 ] ) ) ;
+
+		//				result . Permissions . Add ( permission ) ;
+		//			}
+		//		}
+		//		else
+		//		{
+		//		}
+		//	}
+
+		//	return result ;
+		//}
 
 		private void InitializeGroupMembers ( )
 		{
@@ -124,9 +130,9 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		private void InitializeProperties ( )
 		{
-			foreach ( DirectoryService directoryService in DirectoryServices )
+			foreach ( Entity entity in Entities )
 			{
-				foreach ( DbProperty dbProperty in directoryService . DatabaseObject . Proprieties )
+				foreach ( DbProperty dbProperty in entity . DatabaseObject . Proprieties )
 				{
 					Entity propertyOwner = FindEntity ( dbProperty . Owner ) ;
 
@@ -143,7 +149,7 @@ namespace DreamRecorder . Directory . Services . Logic
 												Value       = dbProperty . Value ,
 											} ;
 
-					directoryService . Properties . Add ( property ) ;
+					entity . Properties . Add ( property ) ;
 				}
 			}
 		}
