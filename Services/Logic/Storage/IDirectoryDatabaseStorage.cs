@@ -3,40 +3,41 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
+using Microsoft . EntityFrameworkCore ;
+
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
 
 	public interface IDirectoryDatabaseStorage
 	{
 
-		HashSet <DbUser> GetDbUsers ( ) ;
+		DbSet <DbUser> DbUsers { get ; set ; }
 
-		HashSet <DbDirectoryService> GetDbDirectoryServices ( ) ;
+		DbSet <DbDirectoryService> DbDirectoryServices { get ; set ; }
 
-		HashSet <DbLoginService> GetDbLoginServices ( ) ;
+		DbSet <DbLoginService> DbLoginServices { get ; set ; }
 
-		HashSet <DbGroup> GetDbGroups ( ) ;
+		DbSet <DbGroup> DbGroups { get ; set ; }
 
-		HashSet <DbGroupMember> GetDbGroupMembers ( ) ;
+		DbSet <DbGroupMember> DbGroupMembers { get ; set ; }
 
-		HashSet <DbProperty> GetDbProperties ( ) ;
+		DbSet <DbProperty> DbProperties { get ; set ; }
+
+		DbSet <DbPermissionGroup> DbPermissionGroups { get ; set ; }
+
+		DbSet <DbService> DbServices { get ; set ; }
 
 		void Save ( ) ;
-
-		void DeleteGroupMember ( DbGroupMember groupMember ) ;
-
-		void DeleteProperty ( DbProperty property ) ;
-
-		HashSet <DbService> GetDbServices ( ) ;
 
 	}
 
 	public class DbService
 	{
-		public Guid Guid { get; set; }
 
-		public HashSet<DbProperty> Proprieties { get; set; }
+		public Guid Guid { get ; set ; }
+
+		public HashSet <DbProperty> Proprieties { get ; set ; }
+
 	}
-
 
 }

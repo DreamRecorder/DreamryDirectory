@@ -78,6 +78,38 @@ namespace DreamRecorder . Directory . ServiceProvider
 			response . EnsureSuccessStatusCode ( ) ;
 		}
 
+		public void DisposeToken ( LoginToken token )
+		{
+			HttpClient client = HttpClientFactory ( ) ;
+
+			HttpResponseMessage response = client . PostAsJsonAsync (
+																	new UriBuilder (
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	nameof ( DisposeToken ) ) . Uri ,
+																	token ) .
+													Result ;
+
+			response . EnsureSuccessStatusCode ( ) ;
+		}
+
+		public void DisposeToken ( AccessToken token )
+		{
+			HttpClient client = HttpClientFactory ( ) ;
+
+			HttpResponseMessage response = client . PostAsJsonAsync (
+																	new UriBuilder (
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	nameof ( DisposeToken ) ) . Uri ,
+																	token ) .
+													Result ;
+
+			response . EnsureSuccessStatusCode ( ) ;
+		}
+
 		public AccessToken Access ( EntityToken token , Guid target )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
@@ -143,6 +175,25 @@ namespace DreamRecorder . Directory . ServiceProvider
 			response . EnsureSuccessStatusCode ( ) ;
 		}
 
+		public void TransferProperty ( EntityToken token , Guid target , string name , Guid newOwner )
+		{
+			HttpClient client = HttpClientFactory ( ) ;
+
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+
+			HttpResponseMessage response = client . PostAsync (
+																new UriBuilder (
+																				Uri . UriSchemeHttps ,
+																				Server ,
+																				Port ,
+																				$"{nameof ( TransferProperty )}/{target}/{name}/{newOwner}" ) .
+																	Uri ,
+																null ) .
+													Result ;
+
+			response . EnsureSuccessStatusCode ( ) ;
+		}
+
 		public AccessType AccessProperty ( EntityToken token , Guid target , string name )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
@@ -166,7 +217,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 			return result ;
 		}
 
-		public AccessType GrantRead ( EntityToken token , Guid target , string name , Guid access )
+		public void SetPropertyPermission ( EntityToken token , Guid target , string name , Guid permissionGroup )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
@@ -177,37 +228,55 @@ namespace DreamRecorder . Directory . ServiceProvider
 																				Uri . UriSchemeHttps ,
 																				Server ,
 																				Port ,
-																				$"{nameof ( GrantRead )}/{target}/{name}/{access}" ) .
+																				$"{nameof ( SetPropertyPermission )}/{target}/{name}/{permissionGroup}" ) .
 																	Uri ,
 																null ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
+		}
 
-			AccessType result = response . Content . ReadAsAsync <AccessType> ( ) . Result ;
+		public PermissionGroup GetPermissionGroup ( EntityToken token , Guid target )
+		{
+			HttpClient client = HttpClientFactory ( ) ;
+
+			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+
+			HttpResponseMessage response = client . GetAsync (
+															new UriBuilder (
+																			Uri . UriSchemeHttps ,
+																			Server ,
+																			Port ,
+																			$"{nameof ( GetPermissionGroup )}/{target}" ) .
+																Uri ) .
+													Result ;
+
+			response . EnsureSuccessStatusCode ( ) ;
+
+			PermissionGroup result = response . Content . ReadAsAsync <PermissionGroup> ( ) . Result ;
 
 			return result ;
 		}
 
-		public AccessType GrantWrite ( EntityToken token , Guid target , string name , Guid access )
+		public PermissionGroup UpdatePermissionGroup ( EntityToken token , PermissionGroup target )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
 			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
 
-			HttpResponseMessage response = client . PostAsync (
-																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( GrantWrite )}/{target}/{name}/{access}" ) .
-																	Uri ,
-																null ) .
+			HttpResponseMessage response = client . PostAsJsonAsync (
+																	new UriBuilder (
+																		Uri . UriSchemeHttps ,
+																		Server ,
+																		Port ,
+																		$"{nameof ( UpdatePermissionGroup )}/{target . Guid}" ) .
+																		Uri ,
+																	target ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
 
-			AccessType result = response . Content . ReadAsAsync <AccessType> ( ) . Result ;
+			PermissionGroup result = response . Content . ReadAsAsync <PermissionGroup> ( ) . Result ;
 
 			return result ;
 		}

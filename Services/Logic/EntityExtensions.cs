@@ -10,7 +10,6 @@ using JetBrains . Annotations ;
 
 using KnownPermissionGroups = DreamRecorder . Directory . Services . Logic . Entities . KnownPermissionGroups ;
 using Permission = DreamRecorder . Directory . Services . Logic . Permissions . Permission ;
-using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -33,9 +32,9 @@ namespace DreamRecorder . Directory . Services . Logic
 		public static readonly string CanLoginFromName = $"{Constants . Namespace}.{CanLoginFrom}" ;
 
 
-		public static readonly string StopRenewEntityToken = nameof(StopRenewEntityToken);
+		public static readonly string StopRenewEntityToken = nameof ( StopRenewEntityToken ) ;
 
-		public static readonly string StopRenewEntityTokenName = $"{Constants.Namespace}.{StopRenewEntityToken}";
+		public static readonly string StopRenewEntityTokenName = $"{Constants . Namespace}.{StopRenewEntityToken}" ;
 
 		[CanBeNull]
 		public static string GetDisplayName ( [NotNull] this Entity entity )
@@ -128,7 +127,7 @@ namespace DreamRecorder . Directory . Services . Logic
 								Name = CanLoginFromName ,
 								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
 																	DirectoryServices ,
-								Permissions = KnownPermissionGroups.DirectoryServicesReadWrite,
+								Permissions = KnownPermissionGroups . DirectoryServicesReadWrite ,
 							} ;
 
 				property . Permissions . Permissions . Add (
@@ -138,7 +137,7 @@ namespace DreamRecorder . Directory . Services . Logic
 																	DirectoryDatabase . KnownSpecialGroups .
 																	LoginServices ,
 																Status = PermissionStatus . Allow ,
-																Type   = PermissionType . Read
+																Type   = PermissionType . Read ,
 															} ) ;
 
 				entity . Properties . Add ( property ) ;

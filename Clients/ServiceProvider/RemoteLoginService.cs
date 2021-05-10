@@ -20,7 +20,7 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public int Port { get ; set ; }
 
-		public LoginToken Login ( object credential ) { return Login ( credential as TCredential ) ; }
+		public LoginToken Login ( object credential ) => Login ( credential as TCredential ) ;
 
 		public void CheckToken ( AccessToken token , LoginToken tokenToCheck )
 		{

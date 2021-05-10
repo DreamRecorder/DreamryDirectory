@@ -15,7 +15,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 		{
 			migrationBuilder . CreateTable (
 											"DbDirectoryServices" ,
-											table => new { Guid = table . Column <Guid> ( nullable : false ) } ,
+											table => new { Guid = table . Column <Guid> ( nullable : false ) , } ,
 											constraints : table =>
 														{
 															table . PrimaryKey (
@@ -25,7 +25,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 
 			migrationBuilder . CreateTable (
 											"DbGroups" ,
-											table => new { Guid = table . Column <Guid> ( nullable : false ) } ,
+											table => new { Guid = table . Column <Guid> ( nullable : false ) , } ,
 											constraints : table =>
 														{
 															table . PrimaryKey ( "PK_DbGroups" , x => x . Guid ) ;
@@ -33,7 +33,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 
 			migrationBuilder . CreateTable (
 											"DbLoginServices" ,
-											table => new { Guid = table . Column <Guid> ( nullable : false ) } ,
+											table => new { Guid = table . Column <Guid> ( nullable : false ) , } ,
 											constraints : table =>
 														{
 															table . PrimaryKey (
@@ -43,7 +43,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 
 			migrationBuilder . CreateTable (
 											"DbUsers" ,
-											table => new { Guid = table . Column <Guid> ( nullable : false ) } ,
+											table => new { Guid = table . Column <Guid> ( nullable : false ) , } ,
 											constraints : table =>
 														{
 															table . PrimaryKey ( "PK_DbUsers" , x => x . Guid ) ;
@@ -54,13 +54,17 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 											table => new
 													{
 														Group  = table . Column <Guid> ( nullable : false ) ,
-														Member = table . Column <Guid> ( nullable : false )
+														Member = table . Column <Guid> ( nullable : false ) ,
 													} ,
 											constraints : table =>
 														{
 															table . PrimaryKey (
 																				"PK_DbGroupMembers" ,
-																				x => new { x . Group , x . Member } ) ;
+																				x
+																					=> new
+																						{
+																							x . Group , x . Member ,
+																						} ) ;
 															table . ForeignKey (
 																				"FK_DbGroupMembers_DbGroups_Group" ,
 																				x => x . Group ,
@@ -77,13 +81,13 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 														Owner      = table . Column <Guid> ( nullable : false ) ,
 														Name       = table . Column <string> ( nullable : false ) ,
 														Value      = table . Column <string> ( nullable : true ) ,
-														Permission = table . Column <string> ( nullable : true )
+														Permission = table . Column <string> ( nullable : true ) ,
 													} ,
 											constraints : table =>
 														{
 															table . PrimaryKey (
 																				"PK_DbProperties" ,
-																				x => new { x . Owner , x . Name } ) ;
+																				x => new { x . Owner , x . Name , } ) ;
 															table . ForeignKey (
 																				"FK_DbProperties_DbDirectoryServices_Owner" ,
 																				x => x . Owner ,

@@ -53,11 +53,11 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 									"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbGroupMember" ,
 									b =>
 									{
-										b . Property <Guid> ( "Group" ) . HasColumnType ( "uniqueidentifier" ) ;
+										b . Property <Guid> ( "GroupGuid" ) . HasColumnType ( "uniqueidentifier" ) ;
 
-										b . Property <Guid> ( "Member" ) . HasColumnType ( "uniqueidentifier" ) ;
+										b . Property <Guid> ( "MemberGuid" ) . HasColumnType ( "uniqueidentifier" ) ;
 
-										b . HasKey ( "Group" , "Member" ) ;
+										b . HasKey ( "GroupGuid" , "MemberGuid" ) ;
 
 										b . ToTable ( "DbGroupMembers" ) ;
 									} ) ;
@@ -79,7 +79,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 									"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbProperty" ,
 									b =>
 									{
-										b . Property <Guid> ( "Owner" ) . HasColumnType ( "uniqueidentifier" ) ;
+										b . Property <Guid> ( "Target" ) . HasColumnType ( "uniqueidentifier" ) ;
 
 										b . Property <string> ( "Name" ) . HasColumnType ( "nvarchar(450)" ) ;
 
@@ -87,7 +87,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 
 										b . Property <string> ( "Value" ) . HasColumnType ( "nvarchar(max)" ) ;
 
-										b . HasKey ( "Owner" , "Name" ) ;
+										b . HasKey ( "Target" , "Name" ) ;
 
 										b . ToTable ( "DbProperties" ) ;
 									} ) ;
@@ -113,7 +113,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 													"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbGroup" ,
 													null ) .
 											WithMany ( "Members" ) .
-											HasForeignKey ( "Group" ) .
+											HasForeignKey ( "GroupGuid" ) .
 											OnDelete ( DeleteBehavior . Cascade ) .
 											IsRequired ( ) ;
 									} ) ;
@@ -126,7 +126,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 													"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbDirectoryService" ,
 													null ) .
 											WithMany ( "Proprieties" ) .
-											HasForeignKey ( "Owner" ) .
+											HasForeignKey ( "Target" ) .
 											OnDelete ( DeleteBehavior . Cascade ) .
 											IsRequired ( ) ;
 
@@ -134,7 +134,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 													"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbGroup" ,
 													null ) .
 											WithMany ( "Proprieties" ) .
-											HasForeignKey ( "Owner" ) .
+											HasForeignKey ( "Target" ) .
 											OnDelete ( DeleteBehavior . Cascade ) .
 											IsRequired ( ) ;
 
@@ -142,7 +142,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 													"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbLoginService" ,
 													null ) .
 											WithMany ( "Proprieties" ) .
-											HasForeignKey ( "Owner" ) .
+											HasForeignKey ( "Target" ) .
 											OnDelete ( DeleteBehavior . Cascade ) .
 											IsRequired ( ) ;
 
@@ -150,7 +150,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Migrations
 													"DreamRecorder.Directory.Services.ApiService.DirectoryDatabaseStorage+DbUser" ,
 													null ) .
 											WithMany ( "Proprieties" ) .
-											HasForeignKey ( "Owner" ) .
+											HasForeignKey ( "Target" ) .
 											OnDelete ( DeleteBehavior . Cascade ) .
 											IsRequired ( ) ;
 									} ) ;

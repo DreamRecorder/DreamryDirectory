@@ -1,20 +1,21 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
 
 	public class DbPermissionGroup : IEquatable <DbPermissionGroup>
 	{
-		public Guid Guid { get; set; }
 
-		public string Value { get; set; }
+		public Guid Guid { get ; set ; }
+
+		public string Value { get ; set ; }
 
 		public bool Equals ( DbPermissionGroup other )
 		{
-			if ( other is null)
+			if ( other is null )
 			{
 				return false ;
 			}
@@ -24,7 +25,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null)
+			if ( obj is null )
 			{
 				return false ;
 			}
@@ -37,17 +38,12 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 			return obj . GetType ( ) == GetType ( ) && Equals ( ( DbPermissionGroup ) obj ) ;
 		}
 
-		public override int GetHashCode ( )
-		{
-			return Guid . GetHashCode ( ) ;
-		}
+		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
 
-		public static bool operator == ( DbPermissionGroup left , DbPermissionGroup right ) { return Equals ( left , right ) ; }
+		public static bool operator == ( DbPermissionGroup left , DbPermissionGroup right ) => Equals ( left , right ) ;
 
 		public static bool operator != ( DbPermissionGroup left , DbPermissionGroup right )
-		{
-			return ! Equals ( left , right ) ;
-		}
+			=> ! Equals ( left , right ) ;
 
 	}
 

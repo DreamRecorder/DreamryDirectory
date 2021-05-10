@@ -4,7 +4,7 @@ using System . Collections . Generic ;
 using System . Linq ;
 
 using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder.Directory.Services.Logic.Permissions;
+using DreamRecorder . Directory . Services . Logic . Permissions ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -24,7 +24,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		KnownSpecialGroups KnownSpecialGroups { get ; set ; }
 
-		HashSet<PermissionGroup> PermissionGroups{ get; set; }
+		HashSet <PermissionGroup> PermissionGroups { get ; set ; }
 
 		PermissionGroup FindPermissionGroup ( Guid guid ) ;
 

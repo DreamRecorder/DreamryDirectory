@@ -48,17 +48,13 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 			return Equals ( ( DbDirectoryService ) obj ) ;
 		}
 
-		public override int GetHashCode ( ) { return Guid . GetHashCode ( ) ; }
+		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
 
 		public static bool operator == ( DbDirectoryService left , DbDirectoryService right )
-		{
-			return Equals ( left , right ) ;
-		}
+			=> Equals ( left , right ) ;
 
 		public static bool operator != ( DbDirectoryService left , DbDirectoryService right )
-		{
-			return ! Equals ( left , right ) ;
-		}
+			=> ! Equals ( left , right ) ;
 
 	}
 

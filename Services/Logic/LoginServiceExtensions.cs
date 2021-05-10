@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
@@ -39,11 +39,10 @@ namespace DreamRecorder . Directory . Services . Logic
 				property = new EntityProperty
 							{
 								Name = ApiEndPointsName ,
-								Owner =
-									DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
-																LoginServices ,
+								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
+																	LoginServices ,
 								Value       = string . Empty ,
-								Permissions = KnownPermissionGroups.EveryoneReadonly
+								Permissions = KnownPermissionGroups . EveryoneReadonly ,
 							} ;
 
 				LoginService . Properties . Add ( property ) ;

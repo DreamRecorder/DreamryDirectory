@@ -19,9 +19,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 		}
 
 		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null )
-		{
-			return entity is LoginService ;
-		}
+			=> entity is LoginService ;
 
 	}
 

@@ -6,7 +6,6 @@ using System . Xml . Linq ;
 
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . Directory . Services . Logic . Permissions ;
 using DreamRecorder . ToolBox . General ;
 
 using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
@@ -52,21 +51,13 @@ namespace DreamRecorder . Directory . Services . Logic
 		}
 
 		public override bool Equals ( object obj )
-		{
-			return ReferenceEquals ( this , obj ) || obj is EntityProperty other && Equals ( other ) ;
-		}
+			=> ReferenceEquals ( this , obj ) || obj is EntityProperty other && Equals ( other ) ;
 
-		public override int GetHashCode ( ) { return HashCode . Combine ( Owner , Name ) ; }
+		public override int GetHashCode ( ) => HashCode . Combine ( Owner , Name ) ;
 
-		public static bool operator == ( EntityProperty left , EntityProperty right )
-		{
-			return Equals ( left , right ) ;
-		}
+		public static bool operator == ( EntityProperty left , EntityProperty right ) => Equals ( left , right ) ;
 
-		public static bool operator != ( EntityProperty left , EntityProperty right )
-		{
-			return ! Equals ( left , right ) ;
-		}
+		public static bool operator != ( EntityProperty left , EntityProperty right ) => ! Equals ( left , right ) ;
 
 		public AccessType Access ( Entity target )
 		{

@@ -2,17 +2,16 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
-using System . Text ;
 
 using DreamRecorder . Directory . Logic ;
-using DreamRecorder.Directory.Services.General;
+using DreamRecorder . Directory . Services . General ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
 using JetBrains . Annotations ;
 
 namespace DreamRecorder . Directory . Services . Logic . Permissions
 {
-	
+
 	public class PermissionGroup
 	{
 
@@ -22,19 +21,19 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 
 		public HashSet <Permission> Permissions { get ; set ; } = new HashSet <Permission> ( ) ;
 
-		public DreamRecorder . Directory . Logic . PermissionGroup ToClientSidePermissionGroup ( )
+		public Directory . Logic . PermissionGroup ToClientSidePermissionGroup ( )
 		{
-			Directory . Logic . PermissionGroup result = new DreamRecorder.Directory.Logic.PermissionGroup(  );
+			Directory . Logic . PermissionGroup result = new Directory . Logic . PermissionGroup ( ) ;
 
-			result.Guid    = Guid;
+			result . Guid  = Guid ;
 			result . Owner = Owner . Guid ;
-			result . Permissions = Permissions . Select ( permission => permission . ToClientSidePermission ( ) ) . ToHashSet ( ) ;
+			result . Permissions = Permissions . Select ( permission => permission . ToClientSidePermission ( ) ) .
+												ToHashSet ( ) ;
 
 			return result ;
-
 		}
 
-		public void Edit ( [NotNull] DreamRecorder . Directory . Logic . PermissionGroup permissionGroup )
+		public void Edit ( [NotNull] Directory . Logic . PermissionGroup permissionGroup )
 		{
 			if ( permissionGroup == null )
 			{
@@ -51,9 +50,9 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 
 			HashSet <Permission> newPermissions = new HashSet <Permission> ( ) ;
 
-			foreach ( Directory . Logic . Permission permission in permissionGroup.Permissions )
+			foreach ( Directory . Logic . Permission permission in permissionGroup . Permissions )
 			{
-				 newPermissions.Add( Permission . Create ( permission ) );
+				newPermissions . Add ( Permission . Create ( permission ) ) ;
 			}
 
 			Permissions = newPermissions ;

@@ -2,16 +2,13 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
+using System . Text . Json ;
 
-using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
+using DreamRecorder . Directory . Services . Logic . Permissions ;
 using DreamRecorder . Directory . Services . Logic . Storage ;
 
-using JetBrains . Annotations ;
-
-using KnownSpecialGroups = DreamRecorder . Directory . Services . Logic . Entities . KnownSpecialGroups ;
-using Permission = DreamRecorder . Directory . Services . Logic . Permissions . Permission ;
-using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
+using Microsoft . EntityFrameworkCore ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -28,11 +25,12 @@ namespace DreamRecorder . Directory . Services . Logic
 						Union ( Services ) .
 						Union ( LoginServices ) .
 						Union ( DirectoryServices ) .
-						Union ( KnownSpecialGroups . Entities ) .Union(new []{ Anonymous , } );
-
-		public DirectoryDatabase ( IDirectoryDatabaseStorage databaseStorage ) { DatabaseStorage = databaseStorage ; }
+						Union ( KnownSpecialGroups . Entities ) .
+						Union ( new [ ] { Anonymous , } ) ;
 
 		public Anonymous Anonymous { get ; set ; } = new Anonymous ( ) ;
+
+		public DirectoryDatabase ( IDirectoryDatabaseStorage databaseStorage ) => DatabaseStorage = databaseStorage ;
 
 		public HashSet <User> Users { get ; set ; }
 
@@ -46,9 +44,9 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public HashSet <PermissionGroup> PermissionGroups { get ; set ; }
 
-		public PermissionGroup FindPermissionGroup(Guid guid)
+		public PermissionGroup FindPermissionGroup ( Guid guid )
 		{
-			return PermissionGroups.SingleOrDefault(permissionGroup => permissionGroup.Guid == guid);
+			return PermissionGroups . SingleOrDefault ( permissionGroup => permissionGroup . Guid == guid ) ;
 		}
 
 		public Entity FindEntity ( Guid guid )
@@ -58,99 +56,100 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public KnownSpecialGroups KnownSpecialGroups { get ; set ; }
 
-		public void CreateNew ( )
-		{
-
-		}
+		public void CreateNew ( ) { }
 
 		public void Init ( )
 		{
 			InitializeEntities ( ) ;
-			InitializeGroupMembers();
-			InitializePermissionGroups( ) ;
+			InitializeGroupMembers ( ) ;
+			InitializePermissionGroups ( ) ;
 			InitializeProperties ( ) ;
 		}
 
-		//public PermissionGroup CreatePermissionGroup ( [NotNull] string value )
-		//{
-		//	if ( value == null )
-		//	{
-		//		throw new ArgumentNullException ( nameof ( value ) ) ;
-		//	}
-
-		//	PermissionGroup result = new PermissionGroup ( ) ;
-
-		//	List <string [ ]> permissions = value .
-		//									Split ( Environment . NewLine , StringSplitOptions . RemoveEmptyEntries ) .
-		//									Select ( line => line . Trim ( ) ) .
-		//									Select (
-		//											line
-		//												=> line .
-		//													Split ( ',' , StringSplitOptions . RemoveEmptyEntries ) .
-		//													Select ( part => part . Trim ( ) ) .
-		//													ToArray ( ) ) .
-		//									ToList ( ) ;
-
-		//	foreach ( string [ ] permissionStrings in permissions )
-		//	{
-		//		if ( permissionStrings . Length == 3 )
-		//		{
-		//			Guid   guid   = Guid . Parse ( permissionStrings [ 0 ] ) ;
-		//			Entity target = FindEntity ( guid ) ;
-
-		//			if ( target != null )
-		//			{
-		//				Permission permission = new Permission (
-		//														target ,
-		//														Enum . Parse <PermissionStatus> (
-		//														permissionStrings [ 1 ] ) ,
-		//														Enum . Parse <PermissionType> (
-		//														permissionStrings [ 2 ] ) ) ;
-
-		//				result . Permissions . Add ( permission ) ;
-		//			}
-		//		}
-		//		else
-		//		{
-		//		}
-		//	}
-
-		//	return result ;
-		//}
 
 		private void InitializeGroupMembers ( )
 		{
+			DbSet <DbGroupMember> dbGroupMembers = DatabaseStorage . DbGroupMembers ;
 
+			foreach ( DbGroupMember dbGroupMember in dbGroupMembers )
+			{
+				Group group = FindEntity ( dbGroupMember . Group . Guid ) as Group ;
+
+				if ( group == null )
+				{
+					//todo: Warning
+					continue ;
+				}
+
+				Entity target = FindEntity ( dbGroupMember . MemberGuid ) ;
+
+				if ( target == null )
+				{
+					//todo: Warning
+					continue ;
+				}
+
+				group . Members . Add ( target ) ;
+			}
 		}
 
-		private void InitializePermissionGroups()
+		private void InitializePermissionGroups ( )
 		{
+			DbSet <DbPermissionGroup> dbPermissionGroups = DatabaseStorage . DbPermissionGroups ;
 
+			foreach ( DbPermissionGroup dbPermissionGroup in dbPermissionGroups )
+			{
+				Directory . Logic . PermissionGroup clientPermissionGroup =
+					JsonSerializer . Deserialize <Directory . Logic . PermissionGroup> ( dbPermissionGroup . Value ) ;
+
+				if ( clientPermissionGroup is null )
+				{
+					//todo: Warning
+					continue ;
+				}
+
+				if ( clientPermissionGroup . Guid != dbPermissionGroup . Guid )
+				{
+					//todo: Warning
+					continue ;
+				}
+
+				PermissionGroup permissionGroup = new PermissionGroup ( ) ;
+				permissionGroup . Edit ( clientPermissionGroup ) ;
+				permissionGroup . Guid = clientPermissionGroup . Guid ;
+
+				PermissionGroups . Add ( permissionGroup ) ;
+			}
 		}
 
 		private void InitializeProperties ( )
 		{
-			foreach ( Entity entity in Entities )
+			DbSet <DbProperty> dbProperties = DatabaseStorage . DbProperties ;
+
+			foreach ( DbProperty dbProperty in dbProperties )
 			{
-				foreach ( DbProperty dbProperty in entity . DatabaseObject . Proprieties )
+				Entity propertyTarget = FindEntity ( dbProperty . Target ) ;
+
+				if ( propertyTarget is null )
 				{
-					Entity propertyOwner = FindEntity ( dbProperty . Owner ) ;
-
-					if ( propertyOwner is null )
-					{
-						propertyOwner = DirectoryServiceInternal . ServiceEntity ;
-					}
-
-					EntityProperty property = new EntityProperty
-											{
-												Name        = dbProperty . Name ,
-												Owner       = propertyOwner ,
-												Permissions = CreatePermissionGroup ( dbProperty . Permission ) ,
-												Value       = dbProperty . Value ,
-											} ;
-
-					entity . Properties . Add ( property ) ;
+					//todo: Warning
+					continue ;
 				}
+
+				Entity propertyOwner = FindEntity ( dbProperty . Owner ) ?? KnownSpecialGroups . DirectoryServices ;
+
+				PermissionGroup permissionGroup = FindPermissionGroup ( dbProperty . PermissionGuid )
+												?? KnownPermissionGroups . InternalApiOnly ;
+
+				EntityProperty property = new EntityProperty
+										{
+											Name        = dbProperty . Name ,
+											Owner       = propertyOwner ,
+											Permissions = permissionGroup ,
+											Value       = dbProperty . Value ,
+										} ;
+
+				propertyTarget . Properties . Add ( property ) ;
 			}
 		}
 
@@ -159,106 +158,64 @@ namespace DreamRecorder . Directory . Services . Logic
 			KnownSpecialGroups = new KnownSpecialGroups ( ) ;
 
 			DirectoryServices ??= new HashSet <DirectoryService> ( ) ;
-			HashSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . GetDbDirectoryServices ( ) ;
+			DbSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . DbDirectoryServices ;
 			foreach ( DbDirectoryService dbDirectoryService in dbDirectoryServices )
 			{
 				DirectoryService directoryService =
 					DirectoryServices . FirstOrDefault ( service => service . Guid == dbDirectoryService . Guid ) ;
 				if ( directoryService is null )
 				{
-					directoryService = new DirectoryService
-										{
-											Guid = dbDirectoryService . Guid , DatabaseObject = dbDirectoryService ,
-										} ;
+					directoryService = new DirectoryService { Guid = dbDirectoryService . Guid , } ;
 					DirectoryServices . Add ( directoryService ) ;
 				}
-				else
-				{
-					directoryService . DatabaseObject = dbDirectoryService ;
-				}
 			}
 
-			LoginServices ??= new HashSet<LoginService>();
-			HashSet<DbLoginService> dbLoginServices = DatabaseStorage.GetDbLoginServices();
-			foreach (DbLoginService dbLoginService in dbLoginServices)
+			LoginServices ??= new HashSet <LoginService> ( ) ;
+			DbSet <DbLoginService> dbLoginServices = DatabaseStorage . DbLoginServices ;
+			foreach ( DbLoginService dbLoginService in dbLoginServices )
 			{
 				LoginService loginService =
-					LoginServices.FirstOrDefault(service => service.Guid == dbLoginService.Guid);
-				if (loginService is null)
+					LoginServices . FirstOrDefault ( service => service . Guid == dbLoginService . Guid ) ;
+				if ( loginService is null )
 				{
-					loginService = new LoginService
-										{
-											Guid           = dbLoginService.Guid,
-											DatabaseObject = dbLoginService ,
-										};
-					LoginServices.Add(loginService);
-				}
-				else
-				{
-					loginService.DatabaseObject = dbLoginService;
+					loginService = new LoginService { Guid = dbLoginService . Guid , } ;
+					LoginServices . Add ( loginService ) ;
 				}
 			}
 
-			Services ??= new HashSet<Service>();
-			HashSet<DbService> dbServices = DatabaseStorage.GetDbServices();
-			foreach (DbService dbService in dbServices)
+			Services ??= new HashSet <Service> ( ) ;
+			DbSet <DbService> dbServices = DatabaseStorage . DbServices ;
+			foreach ( DbService dbService in dbServices )
 			{
-				Service service =
-					Services.FirstOrDefault(service => service.Guid == dbService.Guid);
-				if (service is null)
+				Service service = Services . FirstOrDefault ( service => service . Guid == dbService . Guid ) ;
+				if ( service is null )
 				{
-					service = new Service
-									{
-										Guid           = dbService.Guid,
-										DatabaseObject = dbService,
-									};
-					Services.Add(service);
-				}
-				else
-				{
-					service.DatabaseObject = dbService;
+					service = new Service { Guid = dbService . Guid , } ;
+					Services . Add ( service ) ;
 				}
 			}
 
-			Groups ??= new HashSet<Group>();
-			HashSet<DbGroup> dbGroups = DatabaseStorage.GetDbGroups();
-			foreach (DbGroup dbGroup in dbGroups)
+			Groups ??= new HashSet <Group> ( ) ;
+			DbSet <DbGroup> dbGroups = DatabaseStorage . DbGroups ;
+			foreach ( DbGroup dbGroup in dbGroups )
 			{
-				Group group =
-					Groups.FirstOrDefault(group => group.Guid == dbGroup.Guid);
-				if (group is null)
+				Group group = Groups . FirstOrDefault ( group => group . Guid == dbGroup . Guid ) ;
+				if ( group is null )
 				{
-					group = new Group
-							{
-								Guid           = dbGroup.Guid,
-								DatabaseObject = dbGroup,
-							};
-					Groups.Add(group);
-				}
-				else
-				{
-					group.DatabaseObject = dbGroup;
+					group = new Group { Guid = dbGroup . Guid , } ;
+					Groups . Add ( group ) ;
 				}
 			}
 
-			Users ??= new HashSet<User>();
-			HashSet<DbUser> dbUsers = DatabaseStorage.GetDbUsers();
-			foreach (DbUser dbUser in dbUsers)
+			Users ??= new HashSet <User> ( ) ;
+			DbSet <DbUser> dbUsers = DatabaseStorage . DbUsers ;
+			foreach ( DbUser dbUser in dbUsers )
 			{
-				User user =
-					Users.FirstOrDefault(user => user.Guid == dbUser.Guid);
-				if (user is null)
+				User user = Users . FirstOrDefault ( user => user . Guid == dbUser . Guid ) ;
+				if ( user is null )
 				{
-					user = new User
-							{
-								Guid           = dbUser.Guid,
-								DatabaseObject = dbUser,
-							};
-					Users.Add(user);
-				}
-				else
-				{
-					user.DatabaseObject = dbUser;
+					user = new User { Guid = dbUser . Guid , } ;
+					Users . Add ( user ) ;
 				}
 			}
 

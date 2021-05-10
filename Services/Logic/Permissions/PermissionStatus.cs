@@ -6,6 +6,4 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Permissions
 {
 
-	
-
 }

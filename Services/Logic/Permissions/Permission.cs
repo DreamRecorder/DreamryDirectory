@@ -4,7 +4,7 @@ using System . Collections . Generic ;
 using System . Linq ;
 
 using DreamRecorder . Directory . Logic ;
-using DreamRecorder.Directory.Services.General;
+using DreamRecorder . Directory . Services . General ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
 namespace DreamRecorder . Directory . Services . Logic . Permissions
@@ -29,30 +29,29 @@ namespace DreamRecorder . Directory . Services . Logic . Permissions
 			Type   = type ;
 		}
 
-		public DreamRecorder . Directory . Logic . Permission ToClientSidePermission ( )
-		{
-			return new Directory . Logic . Permission ( Status , Type , Target.Guid ) ;
-		}
+		public Directory . Logic . Permission ToClientSidePermission ( )
+			=> new Directory . Logic . Permission ( Status , Type , Target . Guid ) ;
 
-		public static Permission Create (DreamRecorder.Directory.Logic.Permission permission )
+		public static Permission Create ( Directory . Logic . Permission permission )
 		{
-			Entity target = DirectoryServiceInternal . Current . DirectoryDatabase . FindEntity ( permission . Target ) ;
+			Entity target =
+				DirectoryServiceInternal . Current . DirectoryDatabase . FindEntity ( permission . Target ) ;
 
-			if ( target!=null )
+			if ( target != null )
 			{
-				Permission result = new Permission ( )
+				Permission result = new Permission
 									{
 										Status = permission . Status , Target = target , Type = permission . Type ,
 									} ;
 
-				return result;
+				return result ;
 			}
 			else
 			{
-				throw new TargetEntityNotFoundException (permission.Target ) ;
+				throw new TargetEntityNotFoundException ( permission . Target ) ;
 			}
-
 		}
+
 	}
 
 }

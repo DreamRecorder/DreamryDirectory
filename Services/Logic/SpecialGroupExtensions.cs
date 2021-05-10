@@ -36,7 +36,7 @@ namespace DreamRecorder . Directory . Services . Logic
 								Name = MembersName ,
 								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
 																	DirectoryServices ,
-								Value = string . Empty
+								Value = string . Empty ,
 							} ;
 
 				specialGroup . Properties . Add ( property ) ;

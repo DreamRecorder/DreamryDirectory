@@ -19,6 +19,11 @@ namespace DreamRecorder . Directory . Services . Logic
 			$"{Constants . Namespace}.{DatabaseConnectionString}" ;
 
 
+		public static readonly string ApiEndPoints = nameof ( ApiEndPoints ) ;
+
+		public static readonly string ApiEndPointsName = $"{Constants . Namespace}.{ApiEndPoints}" ;
+
+
 		public static EntityProperty GetDatabaseConnectionStringProperty (
 			[NotNull] this DirectoryService directoryService )
 		{
@@ -38,8 +43,8 @@ namespace DreamRecorder . Directory . Services . Logic
 								Name = DatabaseConnectionString ,
 								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
 																	DirectoryServices ,
-								Value = string . Empty,
-								Permissions=KnownPermissionGroups.InternalApiOnly
+								Value       = string . Empty ,
+								Permissions = KnownPermissionGroups . InternalApiOnly ,
 							} ;
 
 				directoryService . Properties . Add ( property ) ;
@@ -47,11 +52,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			return property ;
 		}
-
-
-		public static readonly string ApiEndPoints = nameof ( ApiEndPoints ) ;
-
-		public static readonly string ApiEndPointsName = $"{Constants . Namespace}.{ApiEndPoints}" ;
 
 		public static EntityProperty GetApiEndPointsProperty ( [NotNull] this DirectoryService directoryService )
 		{
@@ -71,7 +71,7 @@ namespace DreamRecorder . Directory . Services . Logic
 								Name = ApiEndPointsName ,
 								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
 																	DirectoryServices ,
-								Value = string . Empty
+								Value = string . Empty ,
 							} ;
 
 				directoryService . Properties . Add ( property ) ;

@@ -8,7 +8,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public class PermissionDeniedException : Exception
 	{
-		
+
 	}
 
 }

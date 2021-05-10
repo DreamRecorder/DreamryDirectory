@@ -3,33 +3,10 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
-using DreamRecorder . Directory . Services . Logic . Storage ;
-
 using JetBrains . Annotations ;
 
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
-
-	public interface IDatabaseObject
-	{
-
-		HashSet<DbProperty> Proprieties { get; }
-
-	}
-
-	public interface IEntity
-	{
-
-		IDatabaseObject DatabaseObject{ get; }
-
-	}
-
-	public interface IEntity<out T>:IEntity where T:IDatabaseObject
-	{
-
-		T DatabaseObject { get; }
-
-	}
 
 	public abstract class Entity : IEquatable <Entity>
 	{
@@ -78,11 +55,11 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 			return obj . GetType ( ) == GetType ( ) && Equals ( ( Entity ) obj ) ;
 		}
 
-		public override int GetHashCode ( ) { return Guid . GetHashCode ( ) ; }
+		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
 
-		public static bool operator == ( Entity left , Entity right ) { return Equals ( left , right ) ; }
+		public static bool operator == ( Entity left , Entity right ) => Equals ( left , right ) ;
 
-		public static bool operator != ( Entity left , Entity right ) { return ! Equals ( left , right ) ; }
+		public static bool operator != ( Entity left , Entity right ) => ! Equals ( left , right ) ;
 
 	}
 

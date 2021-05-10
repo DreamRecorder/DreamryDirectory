@@ -18,10 +18,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 			set => throw new InvalidOperationException ( ) ;
 		}
 
-		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null )
-		{
-			return entity is Group ;
-		}
+		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null ) => entity is Group ;
 
 	}
 

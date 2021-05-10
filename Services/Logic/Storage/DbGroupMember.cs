@@ -9,9 +9,11 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbGroupMember : IEquatable <DbGroupMember>
 	{
 
-		public Guid Group { get ; set ; }
+		public DbGroup Group { get ; set ; }
 
-		public Guid Member { get ; set ; }
+		public Guid GroupGuid { get ; set ; }
+
+		public Guid MemberGuid { get ; set ; }
 
 		public bool Equals ( DbGroupMember other )
 		{
@@ -25,7 +27,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 				return true ;
 			}
 
-			return Group . Equals ( other . Group ) && Member . Equals ( other . Member ) ;
+			return GroupGuid . Equals ( other . GroupGuid ) && MemberGuid . Equals ( other . MemberGuid ) ;
 		}
 
 		public override bool Equals ( object obj )
@@ -48,14 +50,11 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 			return Equals ( ( DbGroupMember ) obj ) ;
 		}
 
-		public override int GetHashCode ( ) { return HashCode . Combine ( Group , Member ) ; }
+		public override int GetHashCode ( ) => HashCode . Combine ( GroupGuid , MemberGuid ) ;
 
-		public static bool operator == ( DbGroupMember left , DbGroupMember right ) { return Equals ( left , right ) ; }
+		public static bool operator == ( DbGroupMember left , DbGroupMember right ) => Equals ( left , right ) ;
 
-		public static bool operator != ( DbGroupMember left , DbGroupMember right )
-		{
-			return ! Equals ( left , right ) ;
-		}
+		public static bool operator != ( DbGroupMember left , DbGroupMember right ) => ! Equals ( left , right ) ;
 
 	}
 

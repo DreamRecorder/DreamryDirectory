@@ -1,6 +1,4 @@
-﻿using DreamRecorder.Directory.Services.Logic.Entities;
-
-using System ;
+﻿using System ;
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
@@ -8,7 +6,7 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
 
-	public class DbUser : IEquatable <DbUser>,IDatabaseObject
+	public class DbUser : IEquatable <DbUser>
 	{
 
 		public Guid Guid { get ; set ; }
@@ -50,11 +48,11 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 			return Equals ( ( DbUser ) obj ) ;
 		}
 
-		public override int GetHashCode ( ) { return Guid . GetHashCode ( ) ; }
+		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
 
-		public static bool operator == ( DbUser left , DbUser right ) { return Equals ( left , right ) ; }
+		public static bool operator == ( DbUser left , DbUser right ) => Equals ( left , right ) ;
 
-		public static bool operator != ( DbUser left , DbUser right ) { return ! Equals ( left , right ) ; }
+		public static bool operator != ( DbUser left , DbUser right ) => ! Equals ( left , right ) ;
 
 	}
 

@@ -11,7 +11,7 @@ namespace DreamRecorder . Directory . Services . General
 
 		public Guid EntityGuid { get ; set ; }
 
-		public EntityDisabledException ( Guid entityGuid ) { EntityGuid = entityGuid ; }
+		public EntityDisabledException ( Guid entityGuid ) => EntityGuid = entityGuid ;
 
 	}
 

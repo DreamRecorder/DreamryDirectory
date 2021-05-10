@@ -35,12 +35,17 @@ namespace DreamRecorder . Directory . Logic . Tokens
 				return true ;
 			}
 
-			return Owner . Equals ( other . Owner ) && Equals ( Secret , other . Secret ) && NotBefore . Equals ( other . NotBefore ) && NotAfter . Equals ( other . NotAfter ) && Guid . Equals ( other . Guid ) && Issuer . Equals ( other . Issuer ) ;
+			return Owner . Equals ( other . Owner )
+					&& Equals ( Secret , other . Secret )
+					&& NotBefore . Equals ( other . NotBefore )
+					&& NotAfter . Equals ( other . NotAfter )
+					&& Guid . Equals ( other . Guid )
+					&& Issuer . Equals ( other . Issuer ) ;
 		}
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null)
+			if ( obj is null )
 			{
 				return false ;
 			}
@@ -59,13 +64,11 @@ namespace DreamRecorder . Directory . Logic . Tokens
 		}
 
 		public override int GetHashCode ( )
-		{
-			return HashCode . Combine ( Owner , Secret , NotBefore , NotAfter , Guid , Issuer ) ;
-		}
+			=> HashCode . Combine ( Owner , Secret , NotBefore , NotAfter , Guid , Issuer ) ;
 
-		public static bool operator == ( Token left , Token right ) { return Equals ( left , right ) ; }
+		public static bool operator == ( Token left , Token right ) => Equals ( left , right ) ;
 
-		public static bool operator != ( Token left , Token right ) { return ! Equals ( left , right ) ; }
+		public static bool operator != ( Token left , Token right ) => ! Equals ( left , right ) ;
 
 	}
 
