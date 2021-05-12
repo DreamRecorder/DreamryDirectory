@@ -1,6 +1,7 @@
 ﻿using System ;
 using System . Collections ;
 using System . Collections . Generic ;
+using System . ComponentModel . DataAnnotations ;
 using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
@@ -9,16 +10,22 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbProperty : IEquatable <DbProperty>
 	{
 
+		[Required]
 		public Guid Target { get ; set ; }
 
+		[Required]
 		public Guid Owner { get ; set ; }
 
+		[Required]
 		public string Name { get ; set ; }
 
+		[Required]
 		public string Value { get ; set ; }
 
+		[Required]
 		public Guid PermissionGuid { get ; set ; }
 
+		[Required]
 		public DbPermissionGroup Permission { get ; set ; }
 
 		public bool Equals ( DbProperty other )
@@ -48,12 +55,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 				return true ;
 			}
 
-			if ( obj . GetType ( ) != GetType ( ) )
-			{
-				return false ;
-			}
-
-			return Equals ( ( DbProperty ) obj ) ;
+			return obj . GetType ( ) == GetType ( ) && Equals ( ( DbProperty ) obj ) ;
 		}
 
 		public override int GetHashCode ( ) => HashCode . Combine ( Target , Name ) ;

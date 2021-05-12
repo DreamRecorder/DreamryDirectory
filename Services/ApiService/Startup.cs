@@ -30,11 +30,13 @@ namespace DreamRecorder . Directory . Services . ApiService
 		{
 			services . AddControllers ( HeaderComplexModelBinder . EnableHeaderComplexModelBinder ( ) ) ;
 
-			services . AddDbContext <DirectoryDatabaseStorage> (
-																options
-																	=> options . UseSqlServer (
-																	Configuration . GetConnectionString (
-																	nameof ( DirectoryDatabaseStorage ) ) ) ) ;
+			services . AddDbContext <DirectoryDatabaseStorage> () ;
+
+
+			//options
+			//	=> options.UseSqlServer(
+			//							Configuration.GetConnectionString(
+			//															nameof(DirectoryDatabaseStorage)))
 
 			services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
 			services . AddTransient <IDirectoryDatabaseStorage , DirectoryDatabaseStorage> ( ) ;

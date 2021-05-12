@@ -9,7 +9,7 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 	public class PreSharedKeyLoginService : LoginServiceBase <PreSharedKeyCredential>
 	{
 
-		public override Guid ? CheckCredential ( PreSharedKeyCredential credential ) { }
+		public override Guid ? CheckCredential ( PreSharedKeyCredential credential ) { throw null ; }
 
 	}
 

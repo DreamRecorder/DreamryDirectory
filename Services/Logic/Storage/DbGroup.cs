@@ -1,6 +1,7 @@
 ﻿using System ;
 using System . Collections ;
 using System . Collections . Generic ;
+using System . ComponentModel . DataAnnotations ;
 using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
@@ -9,10 +10,13 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbGroup : IEquatable <DbGroup>
 	{
 
+		[Required]
 		public Guid Guid { get ; set ; }
 
-		public HashSet <DbProperty> Proprieties { get ; set ; }
+		[Required]
+		public HashSet <DbProperty> Properties { get ; set ; }
 
+		[Required]
 		public HashSet <DbGroupMember> Members { get ; set ; }
 
 		public bool Equals ( DbGroup other )

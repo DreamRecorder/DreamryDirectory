@@ -16,18 +16,4 @@ namespace DreamRecorder . Directory . Services . General
 
 	}
 
-	public class TargetEntityNotFoundException : TargetNotFoundException
-	{
-
-		public TargetEntityNotFoundException ( Guid targetGuid ) : base ( targetGuid ) { }
-
-	}
-
-	public class TargetPermissionGroupNotFoundException : TargetNotFoundException
-	{
-
-		public TargetPermissionGroupNotFoundException ( Guid targetGuid ) : base ( targetGuid ) { }
-
-	}
-
 }

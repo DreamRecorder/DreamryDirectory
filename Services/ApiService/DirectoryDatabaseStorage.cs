@@ -5,6 +5,8 @@ using System . Linq ;
 
 using DreamRecorder . Directory . Services . Logic . Storage ;
 
+using JetBrains . Annotations ;
+
 using Microsoft . EntityFrameworkCore ;
 
 namespace DreamRecorder . Directory . Services . ApiService
@@ -41,25 +43,25 @@ namespace DreamRecorder . Directory . Services . ApiService
 		{
 			modelBuilder . Entity <DbUser> ( ) . HasKey ( user => user . Guid ) ;
 			modelBuilder . Entity <DbUser> ( ) .
-							HasMany ( user => user . Proprieties ) .
+							HasMany ( user => user . Properties ) .
 							WithOne ( ) .
 							HasForeignKey ( prop => prop . Target ) ;
 
 			modelBuilder . Entity <DbDirectoryService> ( ) . HasKey ( directoryService => directoryService . Guid ) ;
 			modelBuilder . Entity <DbDirectoryService> ( ) .
-							HasMany ( directoryService => directoryService . Proprieties ) .
+							HasMany ( directoryService => directoryService . Properties ) .
 							WithOne ( ) .
 							HasForeignKey ( prop => prop . Target ) ;
 
 			modelBuilder . Entity <DbLoginService> ( ) . HasKey ( loginService => loginService . Guid ) ;
 			modelBuilder . Entity <DbLoginService> ( ) .
-							HasMany ( loginService => loginService . Proprieties ) .
+							HasMany ( loginService => loginService . Properties ) .
 							WithOne ( ) .
 							HasForeignKey ( prop => prop . Target ) ;
 
 			modelBuilder . Entity <DbGroup> ( ) . HasKey ( group => group . Guid ) ;
 			modelBuilder . Entity <DbGroup> ( ) .
-							HasMany ( group => group . Proprieties ) .
+							HasMany ( group => group . Properties ) .
 							WithOne ( ) .
 							HasForeignKey ( prop => prop . Target ) ;
 			modelBuilder . Entity <DbGroup> ( ) .
@@ -69,7 +71,7 @@ namespace DreamRecorder . Directory . Services . ApiService
 
 			modelBuilder . Entity <DbService> ( ) . HasKey ( service => service . Guid ) ;
 			modelBuilder . Entity <DbService> ( ) .
-							HasMany ( service => service . Proprieties ) .
+							HasMany ( service => service . Properties ) .
 							WithOne ( ) .
 							HasForeignKey ( prop => prop . Target ) ;
 
@@ -82,10 +84,7 @@ namespace DreamRecorder . Directory . Services . ApiService
 														Group  = groupMember . GroupGuid ,
 														Member = groupMember . MemberGuid ,
 													} ) ;
-			modelBuilder . Entity <DbGroupMember> ( ) .
-							HasOne ( groupMember => groupMember . Group ) .
-							WithMany ( ) .
-							HasForeignKey ( groupMember => groupMember . GroupGuid ) ;
+
 			modelBuilder . Entity <DbProperty> ( ) .
 							HasKey ( property => new { Owner = property . Target , property . Name , } ) ;
 			modelBuilder . Entity <DbProperty> ( ) .

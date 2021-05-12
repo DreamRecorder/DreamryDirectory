@@ -31,13 +31,4 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 	}
 
-	public class DbService
-	{
-
-		public Guid Guid { get ; set ; }
-
-		public HashSet <DbProperty> Proprieties { get ; set ; }
-
-	}
-
 }

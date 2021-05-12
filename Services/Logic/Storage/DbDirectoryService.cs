@@ -1,6 +1,7 @@
 ﻿using System ;
 using System . Collections ;
 using System . Collections . Generic ;
+using System . ComponentModel . DataAnnotations ;
 using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
@@ -9,9 +10,11 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public class DbDirectoryService : IEquatable <DbDirectoryService>
 	{
 
+		[Required]
 		public Guid Guid { get ; set ; }
 
-		public HashSet <DbProperty> Proprieties { get ; set ; }
+		[Required]
+		public HashSet <DbProperty> Properties { get ; set ; }
 
 		public bool Equals ( DbDirectoryService other )
 		{
