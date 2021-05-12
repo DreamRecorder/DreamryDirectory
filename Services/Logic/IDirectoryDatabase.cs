@@ -30,6 +30,12 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		Entity FindEntity ( Guid guid ) ;
 
+		void Save ( ) ;
+
+		void Initiate ( ) ;
+
+		void CreateNew ( ) ;
+
 	}
 
 }
