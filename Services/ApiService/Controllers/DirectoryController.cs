@@ -2,9 +2,12 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
+using System . Reflection ;
 
+using DreamRecorder.ToolBox.General;
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
+using DreamRecorder . ToolBox . CommandLine ;
 
 using Microsoft . AspNetCore . Mvc ;
 using Microsoft . Extensions . Logging ;
@@ -26,7 +29,13 @@ namespace DreamRecorder . Directory . Services . ApiService . Controllers
 			DirectoryService = directoryService ;
 		}
 
-		[HttpPost ( @"Login" )]
+		[HttpGet("Version")]
+		public ActionResult<string> Version ( )
+		{
+			return ProgramBase . Current . GetType ( ) . Assembly . GetDisplayName ( ) ;
+		}
+
+		[HttpPost ( "Login")]
 		public ActionResult <EntityToken> Login ( [FromBody] LoginToken token )
 		{
 			if ( token is null )
@@ -62,7 +71,9 @@ namespace DreamRecorder . Directory . Services . ApiService . Controllers
 		}
 
 
-		[HttpPost ( @"SetProperty/{target:guid}/{name}" )]
+
+
+		[HttpPost ( "etProperty/{target:guid}/{name}" )]
 		public ActionResult SetProperty (
 			[FromHeader] EntityToken token ,
 			Guid                     target ,

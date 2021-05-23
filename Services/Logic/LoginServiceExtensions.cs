@@ -23,14 +23,21 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static readonly string ApiEndPointsName = $"{Constants . Namespace}.{ApiEndPoints}" ;
 
-		public static EntityProperty GetApiEndPointsProperty ( [NotNull] this LoginService LoginService )
+		public static EntityProperty GetApiEndPointsProperty ( [NotNull] this LoginService loginService )
 		{
-			if ( LoginService == null )
+			if ( loginService == null )
 			{
-				throw new ArgumentNullException ( nameof ( LoginService ) ) ;
+				throw new ArgumentNullException ( nameof ( loginService ) ) ;
 			}
 
-			if ( LoginService . Properties . FirstOrDefault ( prop => prop . Name == ApiEndPointsName ) is
+			return loginService.GetOrCreateProperty(
+													DatabaseConnectionStringName,
+													DirectoryServiceInternal.Current.DirectoryDatabase.
+																			KnownSpecialGroups.DirectoryServices,
+													KnownPermissionGroups.InternalApiOnly, default);
+
+
+			if ( loginService . Properties . FirstOrDefault ( prop => prop . Name == ApiEndPointsName ) is
 					EntityProperty property )
 			{
 			}
@@ -45,7 +52,7 @@ namespace DreamRecorder . Directory . Services . Logic
 								Permissions = KnownPermissionGroups . EveryoneReadonly ,
 							} ;
 
-				LoginService . Properties . Add ( property ) ;
+				loginService . Properties . Add ( property ) ;
 			}
 
 			return property ;

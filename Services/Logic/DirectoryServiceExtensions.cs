@@ -32,25 +32,8 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( directoryService ) ) ;
 			}
 
-			if ( directoryService . Properties . FirstOrDefault ( prop => prop . Name == DatabaseConnectionString ) is
-					EntityProperty property )
-			{
-			}
-			else
-			{
-				property = new EntityProperty
-							{
-								Name = DatabaseConnectionString ,
-								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
-																	DirectoryServices ,
-								Value       = string . Empty ,
-								Permissions = KnownPermissionGroups . InternalApiOnly ,
-							} ;
+			return directoryService. GetOrCreateProperty ( DatabaseConnectionStringName  ) ;
 
-				directoryService . Properties . Add ( property ) ;
-			}
-
-			return property ;
 		}
 
 		public static EntityProperty GetApiEndPointsProperty ( [NotNull] this DirectoryService directoryService )
@@ -60,24 +43,12 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( directoryService ) ) ;
 			}
 
-			if ( directoryService . Properties . FirstOrDefault ( prop => prop . Name == ApiEndPointsName ) is
-					EntityProperty property )
-			{
-			}
-			else
-			{
-				property = new EntityProperty
-							{
-								Name = ApiEndPointsName ,
-								Owner = DirectoryServiceInternal . Current . DirectoryDatabase . KnownSpecialGroups .
-																	DirectoryServices ,
-								Value = string . Empty ,
-							} ;
+			return directoryService . GetOrCreateProperty (
+															ApiEndPointsName ,
+															DirectoryServiceInternal . Current . DirectoryDatabase .
+																KnownSpecialGroups . DirectoryServices ,
+															KnownPermissionGroups . EveryoneReadonly ) ;
 
-				directoryService . Properties . Add ( property ) ;
-			}
-
-			return property ;
 		}
 
 		public static List <(string HostName , int Port)> GetApiEndPoints (

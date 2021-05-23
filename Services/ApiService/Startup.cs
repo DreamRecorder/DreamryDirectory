@@ -51,10 +51,8 @@ namespace DreamRecorder . Directory . Services . ApiService
 			}
 
 			app . UseHttpsRedirection ( ) ;
-
-			app . UseRouting ( ) ;
-
-			app . UseAuthorization ( ) ;
+			
+			app . UseRouting () ;
 
 			app . UseEndpoints ( endpoints => { endpoints . MapControllers ( ) ; } ) ;
 		}

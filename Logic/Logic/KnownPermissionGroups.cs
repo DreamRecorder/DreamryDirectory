@@ -29,4 +29,8 @@ namespace DreamRecorder . Directory . Logic
 
 	}
 
+	public static class KnownGroups
+	{
+	}
+
 }

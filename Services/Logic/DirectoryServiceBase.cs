@@ -880,8 +880,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 				memberProperty . Owner = requester ;
 
-				memberProperty . Permissions = KnownPermissionGroups . DirectoryServicesReadonly ;
-
 				DirectoryDatabase . Groups . Add ( group ) ;
 
 				return group . Guid ;

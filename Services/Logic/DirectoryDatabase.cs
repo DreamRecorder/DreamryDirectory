@@ -2,6 +2,7 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
+using System.Runtime.CompilerServices;
 using System . Text . Json ;
 
 using DreamRecorder . Directory . Services . Logic . Entities ;
@@ -19,6 +20,8 @@ namespace DreamRecorder . Directory . Services . Logic
 		public IDirectoryDatabaseStorage DatabaseStorage { get ; set ; }
 
 		public IDirectoryServiceInternal DirectoryServiceInternal { get ; set ; }
+
+		public bool Initiated { get; private set; } = false;
 
 		public IEnumerable <Entity> Entities
 			=> Users . Union <Entity> ( Groups ) .
@@ -160,10 +163,17 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public void Initiate ( )
 		{
+			if ( Initiated )
+			{
+				return ;
+			}
+
 			InitializeEntities ( ) ;
 			InitializeGroupMembers ( ) ;
 			InitializePermissionGroups ( ) ;
 			InitializeProperties ( ) ;
+
+			Initiated = true;
 		}
 
 
@@ -214,11 +224,15 @@ namespace DreamRecorder . Directory . Services . Logic
 					continue ;
 				}
 
-				PermissionGroup permissionGroup = new PermissionGroup ( ) ;
-				permissionGroup . Edit ( clientPermissionGroup ) ;
-				permissionGroup . Guid = clientPermissionGroup . Guid ;
+				if ( PermissionGroups . SingleOrDefault ( pg => pg . Guid == clientPermissionGroup . Guid ) is not
+						PermissionGroup permissionGroup )
+				{
+					permissionGroup = new PermissionGroup { Guid = clientPermissionGroup . Guid } ;
+					PermissionGroups . Add ( permissionGroup ) ;
+				}
 
-				PermissionGroups . Add ( permissionGroup ) ;
+				permissionGroup . Edit ( clientPermissionGroup ) ;
+
 			}
 		}
 
@@ -236,20 +250,21 @@ namespace DreamRecorder . Directory . Services . Logic
 					continue ;
 				}
 
+				if ( propertyTarget . Properties . SingleOrDefault ( entityProperty => entityProperty . Name == dbProperty . Name ) is not
+						EntityProperty property )
+				{
+					property = new EntityProperty { Name = dbProperty . Name , } ;
+					propertyTarget . Properties . Add ( property ) ;
+				}
+
 				Entity propertyOwner = FindEntity ( dbProperty . Owner ) ?? KnownSpecialGroups . DirectoryServices ;
 
 				PermissionGroup permissionGroup = FindPermissionGroup ( dbProperty . PermissionGuid )
 												?? KnownPermissionGroups . InternalApiOnly ;
 
-				EntityProperty property = new EntityProperty
-										{
-											Name        = dbProperty . Name ,
-											Owner       = propertyOwner ,
-											Permissions = permissionGroup ,
-											Value       = dbProperty . Value ,
-										} ;
-
-				propertyTarget . Properties . Add ( property ) ;
+				property.Owner       = propertyOwner;
+				property.Permissions = permissionGroup;
+				property.Value       = dbProperty.Value;
 			}
 		}
 
