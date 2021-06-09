@@ -7,6 +7,14 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
 
+	public interface IDbEntity
+	{
+		Guid Guid { get; set; }
+
+		HashSet<DbProperty> Properties { get; set; }
+
+	}
+
 	public class DbDirectoryService : IEquatable <DbDirectoryService>
 	{
 

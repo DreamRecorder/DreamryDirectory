@@ -67,7 +67,11 @@ namespace DreamRecorder . Directory . Services . Logic
 			SaveGroupMembers ( ) ;
 		}
 
-		private void SaveProperties ( ) { }
+		private void SaveProperties ( )
+		{
+			
+
+		}
 
 		private void SavePermissionGroups ( )
 		{
@@ -129,10 +133,10 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 		}
 
-		public void SaveEntities ( )
+		public void SaveEntitiesType<T> (DbSet<T> storageSet) where T: class , IDbEntity
 		{
-			DirectoryServices ??= new HashSet <DirectoryService> ( ) ;
 			DbSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . DbDirectoryServices ;
+
 			dbDirectoryServices . RemoveRange (
 												dbDirectoryServices . SkipWhile (
 												dbDirectoryService
@@ -141,6 +145,7 @@ namespace DreamRecorder . Directory . Services . Logic
 																						=> directoryService . Guid
 																							== dbDirectoryService .
 																								Guid ) ) ) ) ;
+
 			foreach ( DirectoryService directoryService in DirectoryServices )
 			{
 				DbDirectoryService dbDirectoryService = dbDirectoryServices . Find ( directoryService . Guid ) ;
@@ -156,10 +161,45 @@ namespace DreamRecorder . Directory . Services . Logic
 				}
 			}
 
-			DatabaseStorage . Save ( ) ;
 		}
 
-		public void CreateNew ( ) { }
+		public void SaveEntities ( )
+		{
+			DirectoryServices ??= new HashSet <DirectoryService> ( ) ;
+
+			DbSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . DbDirectoryServices ;
+
+			dbDirectoryServices . RemoveRange (
+												dbDirectoryServices . SkipWhile (
+												dbDirectoryService
+													=> DirectoryServices . Any (
+																				( directoryService
+																						=> directoryService . Guid
+																							== dbDirectoryService .
+																								Guid ) ) ) ) ;
+
+			foreach ( DirectoryService directoryService in DirectoryServices )
+			{
+				DbDirectoryService dbDirectoryService = dbDirectoryServices . Find ( directoryService . Guid ) ;
+
+				if ( dbDirectoryService is null )
+				{
+					dbDirectoryService = new DbDirectoryService ( )
+										{
+											Guid = directoryService . Guid , Properties = new HashSet <DbProperty> ( ) ,
+										} ;
+
+					dbDirectoryServices . Add ( dbDirectoryService ) ;
+				}
+			}
+
+		DatabaseStorage . Save ( ) ;
+		}
+
+		public void CreateNew ( )
+		{
+
+		}
 
 		public void Initiate ( )
 		{

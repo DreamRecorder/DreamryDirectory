@@ -86,7 +86,7 @@ namespace DreamRecorder . Directory . Services . ApiService
 													} ) ;
 
 			modelBuilder . Entity <DbProperty> ( ) .
-							HasKey ( property => new { Owner = property . Target , property . Name , } ) ;
+							HasKey ( property => new { Target=property . Target ,Name= property . Name , } ) ;
 			modelBuilder . Entity <DbProperty> ( ) .
 							HasOne ( prop => prop . Permission ) .
 							WithMany ( ) .
