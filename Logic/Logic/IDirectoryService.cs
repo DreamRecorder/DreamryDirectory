@@ -13,6 +13,9 @@ namespace DreamRecorder . Directory . Logic
 	public interface IDirectoryService
 	{
 
+		DateTime GetTime ( ) ;
+		Version GetVersion ( ) ;
+
 		[CanBeNull]
 		EntityToken Login ( [CanBeNull] LoginToken token ) ;
 
