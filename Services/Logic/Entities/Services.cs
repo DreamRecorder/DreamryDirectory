@@ -8,17 +8,13 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 	public class Services : SpecialGroup
 	{
-
-		public override HashSet <Entity> Members
-			=> DirectoryServiceInternal . Current . DirectoryDatabase . Services . ToHashSet <Entity> ( ) ;
-
 		public override Guid Guid
 		{
-			get => Guid . Parse ( "C9CF393A-8969-4F7F-8851-AB1AA5192564" ) ;
+			get => DreamRecorder.Directory.Logic.KnownEntities.Services;
 			set => throw new InvalidOperationException ( ) ;
 		}
 
-		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null ) => entity is Service ;
+		public override bool Contain ( Entity entity , HashSet <Guid> checkedEntities = null ) => entity is Service ;
 
 	}
 

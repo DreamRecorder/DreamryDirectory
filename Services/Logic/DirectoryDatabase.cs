@@ -1,381 +1,409 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System . Collections . Specialized ;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using System . Text . Json ;
+using System.Text.Json;
 
-using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . Directory . Services . Logic . Permissions ;
-using DreamRecorder . Directory . Services . Logic . Storage ;
+using DreamRecorder.Directory.Logic;
+using DreamRecorder.Directory.Services.Logic.Entities;
+using DreamRecorder.Directory.Services.Logic.Storage;
+using DreamRecorder.ToolBox.General;
 
-using Microsoft . EntityFrameworkCore ;
+using JetBrains . Annotations ;
 
-namespace DreamRecorder . Directory . Services . Logic
+using LazyCache;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+using PermissionGroup = DreamRecorder.Directory.Services.Logic.Permissions.PermissionGroup;
+
+namespace DreamRecorder.Directory.Services.Logic
 {
 
 	public class DirectoryDatabase : IDirectoryDatabase
 	{
 
-		public IDirectoryDatabaseStorage DatabaseStorage { get ; set ; }
+		public IDirectoryDatabaseStorage DatabaseStorage { get; set; }
 
-		public IDirectoryServiceInternal DirectoryServiceInternal { get ; set ; }
+		public IDirectoryServiceInternal DirectoryServiceInternal { get; set; }
 
 		public bool Initiated { get; private set; } = false;
 
-		public IEnumerable <Entity> Entities
-			=> Users . Union <Entity> ( Groups ) .
-						Union ( Services ) .
-						Union ( LoginServices ) .
-						Union ( DirectoryServices ) .
-						Union ( KnownSpecialGroups . Entities ) .
-						Union ( new [ ] { Anonymous , } ) ;
+		protected IAppCache Cache { get; set; }
 
-		public Anonymous Anonymous { get ; set ; } = new Anonymous ( ) ;
+		public Anonymous Anonymous { get; set; } = new Anonymous();
 
-		public DirectoryDatabase ( IDirectoryDatabaseStorage databaseStorage ) => DatabaseStorage = databaseStorage ;
-
-		public HashSet <User> Users { get ; set ; }
-
-		public HashSet <Group> Groups { get ; set ; }
-
-		public HashSet <Service> Services { get ; set ; }
-
-		public HashSet <LoginService> LoginServices { get ; set ; }
-
-		public HashSet <DirectoryService> DirectoryServices { get ; set ; }
-
-		public HashSet <PermissionGroup> PermissionGroups { get ; set ; }
-
-		public PermissionGroup FindPermissionGroup ( Guid guid )
+		public DirectoryDatabase(IDirectoryDatabaseStorage databaseStorage, IAppCache cache, IDirectoryServiceInternal directoryServiceInternal)
 		{
-			return PermissionGroups . SingleOrDefault ( permissionGroup => permissionGroup . Guid == guid ) ;
+			DatabaseStorage = databaseStorage;
+			Cache = cache;
+			DirectoryServiceInternal = directoryServiceInternal;
 		}
 
-		public Entity FindEntity ( Guid guid )
+		private PermissionGroup GetPermissionGroup(Guid guid)
 		{
-			return Entities . SingleOrDefault ( entity => entity . Guid == guid ) ;
-		}
-
-		public KnownSpecialGroups KnownSpecialGroups { get ; set ; }
-
-		public void Save ( )
-		{
-			SavePermissionGroups ( ) ;
-			SaveEntities ( ) ;
-			SaveProperties ( ) ;
-			SaveGroupMembers ( ) ;
-		}
-
-		private void SaveProperties ( )
-		{
-			
-
-		}
-
-		private void SavePermissionGroups ( )
-		{
-			PermissionGroups ??= new HashSet <PermissionGroup> ( ) ;
-			DbSet <DbPermissionGroup> dbPermissionGroups = DatabaseStorage . DbPermissionGroups ;
-			foreach ( PermissionGroup permissionGroup in PermissionGroups )
+			if (DatabaseStorage.DbPermissionGroups.Find(guid) is DbPermissionGroup dbPermissionGroup)
 			{
-				DbPermissionGroup dbPermissionGroup = dbPermissionGroups . Find ( permissionGroup . Guid ) ;
+				PermissionGroup permissionGroup = new PermissionGroup() { Guid = guid, Owner = dbPermissionGroup.Owner, };
 
-				if ( dbPermissionGroup is null )
-				{
-					dbPermissionGroup = new DbPermissionGroup ( ) { Guid = permissionGroup . Guid , } ;
-					dbPermissionGroups . Add ( dbPermissionGroup ) ;
-				}
+				permissionGroup.Permissions.UnionWith(dbPermissionGroup.Value.
+																CastToStructs<Permission>());
 
-				dbPermissionGroup . Value =
-					JsonSerializer . Serialize ( permissionGroup . ToClientSidePermissionGroup ( ) ) ;
+				permissionGroup.Permissions.CollectionChanged += GetPermissionsCollectionChanged(permissionGroup);
+
+				return permissionGroup;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		
+
+		private NotifyCollectionChangedEventHandler GetPermissionsCollectionChanged ( PermissionGroup permissionGroup )
+		{
+			void PermissionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+			{
+				SavePermissionGroup(permissionGroup);
 			}
 
-			DatabaseStorage . Save ( ) ;
+			return PermissionsCollectionChanged ;
 		}
 
-		private void SaveGroupMembers ( )
+		public PermissionGroup FindPermissionGroup(Guid guid)
 		{
-			DbSet <DbGroupMember> dbGroupMembers = DatabaseStorage . DbGroupMembers ;
+			return Cache.GetOrAdd(CachePermissionGroupKey(guid), () => GetPermissionGroup(guid));
+		}
 
-			dbGroupMembers . RemoveRange (
-										dbGroupMembers . SkipWhile (
-																	dbGroupMember
-																		=> Groups . Any (
-																		group
-																			=> group . Guid
-																				== dbGroupMember . GroupGuid ) ) ) ;
-
-			foreach ( Group @group in Groups )
+		private void Property_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if (sender is EntityProperty property)
 			{
-				dbGroupMembers . RemoveRange (
-											dbGroupMembers .
-												Where ( dbGroupMember => dbGroupMember . GroupGuid == group . Guid ) .
-												SkipWhile (
-															dbGroupMember
-																=> group . Members . Any (
-																member
-																	=> member . Guid
-																		== dbGroupMember . MemberGuid ) ) ) ;
+				SaveProperty(property);
+			}
+		}
 
-				foreach ( Entity groupMember in group . Members )
+		private NotifyCollectionChangedEventHandler GetMembersCollectionChanged(Group group)
+		{
+			void MembersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+			{
+				if (e?.OldItems != null)
 				{
-					DbGroupMember dbGroupMember = dbGroupMembers . Find ( group . Guid , groupMember . Guid ) ;
-
-					if ( dbGroupMember is null )
+					foreach (Guid guid in e?.OldItems)
 					{
-						dbGroupMember =
-							new DbGroupMember ( ) { GroupGuid = group . Guid , MemberGuid = groupMember . Guid } ;
-
-						dbGroupMembers . Add ( dbGroupMember ) ;
+						if (DatabaseStorage.DbGroupMembers.Find(group.Guid, guid) is DbGroupMember dbGroupMember)
+						{
+							DatabaseStorage.DbGroupMembers.Remove(dbGroupMember);
+						}
 					}
 				}
+
+				if (e?.NewItems != null)
+				{
+					foreach (Guid guid in e?.NewItems)
+					{
+						if ( DatabaseStorage . DbGroupMembers . Find ( group . Guid , guid ) ==null )
+						{
+							DatabaseStorage.DbGroupMembers.Add(
+																new DbGroupMember()
+																{
+																	GroupGuid  = @group.Guid,
+																	MemberGuid = guid,
+																});
+						}
+					}
+				}
+
 			}
+
+			return MembersCollectionChanged ;
+
 		}
 
-		public void SaveEntitiesType<T> (DbSet<T> storageSet) where T: class , IDbEntity
+		private Entity GetEntity(Guid guid)
 		{
-			DbSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . DbDirectoryServices ;
+			Entity entity = null;
 
-			dbDirectoryServices . RemoveRange (
-												dbDirectoryServices . SkipWhile (
-												dbDirectoryService
-													=> DirectoryServices . Any (
-																				( directoryService
-																						=> directoryService . Guid
-																							== dbDirectoryService .
-																								Guid ) ) ) ) ;
-
-			foreach ( DirectoryService directoryService in DirectoryServices )
+			if (DatabaseStorage.DbEntities.Find(guid) is DbEntity dbEntity)
 			{
-				DbDirectoryService dbDirectoryService = dbDirectoryServices . Find ( directoryService . Guid ) ;
-
-				if ( dbDirectoryService is null )
+				switch (dbEntity.EntityType)
 				{
-					dbDirectoryService = new DbDirectoryService ( )
-										{
-											Guid = directoryService . Guid , Properties = new HashSet <DbProperty> ( ) ,
-										} ;
+					case DbEntityType.DirectoryService:
+						{
+							entity = new DirectoryService();
+							break;
+						}
+					case DbEntityType.LoginService:
+						{
+							entity = new LoginService();
+							break;
+						}
+					case DbEntityType.Group:
+						{
+							Group group = new Group();
 
-					dbDirectoryServices . Add ( dbDirectoryService ) ;
+							group.Members.UnionWith(
+														DatabaseStorage.DbGroupMembers.
+																		Where(member => member.GroupGuid == guid).
+																		Select(member => member.MemberGuid));
+
+
+							group.Members.CollectionChanged += GetMembersCollectionChanged(group);
+
+							entity = group;
+
+							break;
+						}
+					case DbEntityType.Service:
+						{
+							entity = new Service();
+							break;
+						}
+					case DbEntityType.User:
+						{
+							entity = new User();
+							break;
+						}
+					case DbEntityType.SpecialGroup:
+						{
+							entity = KnownSpecialGroups.Entities.FirstOrDefault(specialGroup => specialGroup.Guid == guid);
+							break;
+						}
+					case DbEntityType.Anonymous:
+						{
+							entity = Anonymous;
+							break ;
+						}
+					default:
+						{
+							entity = null;
+							throw new InvalidOperationException();
+						}
 				}
+
+				entity.Guid = dbEntity.Guid;
+
 			}
 
+			return entity;
 		}
 
-		public void SaveEntities ( )
+
+
+		public Entity FindEntity(Guid guid)
 		{
-			DirectoryServices ??= new HashSet <DirectoryService> ( ) ;
-
-			DbSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . DbDirectoryServices ;
-
-			dbDirectoryServices . RemoveRange (
-												dbDirectoryServices . SkipWhile (
-												dbDirectoryService
-													=> DirectoryServices . Any (
-																				( directoryService
-																						=> directoryService . Guid
-																							== dbDirectoryService .
-																								Guid ) ) ) ) ;
-
-			foreach ( DirectoryService directoryService in DirectoryServices )
-			{
-				DbDirectoryService dbDirectoryService = dbDirectoryServices . Find ( directoryService . Guid ) ;
-
-				if ( dbDirectoryService is null )
-				{
-					dbDirectoryService = new DbDirectoryService ( )
-										{
-											Guid = directoryService . Guid , Properties = new HashSet <DbProperty> ( ) ,
-										} ;
-
-					dbDirectoryServices . Add ( dbDirectoryService ) ;
-				}
-			}
-
-		DatabaseStorage . Save ( ) ;
+			return Cache.GetOrAdd(CacheEntityKey(guid), () => GetEntity(guid));
 		}
 
-		public void CreateNew ( )
+		private EntityProperty GetProperty(Guid entity, string name)
+		{
+			if (DatabaseStorage.DbProperties.Find(entity, name) is DbProperty dbProperty)
+			{
+				EntityProperty property = new EntityProperty()
+				{
+					Name = dbProperty.Name,
+					Owner = dbProperty.Owner,
+					Target = dbProperty.Target,
+					Permissions = FindPermissionGroup(dbProperty.Permission),
+					Value = dbProperty.Value,
+				};
+
+				property.PropertyChanged += Property_PropertyChanged;
+
+				return property;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		public string CacheEntityPropertyKey(Guid entity, string name)
+			=> $"({nameof(EntityProperty)}){entity}.{name}";	
+		
+		public string CachePermissionGroupKey(Guid guid)
+			=> $"({nameof(PermissionGroup)}){guid}";	
+		
+		public string CacheEntityKey(Guid guid)
+			=> $"({nameof(Entity)}){guid}";
+
+		public EntityProperty FindProperty(Guid entity, string name)
+		{
+			return Cache.GetOrAdd(CacheEntityPropertyKey(entity, name), () => GetProperty(entity, name));
+		}
+
+
+
+
+		public Entity AddEntity( [NotNull] Entity entity)
+		{
+			if ( entity == null )
+			{
+				throw new ArgumentNullException ( nameof ( entity ) ) ;
+			}
+
+			if ( DatabaseStorage.DbEntities.Find(entity.Guid) is DbEntity dbEntity )
+			{
+				//Todo:
+			}
+			else
+			{
+				dbEntity = new DbEntity();
+				DatabaseStorage.DbEntities.Add(dbEntity);
+			}
+
+			dbEntity . Guid = entity . Guid ;
+
+			switch (entity)
+			{
+				case Anonymous anonymous :
+				{
+					dbEntity.EntityType = DbEntityType.Anonymous;
+					break;
+				}
+				case DirectoryService directoryService:
+					dbEntity . EntityType = DbEntityType . DirectoryService ;
+					break;
+				case Group @group:
+					dbEntity.EntityType = DbEntityType.Group;
+
+					foreach ( Guid member in group.Members )
+					{
+						if (DatabaseStorage.DbGroupMembers.Find(group.Guid, member) == null)
+						{
+							DatabaseStorage.DbGroupMembers.Add(
+																new DbGroupMember()
+																{
+																	GroupGuid  = @group.Guid,
+																	MemberGuid = member,
+																});
+						}
+					}
+
+					group.Members.CollectionChanged += GetMembersCollectionChanged(group);
+					
+					break;
+				case LoginService loginService:
+					dbEntity.EntityType = DbEntityType.LoginService;
+					break;
+				case Service service:
+					dbEntity.EntityType = DbEntityType.Service;
+					break;
+				case SpecialGroup specialGroup:
+					dbEntity.EntityType = DbEntityType.SpecialGroup;
+					break;
+				case User user:
+					dbEntity.EntityType = DbEntityType.User;
+					break;
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(entity));
+			}
+
+			Cache . Add ( CacheEntityKey ( entity . Guid ) , entity ) ;
+
+			DatabaseStorage.Save();
+
+			return entity;
+		}
+
+		public PermissionGroup AddPermissionGroup( [NotNull] PermissionGroup permissionGroup)
+		{
+			if ( permissionGroup == null )
+			{
+				throw new ArgumentNullException ( nameof ( permissionGroup ) ) ;
+			}
+
+			if (DatabaseStorage.DbPermissionGroups.Find(permissionGroup.Guid) is DbPermissionGroup dbPermissionGroup)
+			{
+				
+			}
+			else
+			{
+				dbPermissionGroup = new DbPermissionGroup ( ) ;
+				DatabaseStorage.DbPermissionGroups.Add (dbPermissionGroup);
+			}
+
+			dbPermissionGroup.Guid = permissionGroup.Guid;
+			dbPermissionGroup.Owner = permissionGroup.Owner;
+			dbPermissionGroup.Value = permissionGroup.Permissions.CastToBytes();
+
+			Cache.Add(CachePermissionGroupKey(permissionGroup.Guid),permissionGroup);
+
+			DatabaseStorage.Save();
+
+			return permissionGroup;
+		}
+
+		public void AddEntityProperty( [NotNull] EntityProperty property)
+		{
+			if ( property == null )
+			{
+				throw new ArgumentNullException ( nameof ( property ) ) ;
+			}
+
+			Cache.Add(CacheEntityPropertyKey(property.Target, property.Name), property);
+			SaveProperty(property);
+		}
+
+		public KnownSpecialGroups KnownSpecialGroups { get; set; } = new KnownSpecialGroups();
+
+		public void Save()
 		{
 
 		}
 
-		public void Initiate ( )
+		public void Initiate() { throw new NotImplementedException(); }
+
+		private void SavePermissionGroup ( PermissionGroup permissionGroup )
 		{
-			if ( Initiated )
-			{
-				return ;
-			}
 
-			InitializeEntities ( ) ;
-			InitializeGroupMembers ( ) ;
-			InitializePermissionGroups ( ) ;
-			InitializeProperties ( ) ;
-
-			Initiated = true;
 		}
 
-
-		private void InitializeGroupMembers ( )
+		private void SaveProperty(EntityProperty property)
 		{
-			DbSet <DbGroupMember> dbGroupMembers = DatabaseStorage . DbGroupMembers ;
 
-			foreach ( DbGroupMember dbGroupMember in dbGroupMembers )
+			DbProperty dbProperty = DatabaseStorage.DbProperties.Find(property.Target, property.Name);
+
+			if (dbProperty != null)
 			{
-				Group group = FindEntity ( dbGroupMember . GroupGuid ) as Group ;
-
-				if ( group == null )
-				{
-					//todo: Warning
-					continue ;
-				}
-
-				Entity target = FindEntity ( dbGroupMember . MemberGuid ) ;
-
-				if ( target == null )
-				{
-					//todo: Warning
-					continue ;
-				}
-
-				group . Members . Add ( target ) ;
+				dbProperty.Value = property.Value;
+				dbProperty.Owner = property.Owner;
+				dbProperty.Permission = property.Permissions.Guid;
 			}
+			else
+			{
+				dbProperty = new DbProperty()
+				{
+					Value = property.Value,
+					Owner = property.Owner,
+					Permission = property.Permissions.Guid,
+					Target = property.Target,
+					Name = property.Name,
+				};
+
+				DatabaseStorage.DbProperties.Add(dbProperty);
+			}
+
+			lock (DatabaseStorage)
+			{
+				DatabaseStorage.Save();
+			}
+
+
 		}
 
-		private void InitializePermissionGroups ( )
+		public void CreateNew()
 		{
-			DbSet <DbPermissionGroup> dbPermissionGroups = DatabaseStorage . DbPermissionGroups ;
 
-			foreach ( DbPermissionGroup dbPermissionGroup in dbPermissionGroups )
-			{
-				Directory . Logic . PermissionGroup clientPermissionGroup =
-					JsonSerializer . Deserialize <Directory . Logic . PermissionGroup> ( dbPermissionGroup . Value ) ;
-
-				if ( clientPermissionGroup is null )
-				{
-					//todo: Warning
-					continue ;
-				}
-
-				if ( clientPermissionGroup . Guid != dbPermissionGroup . Guid )
-				{
-					//todo: Warning
-					continue ;
-				}
-
-				if ( PermissionGroups . SingleOrDefault ( pg => pg . Guid == clientPermissionGroup . Guid ) is not
-						PermissionGroup permissionGroup )
-				{
-					permissionGroup = new PermissionGroup { Guid = clientPermissionGroup . Guid } ;
-					PermissionGroups . Add ( permissionGroup ) ;
-				}
-
-				permissionGroup . Edit ( clientPermissionGroup ) ;
-
-			}
 		}
 
-		private void InitializeProperties ( )
-		{
-			DbSet <DbProperty> dbProperties = DatabaseStorage . DbProperties ;
-
-			foreach ( DbProperty dbProperty in dbProperties )
-			{
-				Entity propertyTarget = FindEntity ( dbProperty . Target ) ;
-
-				if ( propertyTarget is null )
-				{
-					//todo: Warning
-					continue ;
-				}
-
-				if ( propertyTarget . Properties . SingleOrDefault ( entityProperty => entityProperty . Name == dbProperty . Name ) is not
-						EntityProperty property )
-				{
-					property = new EntityProperty { Name = dbProperty . Name , } ;
-					propertyTarget . Properties . Add ( property ) ;
-				}
-
-				Entity propertyOwner = FindEntity ( dbProperty . Owner ) ?? KnownSpecialGroups . DirectoryServices ;
-
-				PermissionGroup permissionGroup = FindPermissionGroup ( dbProperty . PermissionGuid )
-												?? KnownPermissionGroups . InternalApiOnly ;
-
-				property.Owner       = propertyOwner;
-				property.Permissions = permissionGroup;
-				property.Value       = dbProperty.Value;
-			}
-		}
-
-		private void InitializeEntities ( )
-		{
-			KnownSpecialGroups = new KnownSpecialGroups ( ) ;
-
-			DirectoryServices ??= new HashSet <DirectoryService> ( ) ;
-			DbSet <DbDirectoryService> dbDirectoryServices = DatabaseStorage . DbDirectoryServices ;
-			foreach ( DbDirectoryService dbDirectoryService in dbDirectoryServices )
-			{
-				DirectoryService directoryService =
-					DirectoryServices . FirstOrDefault ( service => service . Guid == dbDirectoryService . Guid ) ;
-				if ( directoryService is null )
-				{
-					directoryService = new DirectoryService { Guid = dbDirectoryService . Guid , } ;
-					DirectoryServices . Add ( directoryService ) ;
-				}
-			}
-
-			LoginServices ??= new HashSet <LoginService> ( ) ;
-			DbSet <DbLoginService> dbLoginServices = DatabaseStorage . DbLoginServices ;
-			foreach ( DbLoginService dbLoginService in dbLoginServices )
-			{
-				LoginService loginService =
-					LoginServices . FirstOrDefault ( service => service . Guid == dbLoginService . Guid ) ;
-				if ( loginService is null )
-				{
-					loginService = new LoginService { Guid = dbLoginService . Guid , } ;
-					LoginServices . Add ( loginService ) ;
-				}
-			}
-
-			Services ??= new HashSet <Service> ( ) ;
-			DbSet <DbService> dbServices = DatabaseStorage . DbServices ;
-			foreach ( DbService dbService in dbServices )
-			{
-				Service service = Services . FirstOrDefault ( service => service . Guid == dbService . Guid ) ;
-				if ( service is null )
-				{
-					service = new Service { Guid = dbService . Guid , } ;
-					Services . Add ( service ) ;
-				}
-			}
-
-			Groups ??= new HashSet <Group> ( ) ;
-			DbSet <DbGroup> dbGroups = DatabaseStorage . DbGroups ;
-			foreach ( DbGroup dbGroup in dbGroups )
-			{
-				Group group = Groups . FirstOrDefault ( group => group . Guid == dbGroup . Guid ) ;
-				if ( group is null )
-				{
-					group = new Group { Guid = dbGroup . Guid , } ;
-					Groups . Add ( group ) ;
-				}
-			}
-
-			Users ??= new HashSet <User> ( ) ;
-			DbSet <DbUser> dbUsers = DatabaseStorage . DbUsers ;
-			foreach ( DbUser dbUser in dbUsers )
-			{
-				User user = Users . FirstOrDefault ( user => user . Guid == dbUser . Guid ) ;
-				if ( user is null )
-				{
-					user = new User { Guid = dbUser . Guid , } ;
-					Users . Add ( user ) ;
-				}
-			}
-
-			//todo
-		}
 
 	}
 

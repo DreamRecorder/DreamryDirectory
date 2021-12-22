@@ -17,7 +17,7 @@
 		<RepositoryType>TFS</RepositoryType>
 		<RepositoryUrl>https://vsts.dreamry.org/DefaultCollection/DreamryDirectory</RepositoryUrl>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<Version>0.0.0.$([MSBuild]::ValueOrDefault('$(SourceVersion)', '0'))</Version>
 	</PropertyGroup>
 </Project>

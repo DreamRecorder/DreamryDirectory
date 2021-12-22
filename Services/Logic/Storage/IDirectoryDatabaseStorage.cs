@@ -11,21 +11,13 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 	public interface IDirectoryDatabaseStorage
 	{
 
-		DbSet <DbUser> DbUsers { get ; set ; }
-
-		DbSet <DbDirectoryService> DbDirectoryServices { get ; set ; }
-
-		DbSet <DbLoginService> DbLoginServices { get ; set ; }
-
-		DbSet <DbGroup> DbGroups { get ; set ; }
-
 		DbSet <DbGroupMember> DbGroupMembers { get ; set ; }
 
 		DbSet <DbProperty> DbProperties { get ; set ; }
 
 		DbSet <DbPermissionGroup> DbPermissionGroups { get ; set ; }
 
-		DbSet <DbService> DbServices { get ; set ; }
+		DbSet <DbEntity> DbEntities { get ; set ; }
 
 		void Save ( ) ;
 

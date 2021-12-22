@@ -8,14 +8,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ApiService</AssemblyName>
     <RootNamespace>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ApiService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DreamRecorder.ToolBox.CommandLine" Version="1.1.5.665" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.6" />
+    <PackageReference Include="DreamRecorder.ToolBox.CommandLine" Version="1.1.6.744" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
   </ItemGroup>
 
 

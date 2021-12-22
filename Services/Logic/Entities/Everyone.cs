@@ -11,12 +11,12 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public override Guid Guid
 		{
-			get => Guid . Parse ( "CCAD71E9-041B-4190-AE0D-1B7034FF2E15" ) ;
+			get => DreamRecorder.Directory.Logic.KnownEntities.Everyone;
 			set => throw new InvalidOperationException ( ) ;
 		}
 
-		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null ) => true ;
-
+		public override bool Contain ( Entity entity, HashSet<Guid> checkedEntities = null ) => true ;
+		
 	}
 
 }

@@ -23,10 +23,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		public string Value { get ; set ; }
 
 		[Required]
-		public Guid PermissionGuid { get ; set ; }
-
-		[Required]
-		public DbPermissionGroup Permission { get ; set ; }
+		public Guid Permission { get ; set ; }
 
 		public bool Equals ( DbProperty other )
 		{

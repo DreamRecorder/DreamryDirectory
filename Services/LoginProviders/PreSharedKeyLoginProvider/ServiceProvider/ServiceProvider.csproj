@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+
 		<AssemblyName>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ServiceProvider</AssemblyName>
 		<RootNamespace>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ServiceProvider</RootNamespace>
 	</PropertyGroup>

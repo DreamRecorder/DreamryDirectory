@@ -2,10 +2,11 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
+using System . Runtime . InteropServices ;
 
 namespace DreamRecorder . Directory . Logic
 {
-
+	[StructLayout( LayoutKind.Sequential, Pack = 1)]
 	public readonly struct Permission : IEquatable <Permission>
 	{
 

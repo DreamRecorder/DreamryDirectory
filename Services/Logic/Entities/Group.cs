@@ -1,43 +1,34 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
-namespace DreamRecorder . Directory . Services . Logic . Entities
+using Microsoft . EntityFrameworkCore . ChangeTracking ;
+
+namespace DreamRecorder.Directory.Services.Logic.Entities
 {
 
 	public class Group : Entity
 	{
 
-		public HashSet <Entity> Members { get ; set ; }
+		public ObservableHashSet<Guid> Members { get; }=new ObservableHashSet<Guid> ();
 
-		public override bool Contain ( Entity entity , HashSet <Entity> checkedEntities = null )
+		public override bool Contain(Entity entity, HashSet<Guid> checkedEntities = null)
 		{
-			checkedEntities ??= new HashSet <Entity> ( ) ;
+			checkedEntities ??= new HashSet<Guid>();
 
-			if ( checkedEntities . Contains ( this ) )
+			checkedEntities . Add ( Guid ) ;
+
+			if (checkedEntities.Contains(Guid))
 			{
-				return base . Contain ( entity , checkedEntities ) ;
+				return base.Contain(entity, checkedEntities);
 			}
-
 			else
 			{
-				if ( base . Contain ( entity , checkedEntities ) )
-				{
-					return true ;
-				}
-				else
-				{
-					foreach ( Entity member in Members . Except ( checkedEntities ) )
-					{
-						if ( member . Contain ( entity , checkedEntities ) )
-						{
-							return true ;
-						}
-					}
-				}
-
-				return false ;
+				return base.Contain(entity, checkedEntities)
+						|| Members.Except(checkedEntities).
+										Any(member => DirectoryServiceInternal.FindEntity(member).Contain(entity, checkedEntities));
 			}
 		}
 

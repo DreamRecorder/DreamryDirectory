@@ -34,6 +34,9 @@ namespace DreamRecorder . Directory . Logic
 		[CanBeNull]
 		string GetProperty ( [NotNull] EntityToken token , Guid target , string name ) ;
 
+		[CanBeNull]
+		Guid GetPropertyOwner([NotNull] EntityToken token, Guid target, string name);
+
 		void SetProperty ( [NotNull] EntityToken token , Guid target , string name , string value ) ;
 
 		void TransferProperty ( [NotNull] EntityToken token , Guid target , string name , Guid newOwner ) ;

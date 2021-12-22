@@ -11,7 +11,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 		public override Guid Guid
 		{
-			get => Guid . Parse ( "00000000-0000-0000-0000-000000000000" ) ;
+			get => DreamRecorder.Directory.Logic.KnownEntities.Anonymous;
 			set => throw new InvalidOperationException ( ) ;
 		}
 

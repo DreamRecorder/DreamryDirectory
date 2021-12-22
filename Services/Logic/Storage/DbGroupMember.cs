@@ -1,7 +1,7 @@
 ﻿using System ;
 using System . Collections ;
 using System . Collections . Generic ;
-using System.ComponentModel.DataAnnotations;
+using System . ComponentModel . DataAnnotations ;
 using System . Linq ;
 
 namespace DreamRecorder . Directory . Services . Logic . Storage
@@ -18,7 +18,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 
 		public bool Equals ( DbGroupMember other )
 		{
-			if ( other is null )
+			if ( other is null)
 			{
 				return false ;
 			}
@@ -28,12 +28,13 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 				return true ;
 			}
 
-			return GroupGuid . Equals ( other . GroupGuid ) && MemberGuid . Equals ( other . MemberGuid ) ;
+			return GroupGuid . Equals ( other . GroupGuid )
+					&& MemberGuid . Equals ( other . MemberGuid ) ;
 		}
 
 		public override bool Equals ( object obj )
 		{
-			if ( obj is null )
+			if ( obj is null)
 			{
 				return false ;
 			}
@@ -48,7 +49,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 				return false ;
 			}
 
-			return Equals ( ( DbGroupMember ) obj ) ;
+			return Equals ( ( DbGroupMember )obj ) ;
 		}
 
 		public override int GetHashCode ( ) => HashCode . Combine ( GroupGuid , MemberGuid ) ;

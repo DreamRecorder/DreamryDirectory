@@ -45,8 +45,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			return directoryService . GetOrCreateProperty (
 															ApiEndPointsName ,
-															DirectoryServiceInternal . Current . DirectoryDatabase .
-																KnownSpecialGroups . DirectoryServices ,
+															DirectoryServiceInternal .KnownSpecialGroups . DirectoryServices.Guid ,
 															KnownPermissionGroups . EveryoneReadonly ) ;
 
 		}

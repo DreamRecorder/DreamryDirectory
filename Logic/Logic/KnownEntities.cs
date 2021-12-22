@@ -6,7 +6,7 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Logic
 {
 
-	public static class KnownSpecialGroups
+	public static class KnownEntities
 	{
 
 		public static Guid Everyone => Guid . Parse ( "CCAD71E9-041B-4190-AE0D-1B7034FF2E15" ) ;
@@ -24,6 +24,9 @@ namespace DreamRecorder . Directory . Logic
 		public static Guid Groups => Guid . Parse ( "E02BFEA6-EF75-405E-92BE-3141DDC200F1" ) ;
 
 		public static Guid Users => Guid . Parse ( "80F95DEE-A591-4E41-9747-0ECE02585075" ) ;
+
+		public static Guid Anonymous => Guid.Parse("00000000-0000-0000-0000-000000000000");
+
 
 	}
 

@@ -6,7 +6,7 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Logic
 {
 
-	public enum PermissionStatus
+	public enum PermissionStatus:byte
 	{
 
 		Allow ,

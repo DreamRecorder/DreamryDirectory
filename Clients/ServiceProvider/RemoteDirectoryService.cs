@@ -20,6 +20,10 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public int Port { get ; set ; }
 
+		public DateTime GetTime ( ) => throw new NotImplementedException ( ) ;
+
+		public Version GetVersion ( ) => throw new NotImplementedException ( ) ;
+
 		public EntityToken Login ( LoginToken token )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
@@ -154,6 +158,29 @@ namespace DreamRecorder . Directory . ServiceProvider
 			string result = response . Content . ReadAsAsync <string> ( ) . Result ;
 
 			return result ;
+		}
+
+		public Guid GetPropertyOwner ( EntityToken token , Guid target , string name )
+		{
+			HttpClient client = HttpClientFactory();
+
+			client.DefaultRequestHeaders.Add("token", JsonSerializer.Serialize(token));
+
+			HttpResponseMessage response = client.PostAsync(
+															new UriBuilder(
+																			Uri.UriSchemeHttps,
+																			Server,
+																			Port,
+																			$"{nameof(GetPropertyOwner)}/{target}/{name}").
+																Uri,
+															null).
+												Result;
+
+			response.EnsureSuccessStatusCode();
+
+			Guid result = response.Content.ReadAsAsync<Guid>().Result;
+
+			return result;
 		}
 
 		public void SetProperty ( EntityToken token , Guid target , string name , string value )

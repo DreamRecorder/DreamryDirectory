@@ -9,7 +9,6 @@ using DreamRecorder.Directory.Services.Logic.Entities;
 using JetBrains.Annotations;
 
 using KnownPermissionGroups = DreamRecorder.Directory.Services.Logic.Entities.KnownPermissionGroups;
-using Permission = DreamRecorder.Directory.Services.Logic.Permissions.Permission;
 using PermissionGroup = DreamRecorder.Directory.Services.Logic.Permissions.PermissionGroup;
 
 
@@ -37,10 +36,13 @@ namespace DreamRecorder.Directory.Services.Logic
 
 		public static string StopRenewEntityTokenName => $"{Constants.Namespace}.{StopRenewEntityToken}";
 
+		[CanBeNull]
+		public static EntityProperty TryGetProperty ( [NotNull] this Entity entity , [NotNull] string name  ) => DirectoryServiceInternal.Current.DirectoryDatabase.FindProperty ( entity.Guid, name ) ;
+
 		public static EntityProperty GetOrCreateProperty(
 			[NotNull] this Entity entity,
 			[NotNull] string name,
-				Entity owner = default,
+				Guid? owner = default,
 				PermissionGroup permissionGroup = default,
 			string defaultValue = default)
 		{
@@ -54,7 +56,7 @@ namespace DreamRecorder.Directory.Services.Logic
 				throw new ArgumentNullException(nameof(name));
 			}
 
-			owner ??= DirectoryServiceInternal.Current.DirectoryDatabase.KnownSpecialGroups.DirectoryServices;
+			Guid  ownerResult = owner??DirectoryServiceInternal.KnownSpecialGroups.DirectoryServices.Guid;
 
 			permissionGroup ??= KnownPermissionGroups.InternalApiOnly;
 
@@ -63,17 +65,19 @@ namespace DreamRecorder.Directory.Services.Logic
 				throw new ArgumentNullException(nameof(permissionGroup));
 			}
 
-			if (entity.Properties.FirstOrDefault(prop => prop.Name == name) is not EntityProperty property)
+			if (entity.TryGetProperty(name) is not EntityProperty property)
 			{
 				property = new EntityProperty
 				{
-					Name = name,
-					Owner = owner,
+					Name        = name,
+					Owner       = ownerResult,
 					Permissions = permissionGroup,
-					Value = defaultValue,
+					Value       = defaultValue,
+					Target=entity.Guid,
 				};
 
-				entity.Properties.Add(property);
+				DirectoryServiceInternal . Current . DirectoryDatabase . AddEntityProperty ( property ) ;
+
 			}
 
 			return property;
@@ -97,13 +101,13 @@ namespace DreamRecorder.Directory.Services.Logic
 				case User user:
 				case Service service:
 					{
-						return entity.GetOrCreateProperty(DisplayNameName, entity, KnownPermissionGroups.AuthorizedReadonly);
+						return entity.GetOrCreateProperty(DisplayNameName, entity.Guid, KnownPermissionGroups.AuthorizedReadonly);
 
 					}
 				case LoginService:
 				case DirectoryService:
 					{
-						return entity.GetOrCreateProperty(DisplayNameName, entity, KnownPermissionGroups.EveryoneReadonly);
+						return entity.GetOrCreateProperty(DisplayNameName, entity.Guid, KnownPermissionGroups.EveryoneReadonly);
 					}
 				default:
 					{

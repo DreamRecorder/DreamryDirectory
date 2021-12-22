@@ -7,65 +7,24 @@ using System . Linq ;
 namespace DreamRecorder . Directory . Services . Logic . Storage
 {
 
-	public interface IDbEntity
+	public enum DbEntityType:byte
 	{
-		Guid Guid { get; set; }
-
-		HashSet<DbProperty> Properties { get; set; }
-
+		Anonymous=0,
+		User=1,
+		DirectoryService=2,
+		LoginService=3,
+		Group=4,
+		Service=5,
+		SpecialGroup=6,
 	}
 
-	public class DbDirectoryService : IEquatable <DbDirectoryService>
+	public class DbEntity
 	{
+		[Required]
+		public Guid Guid { get; set; }
 
 		[Required]
-		public Guid Guid { get ; set ; }
-
-		[Required]
-		public HashSet <DbProperty> Properties { get ; set ; }
-
-		public bool Equals ( DbDirectoryService other )
-		{
-			if ( other is null )
-			{
-				return false ;
-			}
-
-			if ( ReferenceEquals ( this , other ) )
-			{
-				return true ;
-			}
-
-			return Guid . Equals ( other . Guid ) ;
-		}
-
-		public override bool Equals ( object obj )
-		{
-			if ( obj is null )
-			{
-				return false ;
-			}
-
-			if ( ReferenceEquals ( this , obj ) )
-			{
-				return true ;
-			}
-
-			if ( obj . GetType ( ) != GetType ( ) )
-			{
-				return false ;
-			}
-
-			return Equals ( ( DbDirectoryService ) obj ) ;
-		}
-
-		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
-
-		public static bool operator == ( DbDirectoryService left , DbDirectoryService right )
-			=> Equals ( left , right ) ;
-
-		public static bool operator != ( DbDirectoryService left , DbDirectoryService right )
-			=> ! Equals ( left , right ) ;
+		public DbEntityType EntityType { get; set; }
 
 	}
 

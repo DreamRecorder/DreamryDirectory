@@ -32,7 +32,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Controllers
 		[HttpGet("Version")]
 		public ActionResult<string> Version ( )
 		{
-			return ProgramBase . Current . GetType ( ) . Assembly . GetDisplayName ( ) ;
+			return ProgramBase . Current . GetType ( ) . Assembly . GetDisplayName ( ) +Environment.NewLine + DirectoryService.GetType().Assembly.GetDisplayName(); 
 		}
 
 		[HttpPost ( "Login")]
@@ -71,9 +71,7 @@ namespace DreamRecorder . Directory . Services . ApiService . Controllers
 		}
 
 
-
-
-		[HttpPost ( "etProperty/{target:guid}/{name}" )]
+		[HttpPost ( "SetProperty/{target:guid}/{name}" )]
 		public ActionResult SetProperty (
 			[FromHeader] EntityToken token ,
 			Guid                     target ,

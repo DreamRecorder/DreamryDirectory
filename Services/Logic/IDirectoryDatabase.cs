@@ -11,24 +11,19 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public interface IDirectoryDatabase
 	{
-
-		HashSet <User> Users { get ; }
-
-		HashSet <Group> Groups { get ; set ; }
-
-		HashSet <Service> Services { get ; set ; }
-
-		HashSet <LoginService> LoginServices { get ; set ; }
-
-		HashSet <DirectoryService> DirectoryServices { get ; set ; }
-
 		KnownSpecialGroups KnownSpecialGroups { get ; set ; }
-
-		HashSet <PermissionGroup> PermissionGroups { get ; set ; }
 
 		PermissionGroup FindPermissionGroup ( Guid guid ) ;
 
 		Entity FindEntity ( Guid guid ) ;
+
+		EntityProperty FindProperty ( Guid entity ,string name) ;
+
+		Entity AddEntity(Entity entity) ;
+
+		PermissionGroup AddPermissionGroup ( PermissionGroup permissionGroup ) ;
+
+		void AddEntityProperty ( EntityProperty property ) ;
 
 		void Save ( ) ;
 

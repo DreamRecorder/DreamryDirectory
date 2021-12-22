@@ -52,8 +52,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		IDirectoryDatabase DirectoryDatabase { get ; set ; }
 
-		
-
 		AccessToken IssueAccessToken ( [NotNull] Entity entity , [NotNull] Entity accessTarget , TimeSpan lifetime ) ;
 
 		/// <summary>

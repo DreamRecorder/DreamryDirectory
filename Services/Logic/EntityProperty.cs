@@ -1,77 +1,89 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
-using System . Xml . Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
-using DreamRecorder . Directory . Logic ;
-using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . ToolBox . General ;
+using DreamRecorder.Directory.Logic;
+using DreamRecorder.Directory.Services.Logic.Entities;
+using DreamRecorder.ToolBox.General;
 
-using PermissionGroup = DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
+using JetBrains.Annotations;
 
-namespace DreamRecorder . Directory . Services . Logic
+using PermissionGroup = DreamRecorder.Directory.Services.Logic.Permissions.PermissionGroup;
+using static DreamRecorder . Directory . Services . Logic . DirectoryServiceInternal;
+
+namespace DreamRecorder.Directory.Services.Logic
 {
 
-	public class EntityProperty : IEquatable <EntityProperty> , ISelfSerializable
+	public static class EntityPropertyExtensions
 	{
 
-		public string Name { get ; set ; }
-
-		public PermissionGroup Permissions { get ; set ; } = new PermissionGroup ( ) ;
-
-		public Entity Owner { get ; set ; }
-
-		public string Value { get ; set ; }
-
-		public bool Equals ( EntityProperty other )
+		public static AccessType Access(this EntityProperty property, Entity target)
 		{
-			if ( other is null )
+			if (target == null)
 			{
-				return false ;
+				throw new ArgumentNullException(nameof(target));
 			}
 
-			if ( ReferenceEquals ( this , other ) )
+			if (FindEntity(property.Owner).Contain(target ))
 			{
-				return true ;
+				return AccessType.ReadWrite;
 			}
 
-			return other . Name == Name && other . Owner == Owner ;
+			return property.Permissions.Access(target);
 		}
 
-		public XElement ToXElement ( )
+
+	}
+
+	public class EntityProperty : IEquatable<EntityProperty>, INotifyPropertyChanged
+	{
+
+		public string Name { get; set; }
+
+		public PermissionGroup Permissions { get; set; } = new PermissionGroup();
+
+		public Guid Owner { get; set; }
+
+		public Guid Target { get; set; }
+
+		public string Value { get; set; }
+
+		public bool Equals(EntityProperty other)
 		{
-			XElement result = new XElement ( nameof ( EntityProperty ) ) ;
+			if (other is null)
+			{
+				return false;
+			}
 
-			result . SetAttributeValue ( nameof ( Name ) ,  Name ) ;
-			result . SetAttributeValue ( nameof ( Owner ) , Owner . Guid ) ;
-			result . SetAttributeValue ( nameof ( Value ) , Value ) ;
+			if (ReferenceEquals(this, other))
+			{
+				return true;
+			}
 
-			return result ;
+			return other.Name == Name && other.Owner == Owner;
 		}
 
-		public override bool Equals ( object obj )
-			=> ReferenceEquals ( this , obj ) || obj is EntityProperty other && Equals ( other ) ;
 
-		public override int GetHashCode ( ) => HashCode . Combine ( Owner , Name ) ;
+		public override bool Equals(object obj)
+			=> ReferenceEquals(this, obj) || obj is EntityProperty other && Equals(other);
 
-		public static bool operator == ( EntityProperty left , EntityProperty right ) => Equals ( left , right ) ;
+		public override int GetHashCode() => HashCode.Combine(Owner, Name);
 
-		public static bool operator != ( EntityProperty left , EntityProperty right ) => ! Equals ( left , right ) ;
+		public static bool operator ==(EntityProperty left, EntityProperty right) => Equals(left, right);
 
-		public AccessType Access ( Entity target )
+		public static bool operator !=(EntityProperty left, EntityProperty right) => !Equals(left, right);
+
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		[NotifyPropertyChangedInvocator]
+		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
-			if ( target == null )
-			{
-				throw new ArgumentNullException ( nameof ( target ) ) ;
-			}
-
-			if ( target == Owner )
-			{
-				return AccessType . ReadWrite ;
-			}
-
-			return Permissions . Access ( target ) ;
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 
 	}
