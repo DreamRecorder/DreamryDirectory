@@ -14,10 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DreamRecorder.ToolBox.AspNet.General" Version="1.1.6.744" />
-    <PackageReference Include="DreamRecorder.ToolBox.CommandLine" Version="1.1.6.744" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
+    <PackageReference Include="DreamRecorder.ToolBox.AspNet.General" Version="1.1.6.749" />
+    <PackageReference Include="DreamRecorder.ToolBox.CommandLine" Version="1.1.6.749" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
