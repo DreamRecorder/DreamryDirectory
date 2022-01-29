@@ -11,6 +11,9 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static string Namespace => "DreamRecorder.Directory" ;
 
+		public static string ToPropertyName ( this string propertyName )
+			=> $"{Namespace}.{propertyName}" ;
+
 	}
 
 }

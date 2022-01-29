@@ -8,7 +8,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 
 	public class Users : SpecialGroup
 	{
-		
+
 		public override Guid Guid
 		{
 			get => Guid . Parse ( "80F95DEE-A591-4E41-9747-0ECE02585075" ) ;

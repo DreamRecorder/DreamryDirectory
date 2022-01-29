@@ -11,38 +11,6 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . Services . Logic
 {
 
-	public class NewUserEventArgs : EventArgs
-	{
-
-		public User User { get ; set ; }
-
-	}
-
-	public class NewLoginEventArgs : EventArgs
-	{
-
-		public Entity Entity { get; set ; }
-
-	}
-
-	public class UpdatePropertyEventArgs : EventArgs
-	{
-
-		public Entity Entity{ get; set; }
-
-		public EntityProperty Property { get ;set; }
-
-	}
-
-	public static class KnownEvents
-	{
-
-		public static event EventHandler <NewUserEventArgs> NewUser ;
-
-		public static event EventHandler <NewLoginEventArgs> NewLogin ;
-
-	}
-
 	public interface IDirectoryServiceInternal
 	{
 
@@ -52,7 +20,10 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		IDirectoryDatabase DirectoryDatabase { get ; set ; }
 
-		AccessToken IssueAccessToken ( [NotNull] Entity entity , [NotNull] Entity accessTarget , TimeSpan lifetime ) ;
+		AccessToken IssueAccessToken (
+			[NotNull] Entity entity ,
+			[NotNull] Entity accessTarget ,
+			TimeSpan         lifetime ) ;
 
 		/// <summary>
 		///     Issue entity token

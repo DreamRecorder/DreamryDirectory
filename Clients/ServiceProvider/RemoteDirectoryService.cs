@@ -29,12 +29,12 @@ namespace DreamRecorder . Directory . ServiceProvider
 			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( Login ) ) . Uri ,
-																	token ) .
+													new UriBuilder (
+													Uri . UriSchemeHttps ,
+													Server ,
+													Port ,
+													nameof ( Login ) ) . Uri ,
+													token ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -48,14 +48,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				nameof ( UpdateToken ) ) . Uri ,
+																Uri . UriSchemeHttps ,
+																Server ,
+																Port ,
+																nameof ( UpdateToken ) ) . Uri ,
 																null ) .
 													Result ;
 
@@ -71,12 +73,13 @@ namespace DreamRecorder . Directory . ServiceProvider
 			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( DisposeToken ) ) . Uri ,
-																	token ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( DisposeToken ) ) .
+														Uri ,
+													token ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -87,12 +90,13 @@ namespace DreamRecorder . Directory . ServiceProvider
 			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( DisposeToken ) ) . Uri ,
-																	token ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( DisposeToken ) ) .
+														Uri ,
+													token ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -103,12 +107,13 @@ namespace DreamRecorder . Directory . ServiceProvider
 			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( DisposeToken ) ) . Uri ,
-																	token ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( DisposeToken ) ) .
+														Uri ,
+													token ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -118,14 +123,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( Access )}/{target}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( Access )}/{target}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -141,14 +148,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( GetProperty )}/{target}/{name}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( GetProperty )}/{target}/{name}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -162,58 +171,68 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		public Guid GetPropertyOwner ( EntityToken token , Guid target , string name )
 		{
-			HttpClient client = HttpClientFactory();
+			HttpClient client = HttpClientFactory ( ) ;
 
-			client.DefaultRequestHeaders.Add("token", JsonSerializer.Serialize(token));
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
-			HttpResponseMessage response = client.PostAsync(
-															new UriBuilder(
-																			Uri.UriSchemeHttps,
-																			Server,
-																			Port,
-																			$"{nameof(GetPropertyOwner)}/{target}/{name}").
-																Uri,
-															null).
-												Result;
+			HttpResponseMessage response = client . PostAsync (
+																new UriBuilder (
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( GetPropertyOwner )}/{target}/{name}" ) .
+																	Uri ,
+																null ) .
+													Result ;
 
-			response.EnsureSuccessStatusCode();
+			response . EnsureSuccessStatusCode ( ) ;
 
-			Guid result = response.Content.ReadAsAsync<Guid>().Result;
+			Guid result = response . Content . ReadAsAsync <Guid> ( ) . Result ;
 
-			return result;
+			return result ;
 		}
 
 		public void SetProperty ( EntityToken token , Guid target , string name , string value )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																		Uri . UriSchemeHttps ,
-																		Server ,
-																		Port ,
-																		$"{nameof ( SetProperty )}/{target}/{name}" ) .
-																		Uri ,
-																	value ) .
+													new UriBuilder (
+													Uri . UriSchemeHttps ,
+													Server ,
+													Port ,
+													$"{nameof ( SetProperty )}/{target}/{name}" ) .
+													Uri ,
+													value ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
 		}
 
-		public void TransferProperty ( EntityToken token , Guid target , string name , Guid newOwner )
+		public void TransferProperty (
+			EntityToken token ,
+			Guid        target ,
+			string      name ,
+			Guid        newOwner )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( TransferProperty )}/{target}/{name}/{newOwner}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( TransferProperty )}/{target}/{name}/{newOwner}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -225,14 +244,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( AccessProperty )}/{target}/{name}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( AccessProperty )}/{target}/{name}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -244,18 +265,24 @@ namespace DreamRecorder . Directory . ServiceProvider
 			return result ;
 		}
 
-		public void SetPropertyPermission ( EntityToken token , Guid target , string name , Guid permissionGroup )
+		public void SetPropertyPermission (
+			EntityToken token ,
+			Guid        target ,
+			string      name ,
+			Guid        permissionGroup )
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( SetPropertyPermission )}/{target}/{name}/{permissionGroup}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( SetPropertyPermission )}/{target}/{name}/{permissionGroup}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -267,20 +294,23 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . GetAsync (
 															new UriBuilder (
-																			Uri . UriSchemeHttps ,
-																			Server ,
-																			Port ,
-																			$"{nameof ( GetPermissionGroup )}/{target}" ) .
+																Uri . UriSchemeHttps ,
+																Server ,
+																Port ,
+																$"{nameof ( GetPermissionGroup )}/{target}" ) .
 																Uri ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
 
-			PermissionGroup result = response . Content . ReadAsAsync <PermissionGroup> ( ) . Result ;
+			PermissionGroup result =
+				response . Content . ReadAsAsync <PermissionGroup> ( ) . Result ;
 
 			return result ;
 		}
@@ -289,21 +319,24 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																		Uri . UriSchemeHttps ,
-																		Server ,
-																		Port ,
-																		$"{nameof ( UpdatePermissionGroup )}/{target . Guid}" ) .
-																		Uri ,
-																	target ) .
+													new UriBuilder (
+													Uri . UriSchemeHttps ,
+													Server ,
+													Port ,
+													$"{nameof ( UpdatePermissionGroup )}/{target . Guid}" ) .
+													Uri ,
+													target ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
 
-			PermissionGroup result = response . Content . ReadAsAsync <PermissionGroup> ( ) . Result ;
+			PermissionGroup result =
+				response . Content . ReadAsAsync <PermissionGroup> ( ) . Result ;
 
 			return result ;
 		}
@@ -312,14 +345,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( Contain )}/{group}/{target}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( Contain )}/{group}/{target}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -335,21 +370,24 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( ListGroup )}/{group}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( ListGroup )}/{group}" ) .
 																	Uri ,
 																null ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
 
-			ICollection <Guid> result = response . Content . ReadAsAsync <ICollection <Guid>> ( ) . Result ;
+			ICollection <Guid> result =
+				response . Content . ReadAsAsync <ICollection <Guid>> ( ) . Result ;
 
 			return result ;
 		}
@@ -358,14 +396,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( AddToGroup )}/{group}/{target}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( AddToGroup )}/{group}/{target}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -377,14 +417,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( RemoveFromGroup )}/{group}/{target}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( RemoveFromGroup )}/{group}/{target}" ) .
 																	Uri ,
 																null ) .
 													Result ;
@@ -396,15 +438,18 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( CheckToken ) ) . Uri ,
-																	tokenToCheck ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( CheckToken ) ) .
+														Uri ,
+													tokenToCheck ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -414,15 +459,18 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( CheckToken ) ) . Uri ,
-																	tokenToCheck ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( CheckToken ) ) .
+														Uri ,
+													tokenToCheck ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -432,14 +480,17 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( CreateUser )}" ) . Uri ,
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( CreateUser )}" ) .
+																	Uri ,
 																null ) .
 													Result ;
 
@@ -454,14 +505,17 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( CreateUser )}" ) . Uri ,
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( CreateUser )}" ) .
+																	Uri ,
 																null ) .
 													Result ;
 
@@ -476,15 +530,18 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( RegisterLogin ) ) . Uri ,
-																	targetToken ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( RegisterLogin ) ) .
+														Uri ,
+													targetToken ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -494,14 +551,16 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsync (
 																new UriBuilder (
-																				Uri . UriSchemeHttps ,
-																				Server ,
-																				Port ,
-																				$"{nameof ( GetLoginTokenLife )}" ) .
+																	Uri . UriSchemeHttps ,
+																	Server ,
+																	Port ,
+																	$"{nameof ( GetLoginTokenLife )}" ) .
 																	Uri ,
 																null ) .
 													Result ;

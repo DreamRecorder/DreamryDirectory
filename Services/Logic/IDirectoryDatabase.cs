@@ -11,15 +11,16 @@ namespace DreamRecorder . Directory . Services . Logic
 
 	public interface IDirectoryDatabase
 	{
+
 		KnownSpecialGroups KnownSpecialGroups { get ; set ; }
 
 		PermissionGroup FindPermissionGroup ( Guid guid ) ;
 
 		Entity FindEntity ( Guid guid ) ;
 
-		EntityProperty FindProperty ( Guid entity ,string name) ;
+		EntityProperty FindProperty ( Guid entity , string name ) ;
 
-		Entity AddEntity(Entity entity) ;
+		Entity AddEntity ( Entity entity ) ;
 
 		PermissionGroup AddPermissionGroup ( PermissionGroup permissionGroup ) ;
 

@@ -36,11 +36,11 @@ namespace DreamRecorder . Directory . Logic . Tokens
 			}
 
 			return Owner . Equals ( other . Owner )
-					&& Equals ( Secret , other . Secret )
-					&& NotBefore . Equals ( other . NotBefore )
-					&& NotAfter . Equals ( other . NotAfter )
-					&& Guid . Equals ( other . Guid )
-					&& Issuer . Equals ( other . Issuer ) ;
+				&& Equals ( Secret , other . Secret )
+				&& NotBefore . Equals ( other . NotBefore )
+				&& NotAfter . Equals ( other . NotAfter )
+				&& Guid . Equals ( other . Guid )
+				&& Issuer . Equals ( other . Issuer ) ;
 		}
 
 		public override bool Equals ( object obj )
@@ -60,7 +60,7 @@ namespace DreamRecorder . Directory . Logic . Tokens
 				return false ;
 			}
 
-			return Equals ( ( Token ) obj ) ;
+			return Equals ( ( Token )obj ) ;
 		}
 
 		public override int GetHashCode ( )

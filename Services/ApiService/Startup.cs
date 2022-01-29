@@ -10,7 +10,6 @@ using DreamRecorder . ToolBox . AspNet . General ;
 
 using Microsoft . AspNetCore . Builder ;
 using Microsoft . AspNetCore . Hosting ;
-using Microsoft . EntityFrameworkCore ;
 using Microsoft . Extensions . Configuration ;
 using Microsoft . Extensions . DependencyInjection ;
 using Microsoft . Extensions . Hosting ;
@@ -28,9 +27,11 @@ namespace DreamRecorder . Directory . Services . ApiService
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices ( IServiceCollection services )
 		{
-			services . AddControllers ( HeaderComplexModelBinder . EnableHeaderComplexModelBinder ( ) ) ;
+			services . AddControllers (
+										HeaderComplexModelBinder .
+											EnableHeaderComplexModelBinder ( ) ) ;
 
-			services . AddDbContext <DirectoryDatabaseStorage> () ;
+			services . AddDbContext <DirectoryDatabaseStorage> ( ) ;
 
 
 			//options
@@ -38,8 +39,8 @@ namespace DreamRecorder . Directory . Services . ApiService
 			//							Configuration.GetConnectionString(
 			//															nameof(DirectoryDatabaseStorage)))
 
-			services . AddTransient <IDirectoryService , DirectoryServiceBase> ( ) ;
-			services . AddTransient <IDirectoryDatabaseStorage , DirectoryDatabaseStorage> ( ) ;
+			services . AddSingleton <IDirectoryService , DirectoryServiceBase> ( ) ;
+			services . AddSingleton <IDirectoryDatabaseStorage , DirectoryDatabaseStorage> ( ) ;
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,8 +52,8 @@ namespace DreamRecorder . Directory . Services . ApiService
 			}
 
 			app . UseHttpsRedirection ( ) ;
-			
-			app . UseRouting () ;
+
+			app . UseRouting ( ) ;
 
 			app . UseEndpoints ( endpoints => { endpoints . MapControllers ( ) ; } ) ;
 		}

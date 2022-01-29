@@ -52,14 +52,16 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 				return true ;
 			}
 
-			return obj . GetType ( ) == GetType ( ) && Equals ( ( DbProperty ) obj ) ;
+			return obj . GetType ( ) == GetType ( ) && Equals ( ( DbProperty )obj ) ;
 		}
 
 		public override int GetHashCode ( ) => HashCode . Combine ( Target , Name ) ;
 
-		public static bool operator == ( DbProperty left , DbProperty right ) => Equals ( left , right ) ;
+		public static bool operator == ( DbProperty left , DbProperty right )
+			=> Equals ( left , right ) ;
 
-		public static bool operator != ( DbProperty left , DbProperty right ) => ! Equals ( left , right ) ;
+		public static bool operator != ( DbProperty left , DbProperty right )
+			=> ! Equals ( left , right ) ;
 
 	}
 

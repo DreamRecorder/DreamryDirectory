@@ -29,9 +29,13 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 			=> typeof ( KnownSpecialGroups ) . GetProperties ( ) .
 												Where (
 														prop
-															=> typeof ( SpecialGroup ) . IsAssignableFrom (
-															prop . PropertyType ) ) .
-												Select ( prop => prop . GetValue ( this ) as SpecialGroup ) .
+															=> typeof ( SpecialGroup ) .
+																IsAssignableFrom (
+																prop . PropertyType ) ) .
+												Select (
+														prop
+															=> prop . GetValue ( this ) as
+																	SpecialGroup ) .
 												ToHashSet ( ) ;
 
 	}

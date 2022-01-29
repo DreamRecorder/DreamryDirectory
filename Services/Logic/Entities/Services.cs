@@ -3,18 +3,22 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
+using DreamRecorder . Directory . Logic ;
+
 namespace DreamRecorder . Directory . Services . Logic . Entities
 {
 
 	public class Services : SpecialGroup
 	{
+
 		public override Guid Guid
 		{
-			get => DreamRecorder.Directory.Logic.KnownEntities.Services;
+			get => KnownEntities . Services ;
 			set => throw new InvalidOperationException ( ) ;
 		}
 
-		public override bool Contain ( Entity entity , HashSet <Guid> checkedEntities = null ) => entity is Service ;
+		public override bool Contain ( Entity entity , HashSet <Guid> checkedEntities = null )
+			=> entity is Service ;
 
 	}
 

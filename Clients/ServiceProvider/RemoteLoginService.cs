@@ -26,15 +26,18 @@ namespace DreamRecorder . Directory . ServiceProvider
 		{
 			HttpClient client = HttpClientFactory ( ) ;
 
-			client . DefaultRequestHeaders . Add ( "token" , JsonSerializer . Serialize ( token ) ) ;
+			client . DefaultRequestHeaders . Add (
+												"token" ,
+												JsonSerializer . Serialize ( token ) ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( CheckToken ) ) . Uri ,
-																	tokenToCheck ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( CheckToken ) ) .
+														Uri ,
+													tokenToCheck ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -45,12 +48,13 @@ namespace DreamRecorder . Directory . ServiceProvider
 			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( DisposeToken ) ) . Uri ,
-																	token ) .
+													new UriBuilder (
+														Uri . UriSchemeHttps ,
+														Server ,
+														Port ,
+														nameof ( DisposeToken ) ) .
+														Uri ,
+													token ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;
@@ -61,12 +65,12 @@ namespace DreamRecorder . Directory . ServiceProvider
 			HttpClient client = HttpClientFactory ( ) ;
 
 			HttpResponseMessage response = client . PostAsJsonAsync (
-																	new UriBuilder (
-																	Uri . UriSchemeHttps ,
-																	Server ,
-																	Port ,
-																	nameof ( Login ) ) . Uri ,
-																	credential ) .
+													new UriBuilder (
+													Uri . UriSchemeHttps ,
+													Server ,
+													Port ,
+													nameof ( Login ) ) . Uri ,
+													credential ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;

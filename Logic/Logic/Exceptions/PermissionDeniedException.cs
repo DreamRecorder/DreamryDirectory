@@ -3,7 +3,7 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
-namespace DreamRecorder . Directory . Services . Logic
+namespace DreamRecorder . Directory . Logic . Exceptions
 {
 
 	public class PermissionDeniedException : Exception

@@ -2,12 +2,10 @@
 using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
-using System . Reflection ;
 
-using DreamRecorder.ToolBox.General;
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
-using DreamRecorder . ToolBox . CommandLine ;
+using DreamRecorder . ToolBox . General ;
 
 using Microsoft . AspNetCore . Mvc ;
 using Microsoft . Extensions . Logging ;
@@ -23,19 +21,21 @@ namespace DreamRecorder . Directory . Services . ApiService . Controllers
 
 		private IDirectoryService DirectoryService { get ; }
 
-		public DirectoryController ( ILogger <DirectoryController> logger , IDirectoryService directoryService )
+		public DirectoryController (
+			ILogger <DirectoryController> logger ,
+			IDirectoryService             directoryService )
 		{
 			_logger          = logger ;
 			DirectoryService = directoryService ;
 		}
 
-		[HttpGet("Version")]
-		public ActionResult<string> Version ( )
-		{
-			return ProgramBase . Current . GetType ( ) . Assembly . GetDisplayName ( ) +Environment.NewLine + DirectoryService.GetType().Assembly.GetDisplayName(); 
-		}
+		[HttpGet ( "Version" )]
+		public ActionResult <string> Version ( )
+			=> ProgramBase . Current . GetType ( ) . Assembly . GetDisplayName ( )
+			+ Environment . NewLine
+			+ DirectoryService . GetType ( ) . Assembly . GetDisplayName ( ) ;
 
-		[HttpPost ( "Login")]
+		[HttpPost ( "Login" )]
 		public ActionResult <EntityToken> Login ( [FromBody] LoginToken token )
 		{
 			if ( token is null )

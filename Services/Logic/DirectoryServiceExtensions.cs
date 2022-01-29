@@ -13,7 +13,8 @@ namespace DreamRecorder . Directory . Services . Logic
 	public static class DirectoryServiceExtensions
 	{
 
-		public static readonly string DatabaseConnectionString = nameof ( DatabaseConnectionString ) ;
+		public static readonly string
+			DatabaseConnectionString = nameof ( DatabaseConnectionString ) ;
 
 		public static readonly string DatabaseConnectionStringName =
 			$"{Constants . Namespace}.{DatabaseConnectionString}" ;
@@ -32,11 +33,11 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( directoryService ) ) ;
 			}
 
-			return directoryService. GetOrCreateProperty ( DatabaseConnectionStringName  ) ;
-
+			return directoryService . GetOrCreateProperty ( DatabaseConnectionStringName ) ;
 		}
 
-		public static EntityProperty GetApiEndPointsProperty ( [NotNull] this DirectoryService directoryService )
+		public static EntityProperty GetApiEndPointsProperty (
+			[NotNull] this DirectoryService directoryService )
 		{
 			if ( directoryService == null )
 			{
@@ -45,9 +46,11 @@ namespace DreamRecorder . Directory . Services . Logic
 
 			return directoryService . GetOrCreateProperty (
 															ApiEndPointsName ,
-															DirectoryServiceInternal .KnownSpecialGroups . DirectoryServices.Guid ,
-															KnownPermissionGroups . EveryoneReadonly ) ;
-
+															DirectoryServiceInternal .
+																KnownSpecialGroups .
+																DirectoryServices . Guid ,
+															KnownPermissionGroups .
+																EveryoneReadonly ) ;
 		}
 
 		public static List <(string HostName , int Port)> GetApiEndPoints (
@@ -58,22 +61,27 @@ namespace DreamRecorder . Directory . Services . Logic
 				throw new ArgumentNullException ( nameof ( directoryService ) ) ;
 			}
 
-			List <(string HostName , int Port)> result = new List <(string HostName , int Port)> ( ) ;
+			List <(string HostName , int Port)>
+				result = new List <(string HostName , int Port)> ( ) ;
 
 			List <string> endPointsStrings = directoryService . GetApiEndPointsProperty ( ) .
 																Value .
 																Split (
-																		',' ,
-																		StringSplitOptions . RemoveEmptyEntries ) .
+																',' ,
+																StringSplitOptions .
+																	RemoveEmptyEntries ) .
 																Select ( str => str . Trim ( ) ) .
 																ToList ( ) ;
 
 
 			foreach ( string endPointsString in endPointsStrings )
 			{
-				string [ ] endPointsParts = endPointsString . Split ( ':' , StringSplitOptions . RemoveEmptyEntries ) .
-															Select ( str => str . Trim ( ) ) .
-															ToArray ( ) ;
+				string [ ] endPointsParts = endPointsString .
+											Split (
+													':' ,
+													StringSplitOptions . RemoveEmptyEntries ) .
+											Select ( str => str . Trim ( ) ) .
+											ToArray ( ) ;
 
 				if ( string . IsNullOrEmpty ( endPointsParts . FirstOrDefault ( ) ) )
 				{

@@ -5,6 +5,7 @@ using System . Linq ;
 using System . Security . Cryptography ;
 
 using DreamRecorder . Directory . Logic ;
+using DreamRecorder . Directory . Logic . Exceptions ;
 using DreamRecorder . Directory . Logic . Tokens ;
 using DreamRecorder . Directory . ServiceProvider ;
 using DreamRecorder . Directory . Services . General ;
@@ -17,13 +18,18 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 	public abstract class LoginServiceBase <TCredential> : ILoginService
 	{
 
-		public virtual IDirectoryServiceProvider DirectoryService { get ; }
+		public abstract Guid Type { get ; }
 
-		public virtual TokenStorage <LoginToken> IssuedLoginTokens { get ; }
+		public abstract IDirectoryServiceProvider DirectoryServiceProvider { get ; }
 
-		public virtual IEntityTokenProvider EntityTokenProvider { get ; }
+		public IDirectoryService DirectoryService
+			=> DirectoryServiceProvider . GetDirectoryService ( ) ;
 
-		public virtual RNGCryptoServiceProvider RngProvider { get ; set ; } = new RNGCryptoServiceProvider ( ) ;
+		public abstract ITokenStorage <LoginToken> IssuedLoginTokens { get ; }
+
+		public abstract IEntityTokenProvider EntityTokenProvider { get ; }
+
+		public EntityToken EntityToken => EntityTokenProvider . GetToken ( ) ;
 
 		public LoginToken Login ( object credential )
 		{
@@ -56,9 +62,22 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 				throw new ArgumentNullException ( nameof ( tokenToCheck ) ) ;
 			}
 
-			DirectoryService . GetDirectoryService ( ) . CheckToken ( EntityTokenProvider . GetToken ( ) , token ) ;
+			if ( token . Target != EntityToken . Owner )
+			{
+				throw new InvalidTargetException ( ) ;
+			}
 
-			token . CheckTokenTime ( ) ;
+			if ( ! DirectoryService . Contain (
+												EntityToken ,
+												KnownEntities . DirectoryServices ,
+												token . Owner ) )
+			{
+				throw new InvalidOperationException ( ) ;
+			}
+
+			DirectoryService . CheckToken ( EntityToken , token ) ;
+
+			tokenToCheck . CheckTokenTime ( ) ;
 
 			if ( token . Issuer == EntityTokenProvider . EntityGuid )
 			{
@@ -83,7 +102,7 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 			}
 			else
 			{
-				DirectoryService . GetDirectoryService ( ) . DisposeToken ( token ) ;
+				DirectoryService . DisposeToken ( token ) ;
 			}
 		}
 
@@ -91,8 +110,7 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 		{
 			DateTimeOffset now = DateTimeOffset . UtcNow ;
 
-			TimeSpan lifetime = DirectoryService . GetDirectoryService ( ) .
-													GetLoginTokenLife ( EntityTokenProvider . GetToken ( ) , target ) ;
+			TimeSpan lifetime = DirectoryService . GetLoginTokenLife ( EntityToken , target ) ;
 
 			LoginToken token = new LoginToken
 								{
@@ -100,10 +118,8 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 									NotBefore = now ,
 									NotAfter  = now + lifetime ,
 									Issuer    = EntityTokenProvider . EntityGuid ,
-									Secret    = new byte[ 1024 ] ,
+									Secret    = RandomNumberGenerator . GetBytes ( 1024 ) ,
 								} ;
-
-			RngProvider . GetBytes ( token . Secret ) ;
 
 			IssuedLoginTokens . AddToken ( token ) ;
 

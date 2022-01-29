@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" >
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup Label="Globals" >
+	<PropertyGroup Label="Globals">
 		<SccProjectName>SAK</SccProjectName>
 		<SccProvider>SAK</SccProvider>
 		<SccAuxPath>SAK</SccAuxPath>
@@ -12,6 +12,10 @@
 		<AssemblyName>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ServiceProvider</AssemblyName>
 		<RootNamespace>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ServiceProvider</RootNamespace>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="6.0.1" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\Clients\ServiceProvider\ServiceProvider.csproj" />

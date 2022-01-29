@@ -7,7 +7,7 @@ using DreamRecorder . Directory . Logic . Tokens ;
 
 using JetBrains . Annotations ;
 
-namespace DreamRecorder . Directory . Services . General
+namespace DreamRecorder . Directory . Logic . Exceptions
 {
 
 	public static class TokenExtensions
@@ -24,8 +24,8 @@ namespace DreamRecorder . Directory . Services . General
 				throw new ArgumentNullException ( nameof ( token ) ) ;
 			}
 
-			if ( token . NotAfter    > DateTimeOffset . UtcNow
-				&& token . NotBefore < DateTimeOffset . UtcNow )
+			if ( token . NotAfter > DateTimeOffset . UtcNow
+			&& token . NotBefore  < DateTimeOffset . UtcNow )
 			{
 			}
 			else

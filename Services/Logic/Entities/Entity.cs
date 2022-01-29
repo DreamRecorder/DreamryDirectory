@@ -1,10 +1,7 @@
 ﻿using System ;
 using System . Collections ;
 using System . Collections . Generic ;
-using System . Collections . ObjectModel ;
-using System . ComponentModel ;
 using System . Linq ;
-using System . Runtime . CompilerServices ;
 
 using JetBrains . Annotations ;
 
@@ -26,7 +23,9 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 			return ReferenceEquals ( this , other ) || Guid . Equals ( other . Guid ) ;
 		}
 
-		public virtual bool Contain ( [NotNull] Entity entity , [CanBeNull] HashSet <Guid> checkedEntities = null )
+		public virtual bool Contain (
+			[NotNull]   Entity         entity ,
+			[CanBeNull] HashSet <Guid> checkedEntities = null )
 		{
 			if ( checkedEntities ? . Contains ( Guid ) == false )
 			{
@@ -48,7 +47,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 				return true ;
 			}
 
-			return obj . GetType ( ) == GetType ( ) && Equals ( ( Entity ) obj ) ;
+			return obj . GetType ( ) == GetType ( ) && Equals ( ( Entity )obj ) ;
 		}
 
 		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
@@ -56,7 +55,7 @@ namespace DreamRecorder . Directory . Services . Logic . Entities
 		public static bool operator == ( Entity left , Entity right ) => Equals ( left , right ) ;
 
 		public static bool operator != ( Entity left , Entity right ) => ! Equals ( left , right ) ;
-		
+
 	}
 
 }

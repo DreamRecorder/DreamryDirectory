@@ -13,9 +13,11 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static IDirectoryServiceInternal Current { get ; set ; }
 
-		public static Entity FindEntity(Guid guid)=>Current.DirectoryDatabase.FindEntity(guid);
+		public static KnownSpecialGroups KnownSpecialGroups
+			=> Current . DirectoryDatabase . KnownSpecialGroups ;
 
-		public static KnownSpecialGroups KnownSpecialGroups => Current.DirectoryDatabase.KnownSpecialGroups;
+		public static Entity FindEntity ( Guid guid )
+			=> Current . DirectoryDatabase . FindEntity ( guid ) ;
 
 	}
 

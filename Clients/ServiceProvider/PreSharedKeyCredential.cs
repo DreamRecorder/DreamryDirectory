@@ -3,7 +3,7 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
-namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider
+namespace DreamRecorder . Directory . ServiceProvider
 {
 
 	public class PreSharedKeyCredential

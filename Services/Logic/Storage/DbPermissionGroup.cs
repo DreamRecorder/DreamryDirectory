@@ -17,7 +17,7 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 		public Guid Owner { get ; set ; }
 
 		[Required]
-		public byte[] Value { get ; set ; }
+		public byte [ ] Value { get ; set ; }
 
 		public bool Equals ( DbPermissionGroup other )
 		{
@@ -41,12 +41,13 @@ namespace DreamRecorder . Directory . Services . Logic . Storage
 				return true ;
 			}
 
-			return obj . GetType ( ) == GetType ( ) && Equals ( ( DbPermissionGroup ) obj ) ;
+			return obj . GetType ( ) == GetType ( ) && Equals ( ( DbPermissionGroup )obj ) ;
 		}
 
 		public override int GetHashCode ( ) => Guid . GetHashCode ( ) ;
 
-		public static bool operator == ( DbPermissionGroup left , DbPermissionGroup right ) => Equals ( left , right ) ;
+		public static bool operator == ( DbPermissionGroup left , DbPermissionGroup right )
+			=> Equals ( left , right ) ;
 
 		public static bool operator != ( DbPermissionGroup left , DbPermissionGroup right )
 			=> ! Equals ( left , right ) ;

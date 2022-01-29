@@ -14,6 +14,7 @@ namespace DreamRecorder . Directory . Logic
 	{
 
 		DateTime GetTime ( ) ;
+
 		Version GetVersion ( ) ;
 
 		[CanBeNull]
@@ -35,11 +36,19 @@ namespace DreamRecorder . Directory . Logic
 		string GetProperty ( [NotNull] EntityToken token , Guid target , string name ) ;
 
 		[CanBeNull]
-		Guid GetPropertyOwner([NotNull] EntityToken token, Guid target, string name);
+		Guid GetPropertyOwner ( [NotNull] EntityToken token , Guid target , string name ) ;
 
-		void SetProperty ( [NotNull] EntityToken token , Guid target , string name , string value ) ;
+		void SetProperty (
+			[NotNull] EntityToken token ,
+			Guid                  target ,
+			string                name ,
+			string                value ) ;
 
-		void TransferProperty ( [NotNull] EntityToken token , Guid target , string name , Guid newOwner ) ;
+		void TransferProperty (
+			[NotNull] EntityToken token ,
+			Guid                  target ,
+			string                name ,
+			Guid                  newOwner ) ;
 
 		/// <summary>
 		///     Get Access of Property
@@ -50,12 +59,18 @@ namespace DreamRecorder . Directory . Logic
 		/// <returns></returns>
 		AccessType AccessProperty ( [NotNull] EntityToken token , Guid target , string name ) ;
 
-		void SetPropertyPermission ( [NotNull] EntityToken token , Guid target , string name , Guid permissionGroup ) ;
+		void SetPropertyPermission (
+			[NotNull] EntityToken token ,
+			Guid                  target ,
+			string                name ,
+			Guid                  permissionGroup ) ;
 
 		[CanBeNull]
 		PermissionGroup GetPermissionGroup ( [NotNull] EntityToken token , Guid target ) ;
 
-		PermissionGroup UpdatePermissionGroup ( [NotNull] EntityToken token , PermissionGroup target ) ;
+		PermissionGroup UpdatePermissionGroup (
+			[NotNull] EntityToken token ,
+			PermissionGroup       target ) ;
 
 		/// <summary>
 		///     Check if an entity is a member of a group

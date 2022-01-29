@@ -17,6 +17,8 @@ namespace DreamRecorder . Directory . ServiceProvider
 
 		ICollection <EndPoint> Directories { get ; }
 
+		string GetProperty ( Guid target , string name ) ;
+
 	}
 
 }

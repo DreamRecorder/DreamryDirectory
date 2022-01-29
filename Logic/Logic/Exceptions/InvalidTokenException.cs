@@ -3,10 +3,10 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
-namespace DreamRecorder . Directory . Services . General
+namespace DreamRecorder . Directory . Logic . Exceptions
 {
 
-	public class InvalidIssuerException : InvalidTokenException
+	public class InvalidTokenException : AuthenticationException
 	{
 
 	}

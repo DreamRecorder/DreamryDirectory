@@ -14,7 +14,8 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 {
 
 	public class Program
-		: ProgramBase <Program , Program . ProgramExitCode , Program . ProgramSetting , Program . ProgramSettingCatalog>
+		: ProgramBase <Program , Program . ProgramExitCode , Program . ProgramSetting ,
+			Program . ProgramSettingCatalog>
 	{
 
 		public enum ProgramSettingCatalog
@@ -46,12 +47,22 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 		{
 			return Host . CreateDefaultBuilder ( args ) .
 						UseServiceProviderFactory ( new StaticServiceProviderFactory ( ) ) .
-						ConfigureWebHostDefaults ( webBuilder => { webBuilder . UseStartup <Startup> ( ) ; } ) ;
+						ConfigureWebHostDefaults (
+												webBuilder =>
+												{
+													webBuilder . UseStartup <Startup> ( ) ;
+												} ) ;
 		}
 
-		public override void Start ( string [ ] args ) { CreateHostBuilder ( args ) . Build ( ) . Run ( ) ; }
+		public override void Start ( string [ ] args )
+		{
+			CreateHostBuilder ( args ) . Build ( ) . Run ( ) ;
+		}
 
-		public override void ConfigureLogger ( ILoggingBuilder builder ) { builder . AddDebug ( ) ; }
+		public override void ConfigureLogger ( ILoggingBuilder builder )
+		{
+			builder . AddDebug ( ) ;
+		}
 
 		public override void ShowLogo ( ) { }
 
