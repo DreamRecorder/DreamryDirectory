@@ -9,8 +9,8 @@
 
 	<PropertyGroup>
 
-		<AssemblyName>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ServiceProvider</AssemblyName>
-		<RootNamespace>DreamRecorder.Directory.LoginProviders.PreSharedKeyLoginProvider.ServiceProvider</RootNamespace>
+		<AssemblyName>DreamRecorder.Directory.LoginProviders.ServiceProvider</AssemblyName>
+		<RootNamespace>DreamRecorder.Directory.LoginProviders.ServiceProvider</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -434,6 +434,27 @@ namespace DreamRecorder . Directory . ServiceProvider
 			response . EnsureSuccessStatusCode ( ) ;
 		}
 
+		public void CheckToken(EntityToken token)
+		{
+			HttpClient client = HttpClientFactory();
+
+			client.DefaultRequestHeaders.Add(
+											"token",
+											JsonSerializer.Serialize(token));
+
+			HttpResponseMessage response = client.PostAsync(
+																new UriBuilder(
+																	Uri.UriSchemeHttps,
+																	Server,
+																	Port,
+																	nameof(CheckToken)).
+																	Uri,
+																null).
+												Result;
+
+			response.EnsureSuccessStatusCode();
+		}
+
 		public void CheckToken ( EntityToken token , AccessToken tokenToCheck )
 		{
 			HttpClient client = HttpClientFactory ( ) ;

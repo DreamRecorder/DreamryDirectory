@@ -1,11 +1,12 @@
 ﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+using System.Collections ;
+using System.Collections.Generic ;
+using System.Linq ;
+using System . Runtime . InteropServices ;
 
-using Microsoft . AspNetCore . Cryptography . KeyDerivation ;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation ;
 
-namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider ;
+namespace DreamRecorder . Directory . LoginProviders . ServiceProvider ;
 
 public class HashV1 : IHash
 {

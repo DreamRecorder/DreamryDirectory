@@ -5,7 +5,7 @@ using System . Linq ;
 
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
-using DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider ;
+using DreamRecorder . Directory . LoginProviders . ServiceProvider ;
 using DreamRecorder . ToolBox . General ;
 
 using Microsoft . AspNetCore . Mvc ;

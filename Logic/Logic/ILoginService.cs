@@ -10,7 +10,6 @@ namespace DreamRecorder . Directory . Logic
 
 	public interface ILoginService
 	{
-
 		LoginToken Login ( object credential ) ;
 
 		void CheckToken ( AccessToken token , LoginToken tokenToCheck ) ;

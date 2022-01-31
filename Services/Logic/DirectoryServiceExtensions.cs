@@ -3,9 +3,14 @@ using System . Collections ;
 using System . Collections . Generic ;
 using System . Linq ;
 
+using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
 using JetBrains . Annotations ;
+
+using KnownPermissionGroups = DreamRecorder . Directory . Services . Logic . Entities . KnownPermissionGroups ;
+
+using static DreamRecorder.Directory.Logic.KnownProperties;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -17,13 +22,9 @@ namespace DreamRecorder . Directory . Services . Logic
 			DatabaseConnectionString = nameof ( DatabaseConnectionString ) ;
 
 		public static readonly string DatabaseConnectionStringName =
-			$"{Constants . Namespace}.{DatabaseConnectionString}" ;
+			DatabaseConnectionString.ToPropertyName() ;
 
-
-		public static readonly string ApiEndPoints = nameof ( ApiEndPoints ) ;
-
-		public static readonly string ApiEndPointsName = $"{Constants . Namespace}.{ApiEndPoints}" ;
-
+		public static readonly string ApiEndpointsName =ApiEndpoints.ToPropertyName() ;
 
 		public static EntityProperty GetDatabaseConnectionStringProperty (
 			[NotNull] this DirectoryService directoryService )
@@ -45,7 +46,7 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 
 			return directoryService . GetOrCreateProperty (
-															ApiEndPointsName ,
+															ApiEndpointsName ,
 															DirectoryServiceInternal .
 																KnownSpecialGroups .
 																DirectoryServices . Guid ,
@@ -53,7 +54,7 @@ namespace DreamRecorder . Directory . Services . Logic
 																EveryoneReadonly ) ;
 		}
 
-		public static List <(string HostName , int Port)> GetApiEndPoints (
+		public static List <(string HostName , int Port)> GetApiEndpoints (
 			[NotNull] this DirectoryService directoryService )
 		{
 			if ( directoryService == null )

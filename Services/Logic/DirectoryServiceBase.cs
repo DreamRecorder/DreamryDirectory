@@ -36,9 +36,6 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public IEntityTokenProvider EntityTokenProvider { get ; set ; }
 
-		public RNGCryptoServiceProvider RngProvider { get ; set ; } =
-			new RNGCryptoServiceProvider ( ) ;
-
 		public EntityToken ServiceToken { get ; }
 
 		public virtual ILoginServiceProvider LoginServiceProvider { get ; }
@@ -634,7 +631,6 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 		}
 
-
 		public bool Contain ( EntityToken token , Guid group , Guid target )
 		{
 			if ( token == null )
@@ -1028,10 +1024,8 @@ namespace DreamRecorder . Directory . Services . Logic
 									NotBefore = now ,
 									NotAfter  = now + lifetime ,
 									Issuer    = ServiceEntity . Guid ,
-									Secret    = new byte[ 1024 ] ,
+									Secret    = RandomNumberGenerator.GetBytes(1024) ,
 								} ;
-
-			RngProvider . GetBytes ( token . Secret ) ;
 
 			IssuedAccessTokens . AddToken ( token ) ;
 
@@ -1059,11 +1053,9 @@ namespace DreamRecorder . Directory . Services . Logic
 									NotBefore = now ,
 									NotAfter  = now + lifetime ,
 									Issuer    = ServiceEntity . Guid ,
-									Secret    = new byte[ 1024 ] ,
+									Secret    = RandomNumberGenerator.GetBytes(1024),
 									Guid      = Guid . NewGuid ( ) ,
 								} ;
-
-			RngProvider . GetBytes ( token . Secret ) ;
 
 			IssuedEntityTokens . AddToken ( token ) ;
 
@@ -1074,7 +1066,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public void Start ( ) { }
 
-		protected void CheckToken ( [NotNull] EntityToken token )
+		public void CheckToken ( [NotNull] EntityToken token )
 		{
 			if ( token == null )
 			{

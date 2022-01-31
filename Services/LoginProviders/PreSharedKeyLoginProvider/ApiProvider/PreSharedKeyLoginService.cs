@@ -6,7 +6,7 @@ using System . Security . Cryptography ;
 
 using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
-using DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider ;
+using DreamRecorder . Directory . LoginProviders . ServiceProvider ;
 using DreamRecorder . Directory . ServiceProvider ;
 using DreamRecorder . Directory . Services . General ;
 

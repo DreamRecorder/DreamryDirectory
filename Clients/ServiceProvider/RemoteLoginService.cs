@@ -1,85 +1,83 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
-using System . Net . Http ;
-using System . Text . Json ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 
-using DreamRecorder . Directory . Logic ;
-using DreamRecorder . Directory . Logic . Tokens ;
+using DreamRecorder.Directory.Logic;
+using DreamRecorder.Directory.Logic.Tokens;
 
-namespace DreamRecorder . Directory . ServiceProvider
+namespace DreamRecorder.Directory.ServiceProvider
 {
 
-	public class RemoteLoginService <TCredential> : ILoginService where TCredential : class
-	{
+    public class RemoteLoginService<TCredential> : ILoginService where TCredential : class
+    {
 
-		public Func <HttpClient> HttpClientFactory { get ; set ; } = ( ) => new HttpClient ( ) ;
+        public Func<HttpClient> HttpClientFactory { get; set; } = () => new HttpClient();
 
-		public string Server { get ; set ; }
+        public string Server { get; set; }
 
-		public int Port { get ; set ; }
+        public int Port { get; set; }
 
-		public LoginToken Login ( object credential ) => Login ( credential as TCredential ) ;
+        public Guid Type { get; set ; }
 
-		public void CheckToken ( AccessToken token , LoginToken tokenToCheck )
-		{
-			HttpClient client = HttpClientFactory ( ) ;
+        public LoginToken Login(object credential) => Login(credential as TCredential);
 
-			client . DefaultRequestHeaders . Add (
-												"token" ,
-												JsonSerializer . Serialize ( token ) ) ;
+        public void CheckToken(AccessToken token, LoginToken tokenToCheck)
+        {
+            HttpClient client = HttpClientFactory();
 
-			HttpResponseMessage response = client . PostAsJsonAsync (
-													new UriBuilder (
-														Uri . UriSchemeHttps ,
-														Server ,
-														Port ,
-														nameof ( CheckToken ) ) .
-														Uri ,
-													tokenToCheck ) .
-													Result ;
+            client.DefaultRequestHeaders.Add("token", JsonSerializer.Serialize(token));
 
-			response . EnsureSuccessStatusCode ( ) ;
-		}
+            HttpResponseMessage response = client.PostAsJsonAsync(
+                                                                    new UriBuilder(
+                                                                    Uri.UriSchemeHttps,
+                                                                    Server,
+                                                                    Port,
+                                                                    $"{Type}/{nameof(CheckToken)}").Uri,
+                                                                    tokenToCheck).
+                                                    Result;
 
-		public void DisposeToken ( LoginToken token )
-		{
-			HttpClient client = HttpClientFactory ( ) ;
+            response.EnsureSuccessStatusCode();
+        }
 
-			HttpResponseMessage response = client . PostAsJsonAsync (
-													new UriBuilder (
-														Uri . UriSchemeHttps ,
-														Server ,
-														Port ,
-														nameof ( DisposeToken ) ) .
-														Uri ,
-													token ) .
-													Result ;
+        public void DisposeToken(LoginToken token)
+        {
+            HttpClient client = HttpClientFactory();
 
-			response . EnsureSuccessStatusCode ( ) ;
-		}
+            HttpResponseMessage response = client.PostAsJsonAsync(
+                                                                    new UriBuilder(
+                                                                    Uri.UriSchemeHttps,
+                                                                    Server,
+                                                                    Port,
+																	$"{Type}/{nameof(DisposeToken)}").Uri,
+                                                                    token).
+                                                    Result;
 
-		public virtual LoginToken Login ( TCredential credential )
-		{
-			HttpClient client = HttpClientFactory ( ) ;
+            response.EnsureSuccessStatusCode();
+        }
 
-			HttpResponseMessage response = client . PostAsJsonAsync (
-													new UriBuilder (
-													Uri . UriSchemeHttps ,
-													Server ,
-													Port ,
-													nameof ( Login ) ) . Uri ,
-													credential ) .
-													Result ;
+        public virtual LoginToken Login(TCredential credential)
+        {
+            HttpClient client = HttpClientFactory();
 
-			response . EnsureSuccessStatusCode ( ) ;
+            HttpResponseMessage response = client.PostAsJsonAsync(
+                                                                    new UriBuilder(
+                                                                    Uri.UriSchemeHttps,
+                                                                    Server,
+                                                                    Port,
+																	$"{Type}/{nameof(Login)}").Uri,
+                                                                    credential).
+                                                    Result;
 
-			LoginToken result = response . Content . ReadAsAsync <LoginToken> ( ) . Result ;
+            response.EnsureSuccessStatusCode();
 
-			return result ;
-		}
+            LoginToken result = response.Content.ReadAsAsync<LoginToken>().Result;
 
-	}
+            return result;
+        }
+
+    }
 
 }

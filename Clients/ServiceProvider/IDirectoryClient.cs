@@ -13,7 +13,6 @@ namespace DreamRecorder . Directory . ServiceProvider
 		: IEntityTokenProvider , IDirectoryServiceProvider , ILoginService , IAccessTokenProvider
 	{
 
-		ICollection <(ILoginService loginProvider , object credential)> Credentials { get ; }
 
 		ICollection <EndPoint> Directories { get ; }
 

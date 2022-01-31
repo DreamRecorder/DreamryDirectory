@@ -1,9 +1,9 @@
 ﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+using System.Collections ;
+using System.Collections.Generic ;
+using System.Linq ;
 
-namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider ;
+namespace DreamRecorder . Directory . LoginProviders . ServiceProvider ;
 
 public interface IHash
 {

@@ -8,6 +8,8 @@ using DreamRecorder . Directory . Services . Logic . Permissions ;
 
 using JetBrains . Annotations ;
 
+using static DreamRecorder . Directory . Logic . KnownProperties;
+
 namespace DreamRecorder . Directory . Services . Logic
 {
 
@@ -16,17 +18,15 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public static char CanLoginFromSeparator => ',' ;
 
-		public static string DisplayName => nameof ( DisplayName ) ;
 
-		public static string DisplayNameName => $"{Constants . Namespace}.{DisplayName}" ;
+		public static string DisplayNameName =>DisplayName.ToPropertyName() ;
 
-		public static string IsDisabled => nameof ( IsDisabled ) ;
 
 		public static string IsDisabledName => IsDisabled . ToPropertyName ( ) ;
 
 		public static string CanLoginFrom => nameof ( CanLoginFrom ) ;
 
-		public static string CanLoginFromName => $"{Constants . Namespace}.{CanLoginFrom}" ;
+		public static string CanLoginFromName => CanLoginFrom.ToPropertyName() ;
 
 		public static string StopRenewEntityToken => nameof ( StopRenewEntityToken ) ;
 

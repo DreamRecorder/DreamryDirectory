@@ -1,13 +1,14 @@
 ﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+using System.Collections ;
+using System.Collections.Generic ;
+using System.Linq ;
 
-using DreamRecorder . Directory . Logic . Tokens ;
+using DreamRecorder . Directory . Logic . Exceptions ;
+using DreamRecorder.Directory.Logic.Tokens ;
 
-using JetBrains . Annotations ;
+using JetBrains.Annotations ;
 
-namespace DreamRecorder . Directory . Logic . Exceptions
+namespace DreamRecorder . Directory . Logic
 {
 
 	public static class TokenExtensions

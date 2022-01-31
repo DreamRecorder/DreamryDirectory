@@ -1,13 +1,37 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+﻿using System;
+using System.Collections;
+using System . Collections . Concurrent ;
+using System.Collections.Generic;
+using System . Collections . ObjectModel ;
+using System.Linq;
 
-namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider ;
+using DreamRecorder.ToolBox.General;
+
+namespace DreamRecorder.Directory.LoginProviders.ServiceProvider;
 
 public class HashProvider : IHashProvider
 {
+    private static ReadOnlyDictionary<Guid, IHash> Hashs { get; set; }
 
-	public IHash GetHash ( Guid guid ) => throw new NotImplementedException ( ) ;
+    [Prepare]
+    public static void Prepare()
+    {
+        lock (StaticServiceProvider.ServiceCollection)
+        {
+           Hashs=new ReadOnlyDictionary<Guid, IHash>( AppDomainExtensions.FindType((type) => type.IsAssignableTo(typeof(IHash))).Distinct().Select(Activator.CreateInstance).Cast<IHash>().ToDictionary(hash => hash.Guid));
+        }
+    }
+
+	public IHash GetHash ( Guid guid )
+	{
+		if ( Hashs.ContainsKey(guid) )
+		{
+			return Hashs[guid];
+        }
+		else
+		{
+            return null;
+		}
+    }
 
 }

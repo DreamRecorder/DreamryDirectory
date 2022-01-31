@@ -1,13 +1,13 @@
 ﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+using System.Collections ;
+using System.Collections.Generic ;
+using System.Linq ;
 
-using DreamRecorder . Directory . Logic ;
+using DreamRecorder.Directory.Logic ;
 
-using JetBrains . Annotations ;
+using JetBrains.Annotations ;
 
-namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider . ServiceProvider ;
+namespace DreamRecorder . Directory . LoginProviders . ServiceProvider ;
 
 public interface ILoginProvider
 {
