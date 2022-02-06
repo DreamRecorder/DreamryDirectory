@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DreamRecorder.ToolBox" Version="1.1.6.762" />
+    <PackageReference Include="DreamRecorder.ToolBox" Version="1.1.6.765" />
   </ItemGroup>
 
 </Project>

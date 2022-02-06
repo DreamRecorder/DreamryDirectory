@@ -13,7 +13,10 @@ namespace DreamRecorder . Directory . Logic
 	public interface IDirectoryService
 	{
 
-		DateTime GetTime ( ) ;
+		DateTimeOffset GetStartupTime ( ) ;
+
+		DateTimeOffset GetTime ( ) ;
+
 		Version GetVersion ( ) ;
 
 		[CanBeNull]

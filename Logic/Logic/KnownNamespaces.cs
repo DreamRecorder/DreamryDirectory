@@ -5,10 +5,9 @@ using System.Linq ;
 
 namespace DreamRecorder . Directory . Logic ;
 
-public static class KnownLoginType
+public static class KnownNamespaces
 {
 
-	public static Guid PreSharedKey => Guid . Parse ( "58BD0A39-3F39-485F-9BC7-18642A48F85D" ) ;
-
+	public const string DirectoryServicesNamespace = "DreamRecorder.Directory";
 
 }

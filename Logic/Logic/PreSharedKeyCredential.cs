@@ -1,9 +1,9 @@
 ﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+using System.Collections ;
+using System.Collections.Generic ;
+using System.Linq ;
 
-namespace DreamRecorder . Directory . ServiceProvider
+namespace DreamRecorder . Directory . Logic
 {
 
 	public class PreSharedKeyCredential
