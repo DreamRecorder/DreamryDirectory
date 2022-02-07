@@ -4,14 +4,11 @@ using System . Collections . Generic ;
 using System . Collections . ObjectModel ;
 using System . Linq ;
 
-using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Services . Logic . Entities ;
 
 using JetBrains . Annotations ;
 
-using KnownPermissionGroups = DreamRecorder . Directory . Services . Logic . Entities . KnownPermissionGroups ;
-
-using static DreamRecorder.Directory.Logic.KnownProperties;
+using static DreamRecorder . Directory . Logic . KnownProperties ;
 
 namespace DreamRecorder . Directory . Services . Logic
 {
@@ -23,9 +20,9 @@ namespace DreamRecorder . Directory . Services . Logic
 			DatabaseConnectionString = nameof ( DatabaseConnectionString ) ;
 
 		public static readonly string DatabaseConnectionStringName =
-			DatabaseConnectionString.ToPropertyName() ;
+			DatabaseConnectionString . ToPropertyName ( ) ;
 
-		public static readonly string ApiEndpointsName =ApiEndpoints.ToPropertyName() ;
+		public static readonly string ApiEndpointsName = ApiEndpoints . ToPropertyName ( ) ;
 
 		public static EntityProperty GetDatabaseConnectionStringProperty (
 			[NotNull] this DirectoryService directoryService )

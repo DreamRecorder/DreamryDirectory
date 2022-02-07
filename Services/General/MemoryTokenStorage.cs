@@ -82,7 +82,7 @@ namespace DreamRecorder . Directory . Services . General
 			}
 		}
 
-		public DateTimeOffset? Gc ( )
+		public DateTimeOffset ? Gc ( )
 		{
 			lock ( Tokens )
 			{

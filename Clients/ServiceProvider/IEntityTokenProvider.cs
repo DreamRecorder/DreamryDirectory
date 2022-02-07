@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
+﻿using System ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 
-using DreamRecorder.Directory.Logic.Tokens;
+using DreamRecorder . Directory . Logic . Tokens ;
 
-namespace DreamRecorder.Directory.ServiceProvider
+namespace DreamRecorder . Directory . ServiceProvider
 {
 
-    public interface IEntityTokenProvider
-    {
+	public interface IEntityTokenProvider
+	{
 
-        Guid EntityGuid { get; }
+		Guid EntityGuid { get ; }
 
-        EntityToken GetToken();
+		EntityToken GetToken ( ) ;
 
-    }
+	}
 
 }

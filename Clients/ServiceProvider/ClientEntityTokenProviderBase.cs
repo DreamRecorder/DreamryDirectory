@@ -1,7 +1,7 @@
 ﻿using System ;
-using System.Collections ;
-using System.Collections.Generic ;
-using System.Linq ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
 using System . Threading ;
 
 using DreamRecorder . Directory . Logic ;
@@ -15,81 +15,81 @@ namespace DreamRecorder . Directory . ServiceProvider ;
 public abstract class ClientEntityTokenProviderBase : IEntityTokenProvider
 {
 
-	protected ClientEntityTokenProviderBase(
-		IDirectoryServiceProvider directoryServiceProvider,
-		ITaskDispatcher           taskDispatcher)
-	{
-		DirectoryServiceProvider = directoryServiceProvider;
-		TaskDispatcher           = taskDispatcher;
+	protected IDirectoryServiceProvider DirectoryServiceProvider { get ; }
 
-		TaskDispatcher.Dispatch(new ScheduledTask(RenewToken));
-	}
+	protected ITaskDispatcher TaskDispatcher { get ; }
 
-	protected IDirectoryServiceProvider DirectoryServiceProvider { get; }
-
-	protected ITaskDispatcher TaskDispatcher { get; }
-
-	protected abstract Func<LoginToken> GetLoginToken { get; }
-
-	public Guid EntityGuid => GetToken().Owner;
+	protected abstract Func <LoginToken> GetLoginToken { get ; }
 
 	[CanBeNull]
-	private EntityToken CurrentToken { get; set; } = null;
+	private EntityToken CurrentToken { get ; set ; }
 
-	public void CheckToken()
+	protected ClientEntityTokenProviderBase (
+		IDirectoryServiceProvider directoryServiceProvider ,
+		ITaskDispatcher           taskDispatcher )
 	{
-		CurrentToken.CheckTokenTime();
-		DirectoryServiceProvider.GetDirectoryService().CheckToken(CurrentToken);
+		DirectoryServiceProvider = directoryServiceProvider ;
+		TaskDispatcher           = taskDispatcher ;
+
+		TaskDispatcher . Dispatch ( new ScheduledTask ( RenewToken ) ) ;
 	}
 
-	public DateTimeOffset? RenewToken()
+	public Guid EntityGuid => GetToken ( ) . Owner ;
+
+	public EntityToken GetToken ( )
 	{
-		lock (this)
+		lock ( this )
 		{
-			while (true)
+			while ( true )
+			{
+				try
+				{
+					CheckToken ( ) ;
+					return CurrentToken ;
+				}
+				catch ( Exception )
+				{
+					RenewToken ( ) ;
+				}
+
+				Thread . Sleep ( 1 ) ;
+			}
+		}
+	}
+
+	public void CheckToken ( )
+	{
+		CurrentToken . CheckTokenTime ( ) ;
+		DirectoryServiceProvider . GetDirectoryService ( ) . CheckToken ( CurrentToken ) ;
+	}
+
+	public DateTimeOffset ? RenewToken ( )
+	{
+		lock ( this )
+		{
+			while ( true )
 			{
 				try
 				{
 					try
 					{
-						CurrentToken.CheckTokenTime();
-						CurrentToken = DirectoryServiceProvider.GetDirectoryService().
-																UpdateToken(CurrentToken);
+						CurrentToken . CheckTokenTime ( ) ;
+						CurrentToken = DirectoryServiceProvider . GetDirectoryService ( ) .
+							UpdateToken ( CurrentToken ) ;
 					}
-					catch (Exception)
+					catch ( Exception )
 					{
-						CurrentToken = DirectoryServiceProvider.GetDirectoryService().
-																Login(GetLoginToken());
+						CurrentToken = DirectoryServiceProvider . GetDirectoryService ( ) .
+							Login ( GetLoginToken ( ) ) ;
 					}
 
-					return DateTimeOffset.UtcNow
-						+ ((CurrentToken.NotAfter - DateTimeOffset.UtcNow) / 2);
+					return DateTimeOffset . UtcNow
+						+ ( ( CurrentToken . NotAfter - DateTimeOffset . UtcNow ) / 2 ) ;
 				}
-				catch (Exception)
+				catch ( Exception )
 				{
-					Thread.Sleep(1);
+					Thread . Sleep ( 1 ) ;
 				}
-			}
-		}
-	}
-
-	public EntityToken GetToken()
-	{
-		lock (this)
-		{
-			while (true)
-			{
-				try
-				{
-					CheckToken();
-					return CurrentToken;
-				}
-				catch (Exception)
-				{
-					RenewToken();
-				}
-
-				Thread.Sleep(1);
 			}
 		}
 	}

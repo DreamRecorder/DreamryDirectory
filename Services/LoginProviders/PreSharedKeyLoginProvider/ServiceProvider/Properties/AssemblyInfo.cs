@@ -1,7 +1,11 @@
-using System.Runtime.InteropServices;
+using System ;
+using System . Collections ;
+using System . Collections . Generic ;
+using System . Linq ;
+using System . Runtime . InteropServices ;
 
 using DreamRecorder . ToolBox . General ;
 
-[assembly: ComVisible(false)]
-[assembly: Guid("8f280d34-9485-455c-8da0-afa82ec8cc78")]
-[assembly:Prepare]
+[assembly : ComVisible ( false )]
+[assembly : Guid ( "8f280d34-9485-455c-8da0-afa82ec8cc78" )]
+[assembly : Prepare]

@@ -11,7 +11,7 @@ namespace DreamRecorder . Directory . Services . Logic
 	public static class Constants
 	{
 
-		public static string Namespace => KnownNamespaces.DirectoryServicesNamespace;
+		public static string Namespace => KnownNamespaces . DirectoryServicesNamespace ;
 
 		public static string ToPropertyName ( this string propertyName )
 			=> $"{Namespace}.{propertyName}" ;
