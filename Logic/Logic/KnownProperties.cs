@@ -37,8 +37,12 @@ public static class KnownProperties
 	[Property ( EntityScope . Any , KnownNamespaces . DirectoryServicesNamespace , false )]
 	public const string DisplayName = nameof ( DisplayName ) ;
 
-	[Property ( EntityScope . Any , KnownNamespaces . DirectoryServicesNamespace , false )]
+	[Property ( EntityScope . Any , KnownNamespaces . DirectoryServicesNamespace , true )]
 	public const string IsDisabled = nameof ( IsDisabled ) ;
+
+	[Property( EntityScope.LoginService, KnownNamespaces.DirectoryServicesNamespace, true)]
+	public const string LoginType = nameof(LoginType);
+
 
 	[Property (
 				EntityScope . DirectoryService | EntityScope . LoginService ,

@@ -7,6 +7,8 @@ using DreamRecorder . Directory . Logic ;
 using DreamRecorder . Directory . Logic . Tokens ;
 using DreamRecorder . ToolBox . General ;
 
+using JetBrains . Annotations ;
+
 namespace DreamRecorder . Directory . ServiceProvider ;
 
 public interface ICredentialTypeProvider
@@ -26,12 +28,22 @@ public class CredentialTypeProvider : ICredentialTypeProvider
 	{
 		lock ( StaticServiceProvider . ServiceCollection )
 		{
-			credentialTypes = 
-			AppDomainExtensions .
-				FindProperty <LoginTypeAttribute>(  (prop)=>prop.info.PropertyType == typeof(Guid)&&prop.info.GetAccessors().First().IsStatic ) .
-				
-				Select ( prop=>((Guid)prop.info.GetValue(null),prop.attribute.CredentialType)) .
-				ToDictionary ( tuple => tuple . Item1,tuple=>tuple.CredentialType )  ;
+			credentialTypes = AppDomainExtensions .
+							FindProperty <LoginTypeAttribute> (
+																( prop )
+																	=> prop . info . PropertyType
+																	== typeof ( Guid )
+																	&& prop . info .
+																			GetAccessors ( ) .
+																			First ( ) .
+																			IsStatic ) .
+							Select (
+									prop
+										=> ( ( Guid )prop . info . GetValue ( null ) ,
+											prop . attribute . CredentialType ) ) .
+							ToDictionary (
+										tuple => tuple . Item1 ,
+										tuple => tuple . CredentialType ) ;
 		}
 	}
 
@@ -39,23 +51,93 @@ public class CredentialTypeProvider : ICredentialTypeProvider
 
 }
 
-public class ClientLoginServiceProvider : ILoginServiceProvider
+public abstract class ClientServiceProviderBase<TRemoteService> where TRemoteService:RemoteServiceBase
 {
 
-	public List <StatefulRemoteService <RemoteLoginService>> KnownDirectoryService { get ; }
+	public IRandom Random { get; }
+
+	public List<StatefulRemoteService<TRemoteService>> KnownRemoteService { get; }=new List<StatefulRemoteService<TRemoteService>> ();
+
+	public TaskDispatcher TaskDispatcher{ get; }
+
+	public int CurrentEpoch { get; protected set; } = 0;
+
+	protected ClientServiceProviderBase ( IRandom random , TaskDispatcher taskDispatcher )
+	{
+		Random         = random ;
+		TaskDispatcher = taskDispatcher ;
+
+		TaskDispatcher.Dispatch(new ScheduledTask())
+	}
+
+
+
+	protected virtual Predicate<StatefulRemoteService<TRemoteService>> WorkingFilter
+		=> service => service . Status == RemoteStatus . Working ;
+
+	public TRemoteService GetRemoteService ([CanBeNull] Predicate<StatefulRemoteService<TRemoteService>> requirement=null)
+	{
+		requirement ??= PredicateExtensions.Pass< StatefulRemoteService<TRemoteService>>() ;
+
+		Comparer<StatefulRemoteService<TRemoteService>> latencyComparer =
+			Comparer<StatefulRemoteService<TRemoteService>>.Create(
+			ComparisonExtensions.
+				Select<StatefulRemoteService<TRemoteService>,
+					double>(
+							sev => sev.CurrentLatency,
+							ComparisonExtensions.IgnoreSmallDifference(0.5d)).
+				Union(
+					ComparisonExtensions.
+						Select<StatefulRemoteService<TRemoteService>, double>(
+						sev => sev.AverageLatency,
+						ComparisonExtensions.IgnoreSmallDifference(0.5d))).
+				Union(
+					ComparisonExtensions.
+						Select<StatefulRemoteService<TRemoteService>, double>(
+						sev => sev.LatencyVariance,
+						ComparisonExtensions.IgnoreSmallDifference(0.5d))).
+				Union(
+					ComparisonExtensions.
+						Select<StatefulRemoteService<TRemoteService>, int>(
+						sev => Random.Next())));
+
+		lock (KnownRemoteService)
+		{
+			return KnownRemoteService.
+					Where(PredicateExtensions.And(requirement,WorkingFilter).Invoke ).
+					Min(latencyComparer) ?.
+					RemoteService;
+		}
+	}
+
+	public abstract void UpdateServers ( ) ;
+
+}
+
+public class ClientLoginServiceProvider : ClientServiceProviderBase<RemoteLoginService>, ILoginServiceProvider
+{
+
 
 	public IDirectoryServiceProvider DirectoryServiceProvider { get ; }
 
-
-	public ClientLoginServiceProvider ( IDirectoryServiceProvider directoryServiceProvider )
-		=> DirectoryServiceProvider = directoryServiceProvider ;
+	public ICredentialTypeProvider CredentialTypeProvider { get ; }
 
 
-	public ILoginService GetLoginService ( Guid type ) => throw new NotImplementedException ( ) ;
+	public ClientLoginServiceProvider (
+		IDirectoryServiceProvider directoryServiceProvider ,
+		IRandom                   random ,
+		ICredentialTypeProvider   credentialTypeProvider ,
+		TaskDispatcher            taskDispatcher ):base(random,taskDispatcher)
+	{
+		DirectoryServiceProvider = directoryServiceProvider ;
+		CredentialTypeProvider   = credentialTypeProvider ;
+	}
+
+	
 
 	public void UpdateServers ( )
 	{
-		lock ( KnownDirectoryService )
+		lock ( KnownRemoteService )
 		{
 			IDirectoryService currentDirectoryService =
 				DirectoryServiceProvider . GetDirectoryService ( ) ;
@@ -65,64 +147,91 @@ public class ClientLoginServiceProvider : ILoginServiceProvider
 				EntityToken anonymousToken = currentDirectoryService . Login ( null )
 										?? throw new InvalidOperationException ( ) ;
 
-				IEnumerable <(string HostName , int Port)> endpoints = currentDirectoryService .
-					ListGroup ( anonymousToken , KnownGroups . ServicingLoginServices ) .
-					SelectMany (
-								guid
-									=> KnownProperties . ParseApiEndpoints (
-									currentDirectoryService . GetProperty (
-									anonymousToken ,
-									guid ,
-									KnownProperties . ApiEndpoints .
-													GetPropertyName ( ) ) ) ) ;
+				IEnumerable <((string HostName , int Port) endpoint , Guid type)> endpoints =
+					currentDirectoryService .
+						ListGroup ( anonymousToken , KnownGroups . ServicingLoginServices ) .
+						SelectMany (
+									guid =>
+									{
+										Guid type = Guid . Parse (
+																currentDirectoryService .
+																	GetProperty (
+																	anonymousToken ,
+																	guid ,
+																	KnownProperties .
+																		LoginType .
+																		GetPropertyName ( ) ) ) ;
 
-				lock ( KnownDirectoryService )
+										return ( KnownProperties . ParseApiEndpoints (
+														currentDirectoryService . GetProperty (
+														anonymousToken ,
+														guid ,
+														KnownProperties . ApiEndpoints .
+															GetPropertyName ( ) ) ) .
+														Select (
+																endpoint
+																	=> ( endpoint , type ) ) ) ;
+									} ) ;
+
+				lock ( KnownRemoteService )
 				{
-					foreach ( (string HostName , int Port) endpoint in endpoints )
+					foreach ( ((string HostName , int Port) endpoint , Guid type) endpointInfo in
+							endpoints )
 					{
-						if ( ! KnownDirectoryService . Any (
-															sev
-																=> sev . RemoteService . HostName
-																== endpoint . HostName
-																&& sev . RemoteService . Port
-																== endpoint . Port ) )
+						if ( KnownRemoteService . FirstOrDefault (
+													sev
+														=> sev . RemoteService . HostName
+														== endpointInfo . endpoint . HostName
+														&& sev . RemoteService . Port
+														== endpointInfo . endpoint . Port
+														&& sev . RemoteService . Type
+														== endpointInfo . type ) is StatefulRemoteService<RemoteLoginService> statefulService )
 						{
-							KnownDirectoryService . Add (
-														new
-															StatefulRemoteService <
-																RemoteLoginService> (
-															new RemoteLoginService (
-															endpoint ) ) ) ;
+							statefulService . Epoch = CurrentEpoch ;
 						}
+
+						RemoteLoginService remoteLogin =
+							( RemoteLoginService )Activator . CreateInstance (
+							typeof ( RemoteLoginService <> ) . MakeGenericType (
+							CredentialTypeProvider . GetCredentialType (
+							endpointInfo . type ) ) ) ;
+
+						KnownRemoteService . Add (
+												new StatefulRemoteService <RemoteLoginService> (
+												remoteLogin ) ) ;
 					}
 				}
 			}
 		}
 	}
 
+	public ILoginService GetLoginService ( Guid type ) => GetRemoteService((sev)=>sev.RemoteService.Type==type) ;
+
 }
 
-public class StatefulRemoteService <T> where T : RemoteServiceBase
+public enum RemoteStatus
 {
 
-	public enum RemoteState
-	{
+	Working,
 
-		Working ,
+	Disconnected,
 
-		Disconnected ,
+	Checking,
 
-		Checking ,
+}
 
-	}
+public class StatefulRemoteService <T> :IStartStop where T : RemoteServiceBase
+{
 
 	public bool Running { get ; private set ; }
+
+	public int Epoch{ get; set; }
 
 	public TaskDispatcher TaskDispatcher { get ; }
 
 	public DateTimeOffset WorkingSince { get ; private set ; }
 
-	public RemoteState State { get ; private set ; } = RemoteState . Disconnected ;
+	public RemoteStatus Status { get ; private set ; } = RemoteStatus . Disconnected ;
 
 	public double CurrentLatency { get ; private set ; }
 
@@ -143,7 +252,14 @@ public class StatefulRemoteService <T> where T : RemoteServiceBase
 
 	public StatefulRemoteService ( T remoteService ) => RemoteService = remoteService ;
 
-	public void Start ( ) { TaskDispatcher . Dispatch ( new ScheduledTask ( UpdateStatus ) ) ; }
+	public void Start ( )
+	{
+		TaskDispatcher . Dispatch ( new ScheduledTask ( UpdateStatus ) ) ;
+	}
+
+	public void Stop(){ Running = false; }
+
+	public bool IsRunning { get; private set; }
 
 	public DateTimeOffset ? UpdateStatus ( )
 	{
@@ -153,9 +269,9 @@ public class StatefulRemoteService <T> where T : RemoteServiceBase
 			{
 				try
 				{
-					if ( State != RemoteState . Working )
+					if ( Status != RemoteStatus . Working )
 					{
-						State = RemoteState . Checking ;
+						Status = RemoteStatus . Checking ;
 					}
 
 					CurrentLatency += RemoteService . MeasureLatency ( ) . TotalMilliseconds ;
@@ -174,15 +290,15 @@ public class StatefulRemoteService <T> where T : RemoteServiceBase
 					LatencyVariance = ( LatencySquaredSum / LatencyCount )
 								- ( AverageLatency        * AverageLatency ) ;
 
-					if ( State != RemoteState . Working )
+					if ( Status != RemoteStatus . Working )
 					{
-						State        = RemoteState . Working ;
+						Status        = RemoteStatus . Working ;
 						WorkingSince = DateTimeOffset . UtcNow ;
 					}
 				}
 				catch ( Exception )
 				{
-					State = RemoteState . Disconnected ;
+					Status = RemoteStatus . Disconnected ;
 				}
 			}
 
@@ -196,20 +312,15 @@ public class StatefulRemoteService <T> where T : RemoteServiceBase
 
 }
 
-public class ClientDirectoryServiceProvider : IDirectoryServiceProvider
+public class ClientDirectoryServiceProvider : ClientServiceProviderBase<RemoteDirectoryService>, IDirectoryServiceProvider
 {
-
-	public IRandom Random { get ; }
-
-	public List <StatefulRemoteService <RemoteDirectoryService>> KnownDirectoryService { get ; }
 
 	public ClientDirectoryServiceProvider (
 		ICollection <(string HostName , int Port)> bootstrapDirectoryServers ,
-		IRandom                                    random )
+		IRandom                                    random ,
+		TaskDispatcher                             taskDispatcher ):base(random,taskDispatcher)
 	{
-		Random = random ;
-		KnownDirectoryService =
-			new List <StatefulRemoteService <RemoteDirectoryService>> (
+		KnownRemoteService .AddRange(
 			bootstrapDirectoryServers . Select (
 												info
 													=> new
@@ -219,54 +330,21 @@ public class ClientDirectoryServiceProvider : IDirectoryServiceProvider
 														info ) ) ) ) ;
 
 		foreach ( StatefulRemoteService <RemoteDirectoryService> remoteDirectoryService in
-				KnownDirectoryService )
+				KnownRemoteService )
 		{
 			remoteDirectoryService . Start ( ) ;
 		}
 	}
 
 
-	public IDirectoryService GetDirectoryService ( )
-	{
-		Comparer <StatefulRemoteService <RemoteDirectoryService>> latencyComparer =
-			Comparer <StatefulRemoteService <RemoteDirectoryService>> . Create (
-			ComparisonExtensions .
-				Select <StatefulRemoteService <RemoteDirectoryService> ,
-					double> (
-							sev => sev . CurrentLatency ,
-							ComparisonExtensions . IgnoreSmallDifference ( 0.5d ) ) .
-				Union (
-						ComparisonExtensions .
-							Select <StatefulRemoteService <RemoteDirectoryService> , double> (
-							sev => sev . AverageLatency ,
-							ComparisonExtensions . IgnoreSmallDifference ( 0.5d ) ) ) .
-				Union (
-						ComparisonExtensions .
-							Select <StatefulRemoteService <RemoteDirectoryService> , double> (
-							sev => sev . LatencyVariance ,
-							ComparisonExtensions . IgnoreSmallDifference ( 0.5d ) ) ) .
-				Union (
-						ComparisonExtensions .
-							Select <StatefulRemoteService <RemoteDirectoryService> , int> (
-							sev => Random . Next ( ) ) ) ) ;
+	public IDirectoryService GetDirectoryService ( ) =>GetRemoteService ( ) ;
 
-		lock ( KnownDirectoryService )
-		{
-			return KnownDirectoryService .
-					Where (
-							sev
-								=> sev . State
-								== StatefulRemoteService <RemoteDirectoryService> . RemoteState .
-										Working ) .
-					Min ( latencyComparer ) ? .
-					RemoteService ;
-		}
-	}
-
-	public void UpdateServers ( )
+	public override void UpdateServers ( )
 	{
-		lock ( KnownDirectoryService )
+		lock ( KnownRemoteService )
 		{
+			CurrentEpoch++ ;
+
 			IDirectoryService currentDirectoryService = GetDirectoryService ( ) ;
 
 			if ( currentDirectoryService != null )
@@ -285,25 +363,41 @@ public class ClientDirectoryServiceProvider : IDirectoryServiceProvider
 									KnownProperties . ApiEndpoints .
 													GetPropertyName ( ) ) ) ) ;
 
-				lock ( KnownDirectoryService )
+				lock ( KnownRemoteService )
 				{
 					foreach ( (string HostName , int Port) endpoint in endpoints )
 					{
-						if ( ! KnownDirectoryService . Any (
-															sev
-																=> sev . RemoteService . HostName
-																== endpoint . HostName
-																&& sev . RemoteService . Port
-																== endpoint . Port ) )
+						if ( KnownRemoteService . FirstOrDefault (
+														sev
+															=> sev . RemoteService . HostName
+															== endpoint . HostName
+															&& sev . RemoteService . Port
+															== endpoint . Port ) is StatefulRemoteService<RemoteDirectoryService> statefulService)
 						{
-							KnownDirectoryService . Add (
-														new
-															StatefulRemoteService <
-																RemoteDirectoryService> (
-															new RemoteDirectoryService (
-															endpoint ) ) ) ;
+							statefulService . Epoch = CurrentEpoch ;
 						}
+
+						StatefulRemoteService <RemoteDirectoryService> remoteService =
+							new StatefulRemoteService <RemoteDirectoryService> (
+							new RemoteDirectoryService ( endpoint ) ) { Epoch = CurrentEpoch } ;
+
+						remoteService . Start ( ) ;
+
+						KnownRemoteService . Add (remoteService ) ;
 					}
+
+					KnownRemoteService . RemoveAll ( sev =>
+														{
+															if (sev.Epoch < CurrentEpoch)
+															{
+																sev.Stop();
+																return true;
+															}
+															else
+															{
+																return false;
+															}
+														} ) ;
 				}
 			}
 		}
