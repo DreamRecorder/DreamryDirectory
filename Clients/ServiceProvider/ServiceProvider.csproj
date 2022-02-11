@@ -24,17 +24,11 @@
 		<PackageReference Include="System.Text.Json" Version="6.0.2" />
 	</ItemGroup>
 
-
 	<ItemGroup>
 		<None Include="..\..\DreamryLogo.svg">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <Folder Include="Exceptions\" />
 	</ItemGroup>
 
 </Project>
