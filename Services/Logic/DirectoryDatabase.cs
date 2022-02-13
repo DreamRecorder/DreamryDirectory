@@ -29,7 +29,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public bool Initiated { get ; private set ; } = false ;
 
-		protected IAppCache Cache { get ; set ; }
+		protected IAppCache Cache { get ; }
 
 		public Anonymous Anonymous { get ; set ; } = new Anonymous ( ) ;
 
@@ -97,8 +97,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 					foreach ( Guid member in group . Members )
 					{
-						if ( DatabaseStorage . DbGroupMembers . Find ( group . Guid , member )
-						== null )
+						if ( DatabaseStorage . DbGroupMembers . Find ( group . Guid , member ) == null )
 						{
 							DatabaseStorage . DbGroupMembers . Add (
 							new DbGroupMember
@@ -108,7 +107,7 @@ namespace DreamRecorder . Directory . Services . Logic
 						}
 					}
 
-					group . Members . CollectionChanged += GetMembersCollectionChanged ( group ) ;
+					group . Members . CollectionChanged += GetGroupMembersCollectionChanged ( group ) ;
 
 					break ;
 				case LoginService loginService :
@@ -226,9 +225,9 @@ namespace DreamRecorder . Directory . Services . Logic
 			}
 		}
 
-		private NotifyCollectionChangedEventHandler GetMembersCollectionChanged ( Group group )
+		private NotifyCollectionChangedEventHandler GetGroupMembersCollectionChanged ( Group group )
 		{
-			void MembersCollectionChanged ( object sender , NotifyCollectionChangedEventArgs e )
+			void GroupMembersCollectionChanged ( object sender , NotifyCollectionChangedEventArgs e )
 			{
 				if ( e ? . OldItems != null )
 				{
@@ -259,7 +258,7 @@ namespace DreamRecorder . Directory . Services . Logic
 				}
 			}
 
-			return MembersCollectionChanged ;
+			return GroupMembersCollectionChanged ;
 		}
 
 		private Entity GetEntity ( Guid guid )
@@ -294,7 +293,7 @@ namespace DreamRecorder . Directory . Services . Logic
 
 
 						group . Members . CollectionChanged +=
-							GetMembersCollectionChanged ( group ) ;
+							GetGroupMembersCollectionChanged ( group ) ;
 
 						entity = group ;
 

@@ -15,6 +15,23 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . LoginProviders . ServiceProvider
 {
 
+	public class LoginServiceLoginTokenProvider:ILoginTokenProvider
+	{
+
+		public LoginServiceLoginTokenProvider (LoginServiceBase loginService , Guid target )
+		{
+			LoginService = loginService ;
+			Target       = target ;
+		}
+
+		private LoginServiceBase LoginService { get; }
+
+		public Guid Target { get;}
+
+		public LoginToken GetToken ( ) => LoginService.IssueLoginToken(Target) ;
+
+	}
+
 	public abstract class LoginServiceBase : ServiceBase , ILoginService
 	{
 
@@ -59,7 +76,7 @@ namespace DreamRecorder . Directory . LoginProviders . ServiceProvider
 			}
 
 			DirectoryService . CheckToken ( EntityToken , token ) ;
-
+			
 			tokenToCheck . CheckTokenTime ( ) ;
 
 			if ( token . Issuer == EntityTokenProvider . EntityGuid )
@@ -89,7 +106,7 @@ namespace DreamRecorder . Directory . LoginProviders . ServiceProvider
 			}
 		}
 
-		public LoginToken IssueAccessToken ( [NotNull] Guid target )
+		public LoginToken IssueLoginToken ( [NotNull] Guid target )
 		{
 			DateTimeOffset now = DateTimeOffset . UtcNow ;
 
@@ -120,7 +137,7 @@ namespace DreamRecorder . Directory . LoginProviders . ServiceProvider
 			{
 				if ( CheckCredential ( tCredential ) is Guid guid )
 				{
-					return IssueAccessToken ( guid ) ;
+					return IssueLoginToken ( guid ) ;
 				}
 				else
 				{

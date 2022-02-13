@@ -25,7 +25,7 @@ namespace DreamRecorder . Directory . Logic . Tokens
 
 		public bool Equals ( Token other )
 		{
-			if ( ReferenceEquals ( null , other ) )
+			if ( other is null)
 			{
 				return false ;
 			}
