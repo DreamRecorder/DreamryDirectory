@@ -12,7 +12,7 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . Services . General
 {
 
-	public class MemoryTokenStorage <TToken> : ITokenStorage <TToken> where TToken : Token
+	public class MemoryTokenStorage <TToken> : ITokenStorage <TToken>,IStartStop where TToken : Token
 	{
 
 		private ITaskDispatcher TaskDispatcher { get ; }
@@ -86,6 +86,9 @@ namespace DreamRecorder . Directory . Services . General
 		{
 			lock ( Tokens )
 			{
+				if ( IsRunning )
+				{
+					
 				if ( Tokens . Count > 0 )
 				{
 					int count =
@@ -100,8 +103,16 @@ namespace DreamRecorder . Directory . Services . General
 				{
 					return DateTimeOffset . UtcNow + TimeSpan . FromMinutes ( 1 ) ;
 				}
+				}
+				return default;
 			}
 		}
+
+		public void Start ( ) { throw new NotImplementedException ( ) ; }
+
+		public void Stop ( ) { throw new NotImplementedException ( ) ; }
+
+		public bool IsRunning { get ; }
 
 	}
 

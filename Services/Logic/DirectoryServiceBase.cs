@@ -43,9 +43,9 @@ namespace DreamRecorder . Directory . Services . Logic
 
 		public EntityToken AnonymousToken { get ; set ; }
 
-		public MemoryTokenStorage <EntityToken> IssuedEntityTokens { get ;  }
+		public ITokenStorage <EntityToken> IssuedEntityTokens { get ;  }
 
-		public MemoryTokenStorage <AccessToken> IssuedAccessTokens { get ; }
+		public ITokenStorage <AccessToken> IssuedAccessTokens { get ; }
 
 
 		public EntityToken Login ( LoginToken token )
