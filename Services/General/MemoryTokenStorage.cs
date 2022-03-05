@@ -1,118 +1,135 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
-using DreamRecorder . Directory . Logic . Exceptions ;
-using DreamRecorder . Directory . Logic . Tokens ;
-using DreamRecorder . ToolBox . General ;
+using DreamRecorder.Directory.Logic.Exceptions;
+using DreamRecorder.Directory.Logic.Tokens;
+using DreamRecorder.ToolBox.General;
 
-using JetBrains . Annotations ;
+using JetBrains.Annotations;
 
-namespace DreamRecorder . Directory . Services . General
+namespace DreamRecorder.Directory.Services.General
 {
 
-	public class MemoryTokenStorage <TToken> : ITokenStorage <TToken>,IStartStop where TToken : Token
+	public class MemoryTokenStorage<TToken> : ITokenStorage<TToken>, IStartStop where TToken : Token
 	{
 
-		private ITaskDispatcher TaskDispatcher { get ; }
+		private ITaskDispatcher TaskDispatcher { get; }
 
-		private HashSet <TToken> Tokens { get ; } = new HashSet <TToken> ( ) ;
+		private HashSet<TToken> Tokens { get; } = new HashSet<TToken>();
 
-		private TimeSpan TotalLifetime { get ; set ; } = TimeSpan . Zero ;
+		private TimeSpan TotalLifetime { get; set; } = TimeSpan.Zero;
 
-		public MemoryTokenStorage ( ITaskDispatcher taskDispatcher )
+		public MemoryTokenStorage(ITaskDispatcher taskDispatcher)
 		{
-			TaskDispatcher = taskDispatcher ;
+			TaskDispatcher = taskDispatcher;
 
-			TaskDispatcher . Dispatch ( new ScheduledTask ( Gc ) ) ;
 		}
 
-		public void AddToken ( [NotNull] TToken token )
+		public void AddToken([NotNull] TToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			if ( token . NotAfter > DateTimeOffset . UtcNow )
+			if (token.NotAfter > DateTimeOffset.UtcNow)
 			{
-				lock ( Tokens )
+				lock (Tokens)
 				{
-					if ( Tokens . Add ( token ) )
+					if (Tokens.Add(token))
 					{
-						TotalLifetime += token . NotAfter - DateTimeOffset . UtcNow ;
+						TotalLifetime += token.NotAfter - DateTimeOffset.UtcNow;
 					}
 				}
 			}
 		}
 
-		public void DisposeToken ( [NotNull] TToken token )
+		public void DisposeToken([NotNull] TToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			lock ( Tokens )
+			lock (Tokens)
 			{
-				if ( Tokens . Remove ( token ) )
+				if (Tokens.Remove(token))
 				{
-					TotalLifetime = ( TotalLifetime / ( Tokens . Count + 1 ) ) * Tokens . Count ;
+					TotalLifetime = (TotalLifetime / (Tokens.Count + 1)) * Tokens.Count;
 				}
 			}
 		}
 
-		public void CheckToken ( [NotNull] TToken token )
+		public void CheckToken([NotNull] TToken token)
 		{
-			if ( token == null )
+			if (token == null)
 			{
-				throw new ArgumentNullException ( nameof ( token ) ) ;
+				throw new ArgumentNullException(nameof(token));
 			}
 
-			lock ( Tokens )
+			lock (Tokens)
 			{
-				if ( Tokens . Contains ( token ) )
+				if (Tokens.Contains(token))
 				{
 				}
 				else
 				{
-					throw new InvalidTokenException ( ) ;
+					throw new InvalidTokenException();
 				}
 			}
 		}
 
-		public DateTimeOffset ? Gc ( )
+		public DateTimeOffset? Gc()
 		{
-			lock ( Tokens )
+			lock (Tokens)
 			{
-				if ( IsRunning )
+				if (IsRunning)
 				{
-					
-				if ( Tokens . Count > 0 )
-				{
-					int count =
-						Tokens . RemoveWhere (
-											token => token . NotAfter < DateTimeOffset . UtcNow ) ;
-					TotalLifetime =
-						( TotalLifetime / ( Tokens . Count + count ) ) * Tokens . Count ;
 
-					return DateTimeOffset . UtcNow + ( ( TotalLifetime / Tokens . Count ) / 2 ) ;
-				}
-				else
-				{
-					return DateTimeOffset . UtcNow + TimeSpan . FromMinutes ( 1 ) ;
-				}
+					if (Tokens.Count > 0)
+					{
+						int count =
+							Tokens.RemoveWhere(
+												token => token.NotAfter < DateTimeOffset.UtcNow);
+						TotalLifetime =
+							(TotalLifetime / (Tokens.Count + count)) * Tokens.Count;
+
+						return DateTimeOffset.UtcNow + ((TotalLifetime / Tokens.Count) / 2);
+					}
+					else
+					{
+						return DateTimeOffset.UtcNow + TimeSpan.FromMinutes(1);
+					}
 				}
 				return default;
 			}
 		}
 
-		public void Start ( ) { throw new NotImplementedException ( ) ; }
+		public void Start()
+		{
+			lock (this)
+			{
+				if (!IsRunning)
+				{
+					TaskDispatcher.Dispatch(new ScheduledTask(Gc));
+					IsRunning = true;
+				}
+			}
 
-		public void Stop ( ) { throw new NotImplementedException ( ) ; }
 
-		public bool IsRunning { get ; }
+		}
+
+		public void Stop()
+		{
+			lock (this)
+			{
+				IsRunning = false;
+			}
+		}
+
+		public bool IsRunning { get; private set; }
 
 	}
 

@@ -22,20 +22,23 @@ public abstract class ServiceBase : IService, IStartStop
 	{
 		lock (this)
 		{
-			if (StartupTime == null)
-			{
-				StartupTime ??= DateTimeOffset.Now;
-			}
+			StartOverride();
+			StartupTime ??= DateTimeOffset . Now ;
 		}
 	}
+
+	protected abstract void StartOverride ( ) ;
 
 	public void Stop()
 	{
 		lock (this)
 		{
+			StopOverride();
 			StartupTime = null;
 		}
 	}
+
+	protected virtual void StopOverride ( ) { }
 
 	public bool IsRunning
 	{

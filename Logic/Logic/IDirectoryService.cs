@@ -10,16 +10,6 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . Logic
 {
 
-	public interface IService
-	{
-
-		DateTimeOffset GetStartupTime ( ) ;
-
-		DateTimeOffset GetTime ( ) ;
-
-		Version GetVersion ( ) ;
-
-	}
 
 
 	public interface IDirectoryService : IService

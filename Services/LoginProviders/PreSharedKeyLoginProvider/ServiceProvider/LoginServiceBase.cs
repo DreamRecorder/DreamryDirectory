@@ -15,23 +15,6 @@ using JetBrains . Annotations ;
 namespace DreamRecorder . Directory . LoginProviders . ServiceProvider
 {
 
-	public class LoginServiceLoginTokenProvider:ILoginTokenProvider
-	{
-
-		public LoginServiceLoginTokenProvider (LoginServiceBase loginService , Guid target )
-		{
-			LoginService = loginService ;
-			Target       = target ;
-		}
-
-		private LoginServiceBase LoginService { get; }
-
-		public Guid Target { get;}
-
-		public LoginToken GetToken ( ) => LoginService.IssueLoginToken(Target) ;
-
-	}
-
 	public abstract class LoginServiceBase : ServiceBase , ILoginService
 	{
 

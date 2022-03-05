@@ -91,6 +91,8 @@ namespace DreamRecorder . Directory . LoginProviders . PreSharedKeyLoginProvider
 			return null ;
 		}
 
+		protected override void StartOverride ( ) { throw new NotImplementedException ( ) ; }
+
 	}
 
 }

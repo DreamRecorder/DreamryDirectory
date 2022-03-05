@@ -291,13 +291,13 @@ namespace DreamRecorder . Directory . ServiceProvider
 												"token" ,
 												JsonSerializer . Serialize ( token ) ) ;
 
-			HttpResponseMessage response = client . GetAsync (
+			HttpResponseMessage response = client . PostAsync (
 															new UriBuilder (
 																Uri . UriSchemeHttps ,
 																HostName ,
 																Port ,
 																$"{nameof ( GetPermissionGroup )}/{target}" ) .
-																Uri ) .
+																Uri,null ) .
 													Result ;
 
 			response . EnsureSuccessStatusCode ( ) ;

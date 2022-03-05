@@ -9,13 +9,9 @@ using JetBrains . Annotations ;
 
 namespace DreamRecorder . Directory . Services . General ;
 
-public interface ITokenStorage <in TToken> where TToken : Token
+public interface ITokenStorageFactory
 {
 
-	void AddToken ( [NotNull] TToken token ) ;
-
-	void DisposeToken ( [NotNull] TToken token ) ;
-
-	void CheckToken ( [NotNull] TToken token ) ;
+	ITokenStorage<TToken> CreateTokenStorage<TToken>() where TToken : Token;
 
 }

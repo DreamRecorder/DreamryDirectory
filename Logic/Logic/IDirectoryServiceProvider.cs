@@ -13,11 +13,4 @@ namespace DreamRecorder . Directory . Logic
 
 	}
 
-	public interface ILoginServiceProvider
-	{
-
-		ILoginService GetLoginService ( Guid type ) ;
-
-	}
-
 }
