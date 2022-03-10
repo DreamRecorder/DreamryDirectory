@@ -13,6 +13,13 @@ using Microsoft . Extensions . DependencyInjection ;
 
 namespace DreamRecorder . Directory . Services . Logic ;
 
+public class DirectoryServiceServerConfig
+{
+
+	public Guid Guid { get ; set ; }
+
+}
+
 public class DirectoryServiceServer : DirectoryServiceBase
 {
 
@@ -39,9 +46,11 @@ public class DirectoryServiceServer : DirectoryServiceBase
 
 	public IServiceProvider ServiceProvider { get; }
 
-	public DirectoryServiceServer(IServiceProvider serviceProvider)
+	public DirectoryServiceServer(IServiceProvider serviceProvider, DirectoryServiceServerConfig config)
 	{
 		ServiceProvider = serviceProvider;
+
+		ServiceEntity = new DirectoryService ( ) { Guid = config . Guid } ;
 	}
 
 

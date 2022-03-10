@@ -5,8 +5,6 @@ using System.Linq ;
 
 using DreamRecorder . Directory . Logic . Tokens ;
 
-using JetBrains . Annotations ;
-
 namespace DreamRecorder . Directory . Services . General ;
 
 public class TokenStorageFactory:ITokenStorageFactory 
@@ -16,7 +14,7 @@ public class TokenStorageFactory:ITokenStorageFactory
 
 	public ITokenStorage <TToken> CreateTokenStorage <TToken> ( ) where TToken : Token =>( ITokenStorage <TToken> )Activator.CreateInstance( TargetType.MakeGenericType(typeof(TToken)))  ;
 
-	public TokenStorageFactory ( [NotNull] Type targetType )
+	public TokenStorageFactory ( Type targetType )
 	{
 		if (TargetType == null)
 		{

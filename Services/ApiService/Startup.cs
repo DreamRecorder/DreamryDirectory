@@ -40,6 +40,7 @@ namespace DreamRecorder . Directory . Services . ApiService
 			//															nameof(DirectoryDatabaseStorage)))
 
 			services . AddSingleton <IDirectoryService , DirectoryServiceBase> ( ) ;
+			services . AddSingleton <IDirectoryDatabase , DirectoryDatabase> ( ) ;
 			services . AddSingleton <IDirectoryDatabaseStorage , DirectoryDatabaseStorage> ( ) ;
 		}
 

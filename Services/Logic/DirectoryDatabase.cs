@@ -1,400 +1,418 @@
-﻿using System ;
-using System . Collections ;
-using System . Collections . Generic ;
-using System . Collections . Specialized ;
-using System . ComponentModel ;
-using System . Linq ;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
 
-using DreamRecorder . Directory . Logic ;
-using DreamRecorder . Directory . Services . Logic . Entities ;
-using DreamRecorder . Directory . Services . Logic . Storage ;
-using DreamRecorder . ToolBox . General ;
+using DreamRecorder.Directory.Logic;
+using DreamRecorder.Directory.Services.Logic.Entities;
+using DreamRecorder.Directory.Services.Logic.Storage;
+using DreamRecorder.ToolBox.General;
 
-using JetBrains . Annotations ;
+using JetBrains.Annotations;
 
-using LazyCache ;
+using LazyCache;
 
 using PermissionGroup =
-	DreamRecorder . Directory . Services . Logic . Permissions . PermissionGroup ;
+	DreamRecorder.Directory.Services.Logic.Permissions.PermissionGroup;
 
-namespace DreamRecorder . Directory . Services . Logic
+namespace DreamRecorder.Directory.Services.Logic
 {
 
 	public class DirectoryDatabase : IDirectoryDatabase
 	{
 
-		public IDirectoryDatabaseStorage DatabaseStorage { get ; set ; }
+		public IDirectoryDatabaseStorage DatabaseStorage { get; }
 
-		public IDirectoryServiceInternal DirectoryServiceInternal { get ; set ; }
+		public IDirectoryServiceInternal DirectoryServiceInternal { get; }
 
-		public bool Initiated { get ; private set ; } = false ;
+		public bool Initiated { get; private set; } = false;
 
-		protected IAppCache Cache { get ; }
+		protected IAppCache Cache { get; }
 
-		public Anonymous Anonymous { get ; set ; } = new Anonymous ( ) ;
+		public Anonymous Anonymous { get; set; } = new Anonymous();
 
-		public DirectoryDatabase (
-			IDirectoryDatabaseStorage databaseStorage ,
-			IAppCache                 cache ,
-			IDirectoryServiceInternal directoryServiceInternal )
+		public DirectoryDatabase(
+			IDirectoryDatabaseStorage databaseStorage,
+			IAppCache cache,
+			IDirectoryServiceInternal directoryServiceInternal)
 		{
-			DatabaseStorage          = databaseStorage ;
-			Cache                    = cache ;
-			DirectoryServiceInternal = directoryServiceInternal ;
+			DatabaseStorage = databaseStorage;
+			Cache = cache;
+			DirectoryServiceInternal = directoryServiceInternal;
 		}
 
-		public PermissionGroup FindPermissionGroup ( Guid guid )
+		public PermissionGroup FindPermissionGroup(Guid guid)
 		{
-			return Cache . GetOrAdd (
-									CachePermissionGroupKey ( guid ) ,
-									( ) => GetPermissionGroup ( guid ) ) ;
+			return Cache.GetOrAdd(
+									CachePermissionGroupKey(guid),
+									() => GetPermissionGroup(guid));
 		}
 
 
-		public Entity FindEntity ( Guid guid )
+		public Entity FindEntity(Guid guid)
 		{
-			return Cache . GetOrAdd ( CacheEntityKey ( guid ) , ( ) => GetEntity ( guid ) ) ;
+			return Cache.GetOrAdd(CacheEntityKey(guid), () => GetEntity(guid));
 		}
 
-		public EntityProperty FindProperty ( Guid entity , string name )
+		public EntityProperty FindProperty(Guid entity, string name)
 		{
-			return Cache . GetOrAdd (
-									CacheEntityPropertyKey ( entity , name ) ,
-									( ) => GetProperty ( entity , name ) ) ;
+			return Cache.GetOrAdd(
+									CacheEntityPropertyKey(entity, name),
+									() => GetProperty(entity, name));
 		}
 
-		public Entity AddEntity ( [NotNull] Entity entity )
+		public Entity AddEntity([NotNull] Entity entity)
 		{
-			if ( entity == null )
+			if (entity == null)
 			{
-				throw new ArgumentNullException ( nameof ( entity ) ) ;
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			if ( DatabaseStorage . DbEntities . Find ( entity . Guid ) is DbEntity dbEntity )
+			if (DatabaseStorage.DbEntities.Find(entity.Guid) is DbEntity dbEntity)
 			{
 				//Todo:
 			}
 			else
 			{
-				dbEntity = new DbEntity ( ) ;
-				DatabaseStorage . DbEntities . Add ( dbEntity ) ;
+				dbEntity = new DbEntity();
+				DatabaseStorage.DbEntities.Add(dbEntity);
 			}
 
-			dbEntity . Guid = entity . Guid ;
+			dbEntity.Guid = entity.Guid;
 
-			switch ( entity )
+			switch (entity)
 			{
-				case Anonymous anonymous :
-				{
-					dbEntity . EntityType = DbEntityType . Anonymous ;
-					break ;
-				}
-				case DirectoryService directoryService :
-					dbEntity . EntityType = DbEntityType . DirectoryService ;
-					break ;
-				case Group group :
-					dbEntity . EntityType = DbEntityType . Group ;
-
-					foreach ( Guid member in group . Members )
+				case Anonymous anonymous:
 					{
-						if ( DatabaseStorage . DbGroupMembers . Find ( group . Guid , member ) == null )
+						dbEntity.EntityType = DbEntityType.Anonymous;
+						break;
+					}
+				case DirectoryService directoryService:
+					dbEntity.EntityType = DbEntityType.DirectoryService;
+					break;
+				case Group group:
+					dbEntity.EntityType = DbEntityType.Group;
+
+					foreach (Guid member in group.Members)
+					{
+						if (DatabaseStorage.DbGroupMembers.Find(group.Guid, member) == null)
 						{
-							DatabaseStorage . DbGroupMembers . Add (
+							DatabaseStorage.DbGroupMembers.Add(
 							new DbGroupMember
 							{
-								GroupGuid = group . Guid , MemberGuid = member ,
-							} ) ;
+								GroupGuid = group.Guid,
+								MemberGuid = member,
+							});
 						}
 					}
 
-					group . Members . CollectionChanged += GetGroupMembersCollectionChanged ( group ) ;
+					group.Members.CollectionChanged += GetGroupMembersCollectionChanged(group);
 
-					break ;
-				case LoginService loginService :
-					dbEntity . EntityType = DbEntityType . LoginService ;
-					break ;
-				case Service service :
-					dbEntity . EntityType = DbEntityType . Service ;
-					break ;
-				case SpecialGroup specialGroup :
-					dbEntity . EntityType = DbEntityType . SpecialGroup ;
-					break ;
-				case User user :
-					dbEntity . EntityType = DbEntityType . User ;
-					break ;
+					break;
+				case LoginService loginService:
+					dbEntity.EntityType = DbEntityType.LoginService;
+					break;
+				case Service service:
+					dbEntity.EntityType = DbEntityType.Service;
+					break;
+				case SpecialGroup specialGroup:
+					dbEntity.EntityType = DbEntityType.SpecialGroup;
+					break;
+				case User user:
+					dbEntity.EntityType = DbEntityType.User;
+					break;
 
-				default :
-					throw new ArgumentOutOfRangeException ( nameof ( entity ) ) ;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(entity));
 			}
 
-			Cache . Add ( CacheEntityKey ( entity . Guid ) , entity ) ;
+			Cache.Add(CacheEntityKey(entity.Guid), entity);
 
-			DatabaseStorage . Save ( ) ;
+			DatabaseStorage.Save();
 
-			return entity ;
+			return entity;
 		}
 
-		public PermissionGroup AddPermissionGroup ( [NotNull] PermissionGroup permissionGroup )
+		public PermissionGroup AddPermissionGroup([NotNull] PermissionGroup permissionGroup)
 		{
-			if ( permissionGroup == null )
+			if (permissionGroup == null)
 			{
-				throw new ArgumentNullException ( nameof ( permissionGroup ) ) ;
+				throw new ArgumentNullException(nameof(permissionGroup));
 			}
 
-			if ( DatabaseStorage . DbPermissionGroups . Find ( permissionGroup . Guid ) is
-				DbPermissionGroup dbPermissionGroup )
+			if (DatabaseStorage.DbPermissionGroups.Find(permissionGroup.Guid) is
+				DbPermissionGroup dbPermissionGroup)
 			{
 			}
 			else
 			{
-				dbPermissionGroup = new DbPermissionGroup ( ) ;
-				DatabaseStorage . DbPermissionGroups . Add ( dbPermissionGroup ) ;
+				dbPermissionGroup = new DbPermissionGroup();
+				DatabaseStorage.DbPermissionGroups.Add(dbPermissionGroup);
 			}
 
-			dbPermissionGroup . Guid  = permissionGroup . Guid ;
-			dbPermissionGroup . Owner = permissionGroup . Owner ;
-			dbPermissionGroup . Value = permissionGroup . Permissions . CastToBytes ( ) ;
+			dbPermissionGroup.Guid = permissionGroup.Guid;
+			dbPermissionGroup.Owner = permissionGroup.Owner;
+			dbPermissionGroup.Value = permissionGroup.Permissions.CastToBytes();
 
-			Cache . Add ( CachePermissionGroupKey ( permissionGroup . Guid ) , permissionGroup ) ;
+			Cache.Add(CachePermissionGroupKey(permissionGroup.Guid), permissionGroup);
 
-			DatabaseStorage . Save ( ) ;
+			DatabaseStorage.Save();
 
-			return permissionGroup ;
+			return permissionGroup;
 		}
 
-		public void AddEntityProperty ( [NotNull] EntityProperty property )
+		public void AddEntityProperty([NotNull] EntityProperty property)
 		{
-			if ( property == null )
+			if (property == null)
 			{
-				throw new ArgumentNullException ( nameof ( property ) ) ;
+				throw new ArgumentNullException(nameof(property));
 			}
 
-			Cache . Add (
-						CacheEntityPropertyKey ( property . Target , property . Name ) ,
-						property ) ;
-			SaveProperty ( property ) ;
+			Cache.Add(
+						CacheEntityPropertyKey(property.Target, property.Name),
+						property);
+			SaveProperty(property);
 		}
 
-		public KnownSpecialGroups KnownSpecialGroups { get ; set ; } = new KnownSpecialGroups ( ) ;
+		public KnownSpecialGroups KnownSpecialGroups { get; set; } = new KnownSpecialGroups();
 
-		public void Save ( ) { }
-
-		public void Initiate ( ) { }
-
-		public void CreateNew ( ) { }
-
-		private PermissionGroup GetPermissionGroup ( Guid guid )
+		public void Save()
 		{
-			if ( DatabaseStorage . DbPermissionGroups . Find ( guid ) is DbPermissionGroup
-				dbPermissionGroup )
+
+			lock (DatabaseStorage)
+			{
+				DatabaseStorage.Save();
+			}
+		}
+
+		public void Initiate()
+		{
+
+		}
+
+		public void CreateNew() { throw new NotImplementedException(); }
+
+
+		private PermissionGroup GetPermissionGroup(Guid guid)
+		{
+			if (DatabaseStorage.DbPermissionGroups.Find(guid) is DbPermissionGroup
+				dbPermissionGroup)
 			{
 				PermissionGroup permissionGroup =
-					new PermissionGroup { Guid = guid , Owner = dbPermissionGroup . Owner , } ;
+					new PermissionGroup { Guid = guid, Owner = dbPermissionGroup.Owner, };
 
-				permissionGroup . Permissions . UnionWith (
-															dbPermissionGroup . Value .
-																CastToStructs <Permission> ( ) ) ;
+				permissionGroup.Permissions.UnionWith(
+															dbPermissionGroup.Value.
+																CastToStructs<Permission>());
 
-				permissionGroup . Permissions . CollectionChanged +=
-					GetPermissionsCollectionChanged ( permissionGroup ) ;
+				permissionGroup.Permissions.CollectionChanged +=
+					GetPermissionsCollectionChanged(permissionGroup);
 
-				return permissionGroup ;
+				return permissionGroup;
 			}
 			else
 			{
-				return null ;
+				return null;
 			}
 		}
 
-		private NotifyCollectionChangedEventHandler GetPermissionsCollectionChanged (
-			PermissionGroup permissionGroup )
+		private NotifyCollectionChangedEventHandler GetPermissionsCollectionChanged(
+			PermissionGroup permissionGroup)
 		{
-			void PermissionsCollectionChanged ( object sender , NotifyCollectionChangedEventArgs e )
+			void PermissionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 			{
-				SavePermissionGroup ( permissionGroup ) ;
+				SavePermissionGroup(permissionGroup);
 			}
 
-			return PermissionsCollectionChanged ;
+			return PermissionsCollectionChanged;
 		}
 
-		private void Property_PropertyChanged ( object sender , PropertyChangedEventArgs e )
+		private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if ( sender is EntityProperty property )
+			if (sender is EntityProperty property)
 			{
-				SaveProperty ( property ) ;
+				SaveProperty(property);
 			}
 		}
 
-		private NotifyCollectionChangedEventHandler GetGroupMembersCollectionChanged ( Group group )
+		private NotifyCollectionChangedEventHandler GetGroupMembersCollectionChanged(Group group)
 		{
-			void GroupMembersCollectionChanged ( object sender , NotifyCollectionChangedEventArgs e )
+			void GroupMembersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 			{
-				if ( e ? . OldItems != null )
+				if (e?.OldItems != null)
 				{
-					foreach ( Guid guid in e ? . OldItems )
+					foreach (Guid guid in e?.OldItems)
 					{
-						if ( DatabaseStorage . DbGroupMembers . Find ( group . Guid , guid ) is
-							DbGroupMember dbGroupMember )
+						if (DatabaseStorage.DbGroupMembers.Find(group.Guid, guid) is
+							DbGroupMember dbGroupMember)
 						{
-							DatabaseStorage . DbGroupMembers . Remove ( dbGroupMember ) ;
+							DatabaseStorage.DbGroupMembers.Remove(dbGroupMember);
 						}
 					}
 				}
 
-				if ( e ? . NewItems != null )
+				if (e?.NewItems != null)
 				{
-					foreach ( Guid guid in e ? . NewItems )
+					foreach (Guid guid in e?.NewItems)
 					{
-						if ( DatabaseStorage . DbGroupMembers . Find ( group . Guid , guid )
-						== null )
+						if (DatabaseStorage.DbGroupMembers.Find(group.Guid, guid)
+						== null)
 						{
-							DatabaseStorage . DbGroupMembers . Add (
+							DatabaseStorage.DbGroupMembers.Add(
 							new DbGroupMember
 							{
-								GroupGuid = group . Guid , MemberGuid = guid ,
-							} ) ;
+								GroupGuid = group.Guid,
+								MemberGuid = guid,
+							});
 						}
 					}
 				}
+
+				Save();
+
 			}
 
-			return GroupMembersCollectionChanged ;
+			return GroupMembersCollectionChanged;
 		}
 
-		private Entity GetEntity ( Guid guid )
+		private Entity GetEntity(Guid guid)
 		{
-			Entity entity = null ;
+			Entity entity = null;
 
-			if ( DatabaseStorage . DbEntities . Find ( guid ) is DbEntity dbEntity )
+			if (DatabaseStorage.DbEntities.Find(guid) is DbEntity dbEntity)
 			{
-				switch ( dbEntity . EntityType )
+				switch (dbEntity.EntityType)
 				{
-					case DbEntityType . DirectoryService :
-					{
-						entity = new DirectoryService ( ) ;
-						break ;
-					}
-					case DbEntityType . LoginService :
-					{
-						entity = new LoginService ( ) ;
-						break ;
-					}
-					case DbEntityType . Group :
-					{
-						Group group = new Group ( ) ;
+					case DbEntityType.DirectoryService:
+						{
+							entity = new DirectoryService();
+							break;
+						}
+					case DbEntityType.LoginService:
+						{
+							entity = new LoginService();
+							break;
+						}
+					case DbEntityType.Group:
+						{
+							Group group = new Group();
 
-						group . Members . UnionWith (
-													DatabaseStorage . DbGroupMembers .
-														Where (
-																member
-																	=> member . GroupGuid
-																	== guid ) .
-														Select ( member => member . MemberGuid ) ) ;
+							group.Members.UnionWith(
+														DatabaseStorage.DbGroupMembers.
+															Where(
+																	member
+																		=> member.GroupGuid
+																		== guid).
+															Select(member => member.MemberGuid));
 
 
-						group . Members . CollectionChanged +=
-							GetGroupMembersCollectionChanged ( group ) ;
+							group.Members.CollectionChanged +=
+								GetGroupMembersCollectionChanged(group);
 
-						entity = group ;
+							entity = group;
 
-						break ;
-					}
-					case DbEntityType . Service :
-					{
-						entity = new Service ( ) ;
-						break ;
-					}
-					case DbEntityType . User :
-					{
-						entity = new User ( ) ;
-						break ;
-					}
-					case DbEntityType . SpecialGroup :
-					{
-						entity = KnownSpecialGroups . Entities . FirstOrDefault (
-						specialGroup => specialGroup . Guid == guid ) ;
-						break ;
-					}
-					case DbEntityType . Anonymous :
-					{
-						entity = Anonymous ;
-						break ;
-					}
-					default :
-					{
-						entity = null ;
-						throw new InvalidOperationException ( ) ;
-					}
+							break;
+						}
+					case DbEntityType.Service:
+						{
+							entity = new Service();
+							break;
+						}
+					case DbEntityType.User:
+						{
+							entity = new User();
+							break;
+						}
+					case DbEntityType.SpecialGroup:
+						{
+							entity = KnownSpecialGroups.Entities.FirstOrDefault(
+							specialGroup => specialGroup.Guid == guid);
+							break;
+						}
+					case DbEntityType.Anonymous:
+						{
+							entity = Anonymous;
+							break;
+						}
+					default:
+						{
+							entity = null;
+							throw new InvalidOperationException();
+						}
 				}
 
-				entity . Guid = dbEntity . Guid ;
+				entity.Guid = dbEntity.Guid;
 			}
 
-			return entity ;
+			return entity;
 		}
 
-		private EntityProperty GetProperty ( Guid entity , string name )
+		private EntityProperty GetProperty(Guid entity, string name)
 		{
-			if ( DatabaseStorage . DbProperties . Find ( entity , name ) is DbProperty dbProperty )
+			if (DatabaseStorage.DbProperties.Find(entity, name) is DbProperty dbProperty)
 			{
 				EntityProperty property = new EntityProperty
-										{
-											Name   = dbProperty . Name ,
-											Owner  = dbProperty . Owner ,
-											Target = dbProperty . Target ,
-											Permissions =
-												FindPermissionGroup ( dbProperty . Permission ) ,
-											Value = dbProperty . Value ,
-										} ;
+				{
+					Name = dbProperty.Name,
+					Owner = dbProperty.Owner,
+					Target = dbProperty.Target,
+					Permissions =
+												FindPermissionGroup(dbProperty.Permission),
+					Value = dbProperty.Value,
+				};
 
-				property . PropertyChanged += Property_PropertyChanged ;
+				property.PropertyChanged += Property_PropertyChanged;
 
-				return property ;
+				return property;
 			}
 			else
 			{
-				return null ;
+				return null;
 			}
 		}
 
-		public string CacheEntityPropertyKey ( Guid entity , string name )
-			=> $"({nameof ( EntityProperty )}){entity}.{name}" ;
+		public string CacheEntityPropertyKey(Guid entity, string name)
+			=> $"({nameof(EntityProperty)}){entity}.{name}";
 
-		public string CachePermissionGroupKey ( Guid guid )
-			=> $"({nameof ( PermissionGroup )}){guid}" ;
+		public string CachePermissionGroupKey(Guid guid)
+			=> $"({nameof(PermissionGroup)}){guid}";
 
-		public string CacheEntityKey ( Guid guid ) => $"({nameof ( Entity )}){guid}" ;
+		public string CacheEntityKey(Guid guid) => $"({nameof(Entity)}){guid}";
 
-		private void SavePermissionGroup ( PermissionGroup permissionGroup ) { }
+		private void SavePermissionGroup(PermissionGroup permissionGroup) { }
 
-		private void SaveProperty ( EntityProperty property )
+
+
+		private void SaveProperty(EntityProperty property)
 		{
 			DbProperty dbProperty =
-				DatabaseStorage . DbProperties . Find ( property . Target , property . Name ) ;
+				DatabaseStorage.DbProperties.Find(property.Target, property.Name);
 
-			if ( dbProperty != null )
+			if (dbProperty != null)
 			{
-				dbProperty . Value      = property . Value ;
-				dbProperty . Owner      = property . Owner ;
-				dbProperty . Permission = property . Permissions . Guid ;
+				dbProperty.Value = property.Value;
+				dbProperty.Owner = property.Owner;
+				dbProperty.Permission = property.Permissions.Guid;
 			}
 			else
 			{
 				dbProperty = new DbProperty
-							{
-								Value      = property . Value ,
-								Owner      = property . Owner ,
-								Permission = property . Permissions . Guid ,
-								Target     = property . Target ,
-								Name       = property . Name ,
-							} ;
+				{
+					Value = property.Value,
+					Owner = property.Owner,
+					Permission = property.Permissions.Guid,
+					Target = property.Target,
+					Name = property.Name,
+				};
 
-				DatabaseStorage . DbProperties . Add ( dbProperty ) ;
+				DatabaseStorage.DbProperties.Add(dbProperty);
 			}
 
-			lock ( DatabaseStorage )
+			lock (DatabaseStorage)
 			{
-				DatabaseStorage . Save ( ) ;
+				DatabaseStorage.Save();
 			}
 		}
 
